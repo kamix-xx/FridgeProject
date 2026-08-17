@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'django-insecure-j4@p==4$^b_@kjwapzy*8)lo%&82xjyxiw4dlb1(g==en$7f&7
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -70,17 +68,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'FridgeProject.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
+        'DATABASE': 'fridge_db',
+        'ROLE': 'neondb_owner',
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'CONNECTION STRING': 'postgresql://neondb_owner:npg_pr3jTWtf4Vqi@ep-long-night-axltxtiz-pooler.c-4.us-east-2.aws.neon.tech/fridge_db?sslmode=require&channel_binding=require',
+        'PASSWORD': 'npg_pr3jTWtf4Vqi',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
@@ -100,7 +106,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
@@ -112,12 +117,10 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
-
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
