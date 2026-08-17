@@ -16,7 +16,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
     </content>
-    <orderEntry type="jdk" jdkName="D:\Studia\inz\venv" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="~\Documents\Studia\inżnierka\FridgeProject\.venv" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="TemplatesService">
