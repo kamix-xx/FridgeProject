@@ -82,7 +82,6 @@ DATABASES = {
     'default': {
         'DATABASE': 'fridge_db',
         'ROLE': 'neondb_owner',
-        'ENGINE': 'django.db.backends.sqlite3',
         'CONNECTION STRING': 'postgresql://neondb_owner:npg_pr3jTWtf4Vqi@ep-long-night-axltxtiz-pooler.c-4.us-east-2.aws.neon.tech/fridge_db?sslmode=require&channel_binding=require',
         'PASSWORD': 'npg_pr3jTWtf4Vqi',
     }
