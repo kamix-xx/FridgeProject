@@ -23,7 +23,7 @@ class User(AbstractUser):
     role = models.CharField(max_length=10, choices=Role.choices, default=Role.USER)
     status = models.CharField(max_length=15, choices=Status.choices, default=Status.ACTIVE)
 
-    REQUIRED_FIELDS = ['email', 'name']
+    REQUIRED_FIELDS = ['email', 'first_name']
 
     def __str__(self):
         return self.username
