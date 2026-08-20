@@ -1,6 +1,7 @@
 # Create your models here.
 
 from django.db import models
+from django.core.validators import MinValueValidator
 
 
 class User(models.Model):
@@ -53,9 +54,9 @@ class Area(models.Model):
 
 class Unit(models.Model):
     id = models.AutoField(primary_key=True)
-    symbol = models.ImageField(upload_to='units/')
+    symbol = models.CharField(max_length=45, unique=True, null=False)
     is_global = models.BooleanField(default=False)
-    User_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
 class ItemStatus(models.TextChoices):
     GLOBAL = "GLOBAL", "GLOBAL"
@@ -71,7 +72,7 @@ class ProductDictionary(models.Model):
     fats = models.FloatField(null=True)
     nutriscore = models.CharField(max_length=1, null=False)
     is_global = models.BooleanField(default=True)
-    User_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=45, null=False, unique=True)
     status = models.CharField(
         max_length=15,
@@ -81,15 +82,53 @@ class ProductDictionary(models.Model):
 
 class UserProduct(models.Model):
     id = models.AutoField(primary_key=True)
-    quantity = models.IntegerField(null=False)
+    quantity = models.IntegerField(null=False, validators=[MinValueValidator(1)])
     expiration_date = models.DateField(null=True)
-    price = models.FloatField(null=False)
+    price = models.FloatField(null=False, validators=[MinValueValidator(0.01)])
     added_date = models.DateTimeField(auto_now_add=True, null=True)
-    User_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
-    Product_id = models.ForeignKey(ProductDictionary, on_delete=models.CASCADE, null=True)
-    Unit_id = models.ForeignKey(Unit, on_delete=models.RESTRICT, null=False)
+    area = models.ForeignKey(Area, on_delete=models.CASCADE, null=False)
+    product = models.ForeignKey(ProductDictionary, on_delete=models.CASCADE, null=True)
+    unit = models.ForeignKey(Unit, on_delete=models.RESTRICT, null=False)
 
 class ShoppingList(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=45, null=False)
-    User_id = models.ForeignKey(User, on_delete=models.RESTRICT, null=False)
+    user = models.ForeignKey(User, on_delete=models.RESTRICT, null=False)
+
+class ShoppingListItem(models.Model):
+    id = models.AutoField(primary_key=True)
+    quantity = models.FloatField(null=False)
+    is_done = models.BooleanField(null=False, default=False)
+    shoppingList= models.ForeignKey(ShoppingList, on_delete=models.CASCADE, null=False)
+    product = models.ForeignKey(ProductDictionary, on_delete=models.CASCADE, null=True)
+    unit = models.ForeignKey(Unit, on_delete=models.RESTRICT, null=False)
+
+class Recipe(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=45, null=False)
+    description = models.TextField(null=True)
+    calories = models.IntegerField(null=False, validators=[MinValueValidator(1)])
+    prep_time = models.TimeField(null=False)
+    is_global = models.BooleanField(default=True)
+    thumbnail = models.ImageField(upload_to='recipes/thumbnails', null=True)
+    user = models.ForeignKey(User, on_delete=models.RESTRICT, null=False)
+    item_status = models.CharField(
+        max_length=15,
+        choices=ItemStatus.choices,
+        default=ItemStatus.GLOBAL
+    )
+
+class Step(models.Model):
+    id = models.AutoField(primary_key=True)
+    description = models.TextField(null=False)
+    order = models.IntegerField(null=False)
+    name = models.CharField(max_length=45, null=False)
+    picture = models.ImageField(upload_to='recipes/pictures', null=True)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, null=False)
+
+class RecipeProduct(models.Model):
+    id = models.AutoField(primary_key=True)
+    quantity = models.FloatField(null=False, validators=[MinValueValidator(0.01)])
+    unit = models.ForeignKey(Unit, on_delete=models.RESTRICT, null=False)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, null=False)
+    product = models.ForeignKey(ProductDictionary, on_delete=models.RESTRICT, null=False)
