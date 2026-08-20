@@ -17,7 +17,7 @@ def landing(request):
 def register(request):
     # Przekieruj zalogowanego użytkownika
     if request.user.is_authenticated:
-        return redirect('home')  # Zmień na nazwę swojej strony głównej
+        return redirect('home')
 
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
