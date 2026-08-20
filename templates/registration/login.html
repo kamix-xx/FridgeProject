@@ -13,15 +13,43 @@
                 <div class="login-box w-100" style="max-width: 360px;">
                     <h1 class="login-title mb-4">Login</h1>
 
-                    <form>
+                    <!-- Komunikaty o błędach logowania -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger mb-3 py-2">
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-0 small text-center">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" action="">
+                        {% csrf_token %}
+
+                        <!-- Login / Username -->
                         <div class="mb-3">
                             <label for="loginInput" class="form-label custom-label">Login</label>
-                            <input type="text" class="form-control custom-input rounded-pill" id="loginInput">
+                            <input type="text"
+                                   name="username"
+                                   class="form-control custom-input rounded-pill {% if form.username.errors or form.non_field_errors %}is-invalid{% endif %}"
+                                   id="loginInput"
+                                   value="{{ form.username.value|default:'' }}"
+                                   required>
+                            {% for error in form.username.errors %}
+                                <div class="invalid-feedback d-block ms-2">{{ error }}</div>
+                            {% endfor %}
                         </div>
 
+                        <!-- Password -->
                         <div class="mb-4">
                             <label for="passwordInput" class="form-label custom-label">Password</label>
-                            <input type="password" class="form-control custom-input rounded-pill" id="passwordInput">
+                            <input type="password"
+                                   name="password"
+                                   class="form-control custom-input rounded-pill {% if form.password.errors or form.non_field_errors %}is-invalid{% endif %}"
+                                   id="passwordInput"
+                                   required>
+                            {% for error in form.password.errors %}
+                                <div class="invalid-feedback d-block ms-2">{{ error }}</div>
+                            {% endfor %}
                         </div>
 
                         <button type="submit"
@@ -31,7 +59,7 @@
 
                         <div class="text-center custom-subtext">
                             <span>if you don't have an account</span><br>
-                            <a href="#" class="custom-link">Register HERE</a>
+                            <a href="{% url 'register' %}" class="custom-link">Register HERE</a>
                         </div>
                     </form>
                 </div>
