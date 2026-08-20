@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}SmartFridge+ — Know what's in your fridge{% endblock %}
+
+{% block content %}
+    <main>
+        <!-- Hero -->
+        <section class="landing-hero">
+            <div class="hero-bg" aria-hidden="true">
+                <img src="https://i.imgur.com/1zKDj0E.jpeg" alt="" class="theme-img-light">
+                <img src="https://i.imgur.com/Y5lnSGL.jpeg" alt="" class="theme-img-dark">
+            </div>
+            <div class="hero-overlay"></div>
+            <span class="notify-badge" aria-hidden="true">
+                <i class="bi bi-bell-fill"></i>
+                <span class="notify-ping"></span>
+            </span>
+
+            <div class="container">
+                <p class="hero-eyebrow hero-fade d1">For people who forget what's in the back of the fridge</p>
+                <h1 class="hero-title hero-fade d2">Know what's in your fridge<br>before you open it.</h1>
+                <p class="hero-sub hero-fade d3">
+                    SmartFridge+ tracks what you've got, warns you before it goes off,
+                    and turns whatever's run out into a shopping list — automatically.
+                </p>
+                <div class="hero-actions hero-fade d4">
+                    <a href="{% url 'register' %}" class="btn btn-custom-orange rounded-pill px-4 py-3 d-inline-flex align-items-center gap-2">
+                        Create account <i class="bi bi-chevron-right"></i>
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-custom rounded-pill px-4 py-3">
+                        Sign in
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="landing-features">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <p class="section-eyebrow">What it does</p>
+                    <h2 class="section-heading">Three habits, handled</h2>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <div class="feature-icon-wrap">
+                                <i class="bi bi-grid-3x3-gap-fill"></i>
+                            </div>
+                            <h3 class="feature-title">Track every shelf</h3>
+                            <p class="mb-0">Add items as they go in, tick them off as they're used. Your fridge, mapped shelf by shelf.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <div class="feature-icon-wrap">
+                                <i class="bi bi-bell-fill"></i>
+                            </div>
+                            <h3 class="feature-title">Get a nudge before it's gone</h3>
+                            <p class="mb-0">A heads-up a few days before something expires, so it gets eaten instead of thrown out.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <div class="feature-icon-wrap">
+                                <i class="bi bi-cart3"></i>
+                            </div>
+                            <h3 class="feature-title">Shop for what's actually missing</h3>
+                            <p class="mb-0">Your list builds itself from what's run out — not from memory.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Closing CTA -->
+        <section class="landing-cta">
+            <div class="container">
+                <h2>Start tracking your fridge today</h2>
+                <p>Takes two minutes to set up. No more mystery Tupperware.</p>
+                <a href="{% url 'register' %}" class="btn btn-custom-orange rounded-pill px-4 py-3 d-inline-flex align-items-center gap-2">
+                    Create account <i class="bi bi-chevron-right"></i>
+                </a>
+                <p class="custom-subtext cta-footnote">
+                    Already have an account? <a href="{% url 'login' %}" class="custom-link">Sign in</a>
+                </p>
+            </div>
+        </section>
+    </main>
+{% endblock %}

@@ -14,7 +14,7 @@
 <!-- Navigation Bar -->
 <nav class="navbar navbar-expand-lg custom-navbar fixed-top px-3 px-md-5">
     <div class="container-fluid">
-        <a class="navbar-brand text-white fw-normal fs-4" href="#">SmartFridge+</a>
+        <a class="navbar-brand text-white fw-normal fs-4" href="{% url 'home' %}">SmartFridge+</a>
 
         <div class="d-flex align-items-center gap-3 ms-auto">
             <!-- Language Selector -->
@@ -70,5 +70,22 @@
         }
     });
 </script>
+
+  <!-- Script to toggle password visibility -->
+    <script>
+        function togglePasswordVisibility(inputId, iconElement) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                iconElement.classList.remove('bi-eye-slash');
+                iconElement.classList.add('bi-eye');
+            } else {
+                input.type = 'password';
+                iconElement.classList.remove('bi-eye');
+                iconElement.classList.add('bi-eye-slash');
+            }
+        }
+    </script>
+
 </body>
 </html>

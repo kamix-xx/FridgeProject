@@ -103,19 +103,4 @@
         </div>
     </div>
 
-    <!-- Script to toggle password visibility -->
-    <script>
-        function togglePasswordVisibility(inputId, iconElement) {
-            const input = document.getElementById(inputId);
-            if (input.type === 'password') {
-                input.type = 'text';
-                iconElement.classList.remove('bi-eye-slash');
-                iconElement.classList.add('bi-eye');
-            } else {
-                input.type = 'password';
-                iconElement.classList.remove('bi-eye');
-                iconElement.classList.add('bi-eye-slash');
-            }
-        }
-    </script>
 {% endblock %}

@@ -6,7 +6,12 @@ from django.contrib import messages
 
 # Create your views here.
 def home(request):
+    if not request.user.is_authenticated:
+        return redirect('landing')
     return render(request, "base.html")
+
+def landing(request):
+    return render(request, "landing.html")
 
 
 def register(request):
