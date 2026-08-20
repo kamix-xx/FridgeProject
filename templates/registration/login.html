@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block content %}
     <div class="container-fluid p-0 login-wrapper">
         <div class="row g-0 h-100 min-vh-100">
@@ -33,9 +35,15 @@
                 </div>
             </div>
 
-            <!-- Right Column: Image Background -->
+            <!-- Right Column: Images for Light and Dark theme -->
             <div class="col-12 col-md-6 col-lg-7 image-section position-absolute end-0 top-0 h-100">
-                <div class="bg-image-holder h-100 w-100"></div>
+                <img src="https://i.imgur.com/1zKDj0E.jpeg"
+                     alt="Light background"
+                     class="theme-img-light w-100 h-100 object-fit-cover">
+
+                <img src="https://i.imgur.com/Y5lnSGL.jpeg"
+                     alt="Dark background"
+                     class="theme-img-dark w-100 h-100 object-fit-cover">
             </div>
 
         </div>
