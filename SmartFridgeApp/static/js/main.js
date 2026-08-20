@@ -1,4 +1,4 @@
-// --- OBSŁUGA MOTYWU (Ciemny / Jasny) ---
+// Theme change:
 (function () {
     const savedTheme = localStorage.getItem('theme') ||
         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// --- OBSŁUGA WIDOCZNOŚCI HASŁA ---
+// Password visbility change:
 function togglePasswordVisibility(inputId, iconElement) {
     const input = document.getElementById(inputId);
     if (!input) return;
