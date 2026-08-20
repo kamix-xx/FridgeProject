@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %} Register {% endblock %}
+
+{% block content %}
+    <div class="container-fluid p-0 login-wrapper">
+        <div class="row g-0 h-100 min-vh-100">
+
+            <!-- Left Column: Form -->
+            <div class="col-12 col-md-6 col-lg-5 d-flex align-items-center justify-content-center p-4 p-md-5 form-container z-2">
+                <div class="login-box w-100" style="max-width: 400px;">
+                    <h1 class="login-title mb-4">Register</h1>
+
+                    <form>
+                        <!-- E-mail -->
+                        <div class="mb-3">
+                            <label for="emailInput" class="form-label custom-label">E-mail</label>
+                            <input type="email" class="form-control custom-input rounded-pill" id="emailInput">
+                        </div>
+
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label for="nameInput" class="form-label custom-label">Name</label>
+                            <input type="text" class="form-control custom-input rounded-pill" id="nameInput">
+                        </div>
+
+                        <!-- Login -->
+                        <div class="mb-3">
+                            <label for="loginInput" class="form-label custom-label">Login</label>
+                            <input type="text" class="form-control custom-input rounded-pill" id="loginInput">
+                        </div>
+
+                        <!-- Password & Confirm Password -->
+                        <div class="row g-2 mb-4">
+                            <div class="col-6">
+                                <label for="passwordInput" class="form-label custom-label">Password</label>
+                                <div class="position-relative">
+                                    <input type="password" class="form-control custom-input rounded-pill pe-5" id="passwordInput">
+                                    <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 custom-eye-icon"
+                                       onclick="togglePasswordVisibility('passwordInput', this)"></i>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <label for="confirmPasswordInput" class="form-label custom-label">Confirm password</label>
+                                <div class="position-relative">
+                                    <input type="password" class="form-control custom-input rounded-pill pe-5" id="confirmPasswordInput">
+                                    <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 custom-eye-icon"
+                                       onclick="togglePasswordVisibility('confirmPasswordInput', this)"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-custom-orange rounded-pill w-100 py-2.5 mb-4 d-flex align-items-center justify-content-center gap-1">
+                            Sign in <i class="bi bi-chevron-right fs-6"></i>
+                        </button>
+
+                        <div class="text-center custom-subtext">
+                            <span>already have an account?</span><br>
+                            <a href="#" class="custom-link">Login HERE</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column: Images for Light and Dark theme -->
+            <div class="col-12 col-md-6 col-lg-7 image-section position-absolute end-0 top-0 h-100">
+                <img src="sciezka/do/obrazka_jasnego.jpg"
+                     alt="Light background"
+                     class="theme-img-light w-100 h-100 object-fit-cover">
+
+                <img src="sciezka/do/obrazka_ciemnego.jpg"
+                     alt="Dark background"
+                     class="theme-img-dark w-100 h-100 object-fit-cover">
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Script to toggle password visibility -->
+    <script>
+        function togglePasswordVisibility(inputId, iconElement) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                iconElement.classList.remove('bi-eye-slash');
+                iconElement.classList.add('bi-eye');
+            } else {
+                input.type = 'password';
+                iconElement.classList.remove('bi-eye');
+                iconElement.classList.add('bi-eye-slash');
+            }
+        }
+    </script>
+{% endblock %}

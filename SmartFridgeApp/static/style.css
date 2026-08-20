@@ -123,6 +123,22 @@ body {
     display: block;
 }
 
+/* Ikona podglądu hasła */
+.custom-eye-icon {
+    cursor: pointer;
+    color: #6c757d;
+    z-index: 5;
+    transition: color 0.2s ease;
+}
+
+.custom-eye-icon:hover {
+    color: #333333;
+}
+
+[data-bs-theme="dark"] .custom-eye-icon:hover {
+    color: #ffffff;
+}
+
 /* Reguły responsywne (Mobile) */
 @media (max-width: 768px) {
     .image-section img {
