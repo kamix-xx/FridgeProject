@@ -5,9 +5,6 @@
     --title-color: #514336;
     --label-color: #514336;
     --subtext-color: #514336;
-
-    /*!* ---> TUTAJ ZALINKUJ SWÓJ JASNY OBRAZEK <--- *!
-    --bg-image: url('https://i.imgur.com/1zKDj0E.jpeg');*/
 }
 
 [data-bs-theme="dark"] {
@@ -16,15 +13,6 @@
     --title-color: #ad9477;
     --label-color: #ad9477;
     --subtext-color: #ad9477;
-
-    /* ---> TUTAJ ZALINKUJ SWÓJ CIEMNY OBRAZEK <--- */
-    --bg-image: url('https://i.imgur.com/Y5lnSGL.jpeg');
-}
-
-/* Zapewnia poprawne rozciąganie obrazka img */
-.image-section img {
-    min-height: 100%;
-    object-fit: cover;
 }
 
 body {
@@ -110,20 +98,22 @@ body {
     color: #cc441b;
 }
 
-/* Background Image Handler */
-.bg-image-holder {
-    background-image: var(--bg-image);
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    transition: background-image 0.3s ease;
+/* Obrazek i maska przezroczystości dla komputerów */
+.image-section img {
+    min-height: 100%;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 25%);
+    mask-image: linear-gradient(to right, transparent 0%, black 25%);
 }
 
-/* Responsive Rules for Mobile */
+/* Reguły responsywne (Mobile) */
 @media (max-width: 768px) {
-    .image-section {
-        position: relative !important;
-        height: 350px !important;
+    .image-section img {
+        -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30%);
+        mask-image: linear-gradient(to bottom, transparent 0%, black 30%);
     }
 
     .login-wrapper {
