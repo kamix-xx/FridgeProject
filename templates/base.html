@@ -8,7 +8,8 @@
     <!-- Bootstrap 5 CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/main.js' %}" defer></script>
 </head>
 <body>
 <!-- Navigation Bar -->
@@ -44,48 +45,12 @@
     </div>
 </nav>
 
-{%  block content %}
-{#    <H1> It works !!!</H1>#}
+{% block content %}
+    {#    <H1> It works !!!</H1>#}
 {% endblock %}
 
 <!-- Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Script for Theme Switching -->
-<script>
-    const themeToggleBtn = document.getElementById('themeToggle');
-    const themeIcon = document.getElementById('themeIcon');
-    const htmlTag = document.documentElement;
-
-    themeToggleBtn.addEventListener('click', () => {
-        const currentTheme = htmlTag.getAttribute('data-bs-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
-        htmlTag.setAttribute('data-bs-theme', newTheme);
-
-        if (newTheme === 'dark') {
-            themeIcon.className = 'bi bi-moon fs-5';
-        } else {
-            themeIcon.className = 'bi bi-sun fs-5';
-        }
-    });
-</script>
-
-  <!-- Script to toggle password visibility -->
-    <script>
-        function togglePasswordVisibility(inputId, iconElement) {
-            const input = document.getElementById(inputId);
-            if (input.type === 'password') {
-                input.type = 'text';
-                iconElement.classList.remove('bi-eye-slash');
-                iconElement.classList.add('bi-eye');
-            } else {
-                input.type = 'password';
-                iconElement.classList.remove('bi-eye');
-                iconElement.classList.add('bi-eye-slash');
-            }
-        }
-    </script>
 
 </body>
 </html>
