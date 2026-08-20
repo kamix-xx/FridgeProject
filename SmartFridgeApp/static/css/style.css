@@ -1,6 +1,7 @@
 /* Custom Palette Variables */
 :root, [data-bs-theme="light"] {
     --page-bg: #e2cbab;
+    --landing-page-bg: #edd6ba;
     --nav-bg: rgba(184, 157, 126, 0.85);
     --title-color: #514336;
     --label-color: #514336;
@@ -9,6 +10,7 @@
 
 [data-bs-theme="dark"] {
     --page-bg: #090a0c;
+    --landing-page-bg: #090a0c;
     --nav-bg: rgba(0, 0, 0, 0.85);
     --title-color: #ad9477;
     --label-color: #ad9477;
@@ -159,10 +161,14 @@ body {
    Landing Page
    ========================================= */
 
+.landing-container {
+    background-color: var(--landing-page-bg);
+}
+
 .landing-hero {
     position: relative;
-    padding-top: calc(70px + 3rem);
-    padding-bottom: 5rem;
+    padding-top: calc(70px + 5rem);
+    padding-bottom: 10rem;
     overflow: hidden;
 }
 
@@ -179,13 +185,19 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
+
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, black 60%);
+    mask-image: linear-gradient(to top, transparent 0%, black 60%);
 }
 
 .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, rgba(9, 10, 12, 0.78) 0%, rgba(9, 10, 12, 0.5) 50%, rgba(9, 10, 12, 0.28) 100%);
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.44) 0%, rgba(0, 0, 0, 0.53) 50%, rgb(0, 0, 0) 100%);
     z-index: 1;
+
+    -webkit-mask-image: linear-gradient(to top, transparent 0%, black 50%);
+    mask-image: linear-gradient(to top, transparent 0%, black 50%);
 }
 
 .landing-hero > .container {
@@ -198,7 +210,7 @@ body {
     letter-spacing: 0.08em;
     font-size: 0.8rem;
     font-weight: 600;
-    color: #e25327;
+    color: #f3dbad;
     margin-bottom: 0.75rem;
 }
 
@@ -227,8 +239,8 @@ body {
 /* Outline variant of the orange button, for secondary actions like "Sign in" */
 .btn-outline-custom {
     background-color: transparent;
-    color: #e25327;
-    border: 2px solid #e25327;
+    color: #f3dbad;
+    border: 2px solid #f3dbad;
     font-weight: 500;
     font-size: 1.15rem;
     transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
@@ -395,6 +407,6 @@ body {
 
 @media (max-width: 768px) {
     .landing-hero {
-        padding-top: 60px;
+        padding-top: calc(70px + 2rem);
     }
 }
