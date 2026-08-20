@@ -3,6 +3,7 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from django.contrib.auth.models import AbstractUser
 
+
 class User(AbstractUser):
     class Role(models.TextChoices):
         USER = "USER", "USER"
@@ -14,23 +15,18 @@ class User(AbstractUser):
 
     id = models.AutoField(primary_key=True)
 
-    username = None
+    username = models.CharField(max_length=15, unique=True)
 
-    login = models.CharField(max_length=15, unique=True)
-    name = models.CharField(max_length=20)
     email = models.CharField(max_length=255, unique=True)
-
 
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     role = models.CharField(max_length=10, choices=Role.choices, default=Role.USER)
     status = models.CharField(max_length=15, choices=Status.choices, default=Status.ACTIVE)
 
-    USERNAME_FIELD = 'login'
-
     REQUIRED_FIELDS = ['email', 'name']
 
     def __str__(self):
-        return self.login
+        return self.username
 
 class Area(models.Model):
     id = models.AutoField(primary_key=True)
