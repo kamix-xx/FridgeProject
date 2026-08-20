@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container-fluid p-0 login-wrapper">
+        <div class="row g-0 h-100 min-vh-100">
+
+            <!-- Left Column: Form -->
+            <div class="col-12 col-md-6 col-lg-5 d-flex align-items-center justify-content-center p-4 p-md-5 form-container z-2">
+                <div class="login-box w-100" style="max-width: 360px;">
+                    <h1 class="login-title mb-4">Login</h1>
+
+                    <form>
+                        <div class="mb-3">
+                            <label for="loginInput" class="form-label custom-label">Login</label>
+                            <input type="text" class="form-control custom-input rounded-pill" id="loginInput">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="passwordInput" class="form-label custom-label">Password</label>
+                            <input type="password" class="form-control custom-input rounded-pill" id="passwordInput">
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-custom-orange rounded-pill w-100 py-2.5 mb-4 d-flex align-items-center justify-content-center gap-1">
+                            Sign in <i class="bi bi-chevron-right fs-6"></i>
+                        </button>
+
+                        <div class="text-center custom-subtext">
+                            <span>if you don't have an account</span><br>
+                            <a href="#" class="custom-link">Register HERE</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column: Image Background -->
+            <div class="col-12 col-md-6 col-lg-7 image-section position-absolute end-0 top-0 h-100">
+                <div class="bg-image-holder h-100 w-100"></div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

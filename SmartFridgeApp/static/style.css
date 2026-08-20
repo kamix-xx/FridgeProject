@@ -1,0 +1,130 @@
+/* Custom Palette Variables */
+:root, [data-bs-theme="light"] {
+    --page-bg: #e2cbab;
+    --nav-bg: rgba(184, 157, 126, 0.85);
+    --title-color: #514336;
+    --label-color: #514336;
+    --subtext-color: #514336;
+
+    /* ---> TUTAJ ZALINKUJ SWÓJ JASNY OBRAZEK <--- */
+    --bg-image: url('https://i.imgur.com/1zKDj0E.jpeg');
+}
+
+[data-bs-theme="dark"] {
+    --page-bg: #090a0c;
+    --nav-bg: rgba(0, 0, 0, 0.85);
+    --title-color: #ad9477;
+    --label-color: #ad9477;
+    --subtext-color: #ad9477;
+
+    /* ---> TUTAJ ZALINKUJ SWÓJ CIEMNY OBRAZEK <--- */
+    --bg-image: url('https://i.imgur.com/Y5lnSGL.jpeg');
+}
+
+body {
+    background-color: var(--page-bg);
+    color: var(--title-color);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
+}
+
+/* Navbar Custom Styling */
+.custom-navbar {
+    background-color: var(--nav-bg);
+    backdrop-filter: blur(8px);
+    transition: background-color 0.3s ease;
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+}
+
+.login-wrapper {
+    padding-top: 70px;
+}
+
+/* Typography & Inputs */
+.login-title {
+    color: var(--title-color);
+    font-size: 2.75rem;
+    font-weight: 400;
+    transition: color 0.3s ease;
+}
+
+.custom-label {
+    color: var(--label-color);
+    font-size: 0.95rem;
+    margin-bottom: 0.35rem;
+    transition: color 0.3s ease;
+}
+
+.custom-input {
+    border: none;
+    background-color: #ffffff;
+    padding: 0.65rem 1.25rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.custom-input:focus {
+    background-color: #ffffff;
+    box-shadow: 0 0 0 0.25rem rgba(229, 83, 37, 0.25);
+}
+
+/* Custom Orange Button */
+.btn-custom-orange {
+    background-color: #e25327;
+    color: #ffffff;
+    border: none;
+    font-weight: 500;
+    font-size: 1.15rem;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-custom-orange:hover {
+    background-color: #cc441b;
+    color: #ffffff;
+}
+
+.btn-custom-orange:active {
+    transform: scale(0.98);
+}
+
+.custom-subtext {
+    color: var(--subtext-color);
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.custom-link {
+    color: #e25327;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.custom-link:hover {
+    color: #cc441b;
+}
+
+/* Background Image Handler */
+.bg-image-holder {
+    background-image: var(--bg-image);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    transition: background-image 0.3s ease;
+}
+
+/* Responsive Rules for Mobile */
+@media (max-width: 768px) {
+    .image-section {
+        position: relative !important;
+        height: 350px !important;
+    }
+
+    .login-wrapper {
+        padding-top: 60px;
+    }
+
+    .form-container {
+        padding-top: 2rem !important;
+    }
+}
