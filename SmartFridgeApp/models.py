@@ -57,12 +57,12 @@ class Unit(models.Model):
     is_global = models.BooleanField(default=False)
     User_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
-class Item_Status(models.TextChoices):
+class ItemStatus(models.TextChoices):
     GLOBAL = "GLOBAL", "GLOBAL"
     PRIVATE = "PRIVATE", "PRIVATE"
     PENDING = "PENDING", "PENDING"
 
-class Product_Dictionary(models.Model):
+class ProductDictionary(models.Model):
     id = models.AutoField(primary_key=True)
     barcode = models.CharField(max_length=50, null=True)
     icon_number = models.IntegerField(null=False)
@@ -75,6 +75,21 @@ class Product_Dictionary(models.Model):
     name = models.CharField(max_length=45, null=False, unique=True)
     status = models.CharField(
         max_length=15,
-        choices=Item_Status.choices,
-        default=Item_Status.GLOBAL
+        choices=ItemStatus.choices,
+        default=ItemStatus.GLOBAL
     )
+
+class UserProduct(models.Model):
+    id = models.AutoField(primary_key=True)
+    quantity = models.IntegerField(null=False)
+    expiration_date = models.DateField(null=True)
+    price = models.FloatField(null=False)
+    added_date = models.DateTimeField(auto_now_add=True, null=True)
+    User_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    Product_id = models.ForeignKey(ProductDictionary, on_delete=models.CASCADE, null=True)
+    Unit_id = models.ForeignKey(Unit, on_delete=models.RESTRICT, null=False)
+
+class ShoppingList(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=45, null=False)
+    User_id = models.ForeignKey(User, on_delete=models.RESTRICT, null=False)
