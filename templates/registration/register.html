@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% load static %}
 
 {% block title %} Register {% endblock %}
@@ -13,23 +12,42 @@
                 <div class="login-box w-100" style="max-width: 400px;">
                     <h1 class="login-title mb-4">Register</h1>
 
-                    <form>
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger mb-3">
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-0 small">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" action="">
+                        {% csrf_token %}
+
                         <!-- E-mail -->
                         <div class="mb-3">
                             <label for="emailInput" class="form-label custom-label">E-mail</label>
-                            <input type="email" class="form-control custom-input rounded-pill" id="emailInput">
+                            <input type="email" name="email" class="form-control custom-input rounded-pill {% if form.email.errors %}is-invalid{% endif %}" id="emailInput" value="{{ form.email.value|default:'' }}" required>
+                            {% for error in form.email.errors %}
+                                <div class="invalid-feedback d-block ms-2">{{ error }}</div>
+                            {% endfor %}
                         </div>
 
                         <!-- Name -->
                         <div class="mb-3">
                             <label for="nameInput" class="form-label custom-label">Name</label>
-                            <input type="text" class="form-control custom-input rounded-pill" id="nameInput">
+                            <input type="text" name="first_name" class="form-control custom-input rounded-pill {% if form.first_name.errors %}is-invalid{% endif %}" id="nameInput" value="{{ form.first_name.value|default:'' }}">
+                            {% for error in form.first_name.errors %}
+                                <div class="invalid-feedback d-block ms-2">{{ error }}</div>
+                            {% endfor %}
                         </div>
 
                         <!-- Login -->
                         <div class="mb-3">
                             <label for="loginInput" class="form-label custom-label">Login</label>
-                            <input type="text" class="form-control custom-input rounded-pill" id="loginInput">
+                            <input type="text" name="username" class="form-control custom-input rounded-pill {% if form.username.errors %}is-invalid{% endif %}" id="loginInput" value="{{ form.username.value|default:'' }}" required>
+                            {% for error in form.username.errors %}
+                                <div class="invalid-feedback d-block ms-2">{{ error }}</div>
+                            {% endfor %}
                         </div>
 
                         <!-- Password & Confirm Password -->
@@ -37,29 +55,35 @@
                             <div class="col-6">
                                 <label for="passwordInput" class="form-label custom-label">Password</label>
                                 <div class="position-relative">
-                                    <input type="password" class="form-control custom-input rounded-pill pe-5" id="passwordInput">
+                                    <input type="password" name="password1" class="form-control custom-input rounded-pill pe-5 {% if form.password1.errors %}is-invalid{% endif %}" id="passwordInput" required>
                                     <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 custom-eye-icon"
                                        onclick="togglePasswordVisibility('passwordInput', this)"></i>
                                 </div>
+                                {% for error in form.password1.errors %}
+                                    <div class="invalid-feedback d-block ms-2">{{ error }}</div>
+                                {% endfor %}
                             </div>
                             <div class="col-6">
                                 <label for="confirmPasswordInput" class="form-label custom-label">Confirm password</label>
                                 <div class="position-relative">
-                                    <input type="password" class="form-control custom-input rounded-pill pe-5" id="confirmPasswordInput">
+                                    <input type="password" name="password2" class="form-control custom-input rounded-pill pe-5 {% if form.password2.errors %}is-invalid{% endif %}" id="confirmPasswordInput" required>
                                     <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 custom-eye-icon"
                                        onclick="togglePasswordVisibility('confirmPasswordInput', this)"></i>
                                 </div>
+                                {% for error in form.password2.errors %}
+                                    <div class="invalid-feedback d-block ms-2">{{ error }}</div>
+                                {% endfor %}
                             </div>
                         </div>
 
                         <button type="submit"
                                 class="btn btn-custom-orange rounded-pill w-100 py-2.5 mb-4 d-flex align-items-center justify-content-center gap-1">
-                            Sign in <i class="bi bi-chevron-right fs-6"></i>
+                            Sign up <i class="bi bi-chevron-right fs-6"></i>
                         </button>
 
                         <div class="text-center custom-subtext">
                             <span>already have an account?</span><br>
-                            <a href="#" class="custom-link">Login HERE</a>
+                            <a href="{% url 'login' %}" class="custom-link">Login HERE</a>
                         </div>
                     </form>
                 </div>
@@ -67,11 +91,11 @@
 
             <!-- Right Column: Images for Light and Dark theme -->
             <div class="col-12 col-md-6 col-lg-7 image-section position-absolute end-0 top-0 h-100">
-                <img src="sciezka/do/obrazka_jasnego.jpg"
+                <img src="{% static 'images/obrazek_jasny.jpg' %}"
                      alt="Light background"
                      class="theme-img-light w-100 h-100 object-fit-cover">
 
-                <img src="sciezka/do/obrazka_ciemnego.jpg"
+                <img src="{% static 'images/obrazek_ciemny.jpg' %}"
                      alt="Dark background"
                      class="theme-img-dark w-100 h-100 object-fit-cover">
             </div>
