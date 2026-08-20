@@ -109,6 +109,20 @@ body {
     mask-image: linear-gradient(to right, transparent 0%, black 25%);
 }
 
+/* Domyślnie w motywie jasnym ukryj ciemny obrazek */
+.theme-img-dark {
+    display: none;
+}
+
+/* W motywie ciemnym ukryj jasny, a pokaż ciemny */
+[data-bs-theme="dark"] .theme-img-light {
+    display: none;
+}
+
+[data-bs-theme="dark"] .theme-img-dark {
+    display: block;
+}
+
 /* Reguły responsywne (Mobile) */
 @media (max-width: 768px) {
     .image-section img {
