@@ -17,7 +17,7 @@
     --sidemenu-divider: rgba(255, 255, 255, 0.18);
     --sidemenu-accent: #d9ff00;
     --sidemenu-logout: #ff8a65;
-    --sidemenu-logout-hover: #dc2a24;
+    --sidemenu-logout-hover: #f3091c;
 }
 
 [data-bs-theme="dark"] {
@@ -758,20 +758,15 @@ body.side-menu-open .side-menu-theme-controls {
    ========================================= */
 
 @media (max-width: 480px) {
-    /*
-     * Your menu is currently 100vw on mobile.
-     * There is therefore no space outside it.
-     *
-     * Put the duplicate theme controls inside
-     * the visible edge of the menu instead.
-     */
     .side-menu-theme-controls {
-        right: auto;
-        left: 12px;
-        top: 1.25rem;
+        right: 1.5rem;   /* Pin to the right side */
+        left: auto;      /* Remove the left positioning */
+        top: auto;       /* Remove the top positioning */
+        bottom: 1.5rem;  /* Pin to the bottom */
 
-        transform: none;
         flex-direction: row;
+        flex-wrap: wrap; /* Allows a second column to wrap cleanly */
+        justify-content: flex-end;
     }
 
     body.side-menu-open .side-menu-theme-controls {
