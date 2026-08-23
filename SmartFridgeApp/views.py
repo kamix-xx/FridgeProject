@@ -8,7 +8,7 @@ from django.contrib import messages
 def home(request):
     if not request.user.is_authenticated:
         return redirect('landing')
-    return render(request, "base.html")
+    return render(request, "dashboard/dashboard.html")
 
 def landing(request):
     return render(request, "landing.html")

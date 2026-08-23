@@ -1,32 +1,106 @@
 // Theme change:
-(function () {
-    const savedTheme = localStorage.getItem('theme') ||
-        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    document.documentElement.setAttribute('data-bs-theme', savedTheme);
-})();
+// (The initial theme attribute is now set synchronously by an inline script in
+// base.html's <head>, before first paint, to avoid a flash of the wrong theme.
+// This just keeps the toggle button + icon in sync from here on.)
 
 document.addEventListener('DOMContentLoaded', () => {
-    const themeToggleBtn = document.getElementById('themeToggle');
-    const themeIcon = document.getElementById('themeIcon');
     const htmlTag = document.documentElement;
 
-    function updateIcon(theme) {
-        if (themeIcon) {
-            themeIcon.className = theme === 'dark' ? 'bi bi-moon fs-5' : 'bi bi-sun fs-5';
+    // Original navbar theme toggle
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+
+    // Duplicate theme controls beside the side menu
+    const sideMenuLightBtn = document.getElementById('sideMenuLightBtn');
+    const sideMenuDarkBtn = document.getElementById('sideMenuDarkBtn');
+
+    function updateTheme(theme) {
+        htmlTag.setAttribute('data-bs-theme', theme);
+
+        try {
+            localStorage.setItem('theme', theme);
+        } catch (e) {
+            // Ignore storage errors
+        }
+
+        updateMainThemeIcon(theme);
+        updateSideMenuThemeButtons(theme);
+    }
+
+    function updateMainThemeIcon(theme) {
+        if (!themeIcon) return;
+
+        themeIcon.className =
+            theme === 'dark'
+                ? 'bi bi-moon fs-5'
+                : 'bi bi-sun fs-5';
+    }
+
+    function updateSideMenuThemeButtons(theme) {
+        if (sideMenuLightBtn) {
+            sideMenuLightBtn.classList.toggle(
+                'active',
+                theme === 'light'
+            );
+        }
+
+        if (sideMenuDarkBtn) {
+            sideMenuDarkBtn.classList.toggle(
+                'active',
+                theme === 'dark'
+            );
         }
     }
 
-    updateIcon(htmlTag.getAttribute('data-bs-theme'));
+    // Set the initial state
+    const initialTheme = htmlTag.getAttribute('data-bs-theme') || 'light';
 
+    updateMainThemeIcon(initialTheme);
+    updateSideMenuThemeButtons(initialTheme);
+
+    // Original navbar toggle
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
-            const currentTheme = htmlTag.getAttribute('data-bs-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const currentTheme =
+                htmlTag.getAttribute('data-bs-theme');
 
-            htmlTag.setAttribute('data-bs-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+            const newTheme =
+                currentTheme === 'dark'
+                    ? 'light'
+                    : 'dark';
 
-            updateIcon(newTheme);
+            updateTheme(newTheme);
+        });
+    }
+
+    // Duplicate light button
+    if (sideMenuLightBtn) {
+        sideMenuLightBtn.addEventListener('click', () => {
+            updateTheme('light');
+        });
+    }
+
+    // Duplicate dark button
+    if (sideMenuDarkBtn) {
+        sideMenuDarkBtn.addEventListener('click', () => {
+            updateTheme('dark');
+        });
+    }
+
+
+    // =========================================
+    // Side Menu
+    // =========================================
+
+    const sideMenuEl = document.getElementById('sideMenu');
+
+    if (sideMenuEl) {
+        sideMenuEl.addEventListener('show.bs.offcanvas', () => {
+            document.body.classList.add('side-menu-open');
+        });
+
+        sideMenuEl.addEventListener('hide.bs.offcanvas', () => {
+            document.body.classList.remove('side-menu-open');
         });
     }
 });

@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 
-{% load static %}
-
 {% block title %} Login {% endblock %}
 
 {% block content %}
@@ -42,11 +40,15 @@
                         <!-- Password -->
                         <div class="mb-4">
                             <label for="passwordInput" class="form-label custom-label">Password</label>
-                            <input type="password"
-                                   name="password"
-                                   class="form-control custom-input rounded-pill {% if form.password.errors or form.non_field_errors %}is-invalid{% endif %}"
-                                   id="passwordInput"
-                                   required>
+                            <div class="position-relative">
+                                <input type="password"
+                                       name="password"
+                                       class="form-control custom-input rounded-pill {% if form.password.errors or form.non_field_errors %}is-invalid{% endif %}"
+                                       id="passwordInput"
+                                       required>
+                                <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 custom-eye-icon"
+                                   onclick="togglePasswordVisibility('passwordInput', this)"></i>
+                            </div>
                             {% for error in form.password.errors %}
                                 <div class="invalid-feedback d-block ms-2">{{ error }}</div>
                             {% endfor %}

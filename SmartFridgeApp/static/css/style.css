@@ -7,6 +7,17 @@
     --title-color: #514336;
     --label-color: #514336;
     --subtext-color: #514336;
+
+    /* Side Menu */
+    --sidemenu-width: min(420px, 88vw);
+    --sidemenu-bg: #8a7155;
+    --sidemenu-overlay: rgba(20, 14, 10, 0.46);
+    --sidemenu-text: #ffffff;
+    --sidemenu-muted: rgba(255, 255, 255, 0.7);
+    --sidemenu-divider: rgba(255, 255, 255, 0.18);
+    --sidemenu-accent: #d9ff00;
+    --sidemenu-logout: #ff8a65;
+    --sidemenu-logout-hover: #dc2a24;
 }
 
 [data-bs-theme="dark"] {
@@ -17,6 +28,16 @@
     --title-color: #ad9477;
     --label-color: #ad9477;
     --subtext-color: #ad9477;
+
+    /* Side Menu */
+    --sidemenu-bg: #0c0c0c;
+    --sidemenu-overlay: rgba(0, 0, 0, 0.49);
+    --sidemenu-text: #ffffff;
+    --sidemenu-muted: rgba(255, 255, 255, 0.6);
+    --sidemenu-divider: rgba(255, 255, 255, 0.12);
+    --sidemenu-accent: #d9ff00;
+    --sidemenu-logout: #ff8a65;
+    --sidemenu-logout-hover: #dc2a24;;
 }
 
 body {
@@ -31,13 +52,14 @@ body {
     background-color: var(--register-page-bg);
 }
 
-/* Navbar Custom Styling */
 .custom-navbar {
     background-color: var(--nav-bg);
     backdrop-filter: blur(8px);
-    transition: background-color 0.3s ease;
+
     padding-top: 0.8rem;
     padding-bottom: 0.8rem;
+
+    transition: background-color 0.3s ease;
 }
 
 .login-wrapper {
@@ -187,23 +209,29 @@ body {
     z-index: 0;
 }
 
-.hero-bg img {
+[data-bs-theme="dark"] .hero-bg img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
 
-    -webkit-mask-image: -webkit-linear-gradient(to top, transparent 2%, black 60%);
-    mask-image: linear-gradient(to top, transparent 2%, black 60%);
+    -webkit-mask-image: -webkit-linear-gradient(to top, transparent 2%, black 70%);
+    mask-image: linear-gradient(to top, transparent 2%, black 70%);
 }
 
 [data-bs-theme="light"] .hero-bg img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
     -webkit-mask-image: -webkit-linear-gradient(to top, transparent 5%, black 60%);
     mask-image: linear-gradient(to top, transparent 5%, black 60%);
 }
 
-.hero-overlay {
+[data-bs-theme="dark"] .hero-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.44) 0%, rgba(0, 0, 0, 0.53) 50%, rgb(0, 0, 0) 100%);
@@ -213,8 +241,12 @@ body {
     mask-image: linear-gradient(to top, transparent 0%, black 50%);
 }
 
-[data-bs-theme="light"]  .hero-overlay {
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.11) 0%, rgba(0, 0, 0, 0.23) 50%, rgba(0, 0, 0, 0.4) 100%);
+[data-bs-theme="light"] .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.23) 50%, rgba(0, 0, 0, 0.53) 100%);
+    -webkit-mask-image: -webkit-linear-gradient(to top, transparent 0%, black 50%);
+    mask-image: linear-gradient(to top, transparent 0%, black 50%);
 }
 
 .landing-hero > .container {
@@ -305,8 +337,14 @@ body {
 }
 
 @keyframes sf-ping {
-    0% { transform: scale(1); opacity: 0.6; }
-    100% { transform: scale(1.9); opacity: 0; }
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+    100% {
+        transform: scale(1.9);
+        opacity: 0;
+    }
 }
 
 /* Staggered fade-in for hero content */
@@ -316,18 +354,40 @@ body {
     animation: sf-fade-up 0.6s ease forwards;
 }
 
-.hero-fade.d1 { animation-delay: 0.05s; }
-.hero-fade.d2 { animation-delay: 0.15s; }
-.hero-fade.d3 { animation-delay: 0.25s; }
-.hero-fade.d4 { animation-delay: 0.35s; }
+.hero-fade.d1 {
+    animation-delay: 0.05s;
+}
+
+.hero-fade.d2 {
+    animation-delay: 0.15s;
+}
+
+.hero-fade.d3 {
+    animation-delay: 0.25s;
+}
+
+.hero-fade.d4 {
+    animation-delay: 0.35s;
+}
 
 @keyframes sf-fade-up {
-    to { opacity: 1; transform: translateY(0); }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .hero-fade { animation: none; opacity: 1; transform: none; }
-    .notify-ping { animation: none; display: none; }
+    .hero-fade {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+
+    .notify-ping {
+        animation: none;
+        display: none;
+    }
 }
 
 /* Feature cards */
@@ -425,5 +485,302 @@ body {
 @media (max-width: 768px) {
     .landing-hero {
         padding-top: calc(70px + 2rem);
+    }
+}
+
+/* =========================================
+   Side Menu (offcanvas)
+   ========================================= */
+.side-menu {
+    z-index: 1050;
+
+    width: var(--sidemenu-width);
+    background-color: var(--sidemenu-bg);
+    color: var(--sidemenu-text);
+
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+    border: none;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+
+    transition: background-color 0.3s ease,
+    color 0.3s ease,
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+}
+
+.offcanvas-backdrop {
+    z-index: 1045;
+    background-color: var(--sidemenu-overlay);
+    transition: opacity 0.2s linear;
+}
+
+/* Themed backdrop scrim behind the panel */
+.offcanvas-backdrop.show {
+    opacity: 0.9;
+}
+
+.side-menu-header {
+    padding: 1.75rem 1.75rem 1rem;
+}
+
+.side-menu-close {
+    background: transparent;
+    border: none;
+    color: var(--sidemenu-text);
+    font-size: 1.1rem;
+    padding: 0.25rem;
+    line-height: 1;
+    transition: opacity 0.2s ease;
+}
+
+.side-menu-close:hover {
+    opacity: 0.7;
+}
+
+.side-menu-title {
+    font-size: 1.35rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.side-menu-header-spacer {
+    width: 1.1rem;
+}
+
+.side-menu-user {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.5rem 1.75rem 1.5rem;
+}
+
+.side-menu-avatar {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.side-menu-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.side-menu-username {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--sidemenu-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.side-menu-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 0 1.75rem;
+}
+
+.side-menu-link {
+    display: block;
+    padding: 1.1rem 0;
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--sidemenu-text);
+    text-decoration: none;
+    border-bottom: 1px solid var(--sidemenu-divider);
+    transition: color 0.2s ease, padding-left 0.2s ease;
+}
+
+.side-menu-link:hover {
+    color: #e25327;
+    padding-left: 0.25rem;
+}
+
+.side-menu-link-admin {
+    color: var(--sidemenu-accent);
+    font-weight: 500;
+}
+
+.side-menu-link-admin:hover {
+    color: var(--sidemenu-accent);
+    opacity: 0.8;
+}
+
+.side-menu-footer {
+    margin-top: auto;
+    padding: 1.5rem 1.75rem 2rem;
+}
+
+.side-menu-footer form {
+    margin: 0;
+}
+
+.side-menu-logout {
+    background: transparent;
+    border: none;
+    color: var(--sidemenu-logout);
+    font-size: 1.35rem;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    text-align: left;
+    transition: color 0.2s ease, padding-left 0.2s ease;
+}
+
+.side-menu-logout:hover {
+    color: var(--sidemenu-logout-hover);
+    padding-left: 0.2rem;
+}
+
+
+/* =========================================
+   Responsive Side Menu
+   ========================================= */
+
+@media (max-width: 480px) {
+    :root,
+    [data-bs-theme="light"],
+    [data-bs-theme="dark"] {
+        --sidemenu-width: 100vw;
+    }
+
+    .side-menu {
+        width: 100vw;
+    }
+
+
+    .side-menu-link {
+        font-size: 1.15rem;
+    }
+}
+
+
+/* =========================================
+   Theme controls beside Side Menu
+   ========================================= */
+
+.side-menu-theme-controls {
+    position: fixed;
+
+    /*
+     * Side menu is on the right.
+     * Put these controls immediately to its left.
+     */
+    right: calc(var(--sidemenu-width) + 12px);
+    top: 3.5%;
+
+    z-index: 1055;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition: opacity 0.2s ease,
+    visibility 0.2s ease;
+}
+
+/*
+ * Show the controls only while the Bootstrap
+ * offcanvas is open.
+ */
+body.side-menu-open .side-menu-theme-controls {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.side-menu-theme-btn {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+
+    background-color: var(--sidemenu-bg);
+    color: var(--sidemenu-text);
+
+    font-size: 1.1rem;
+
+    cursor: pointer;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+
+    transition: background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease,
+    border-color 0.2s ease;
+}
+
+.side-menu-theme-btn:hover {
+    transform: scale(1.08);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.side-menu-theme-btn:active {
+    transform: scale(0.95);
+}
+
+
+/* Highlight the currently selected theme */
+[data-bs-theme="light"] #sideMenuLightBtn {
+    background-color: #ffffff;
+    color: #514336;
+}
+
+[data-bs-theme="dark"] #sideMenuDarkBtn {
+    background-color: #ffffff;
+    color: #111111;
+}
+
+
+/* =========================================
+   Mobile
+   ========================================= */
+
+@media (max-width: 480px) {
+    /*
+     * Your menu is currently 100vw on mobile.
+     * There is therefore no space outside it.
+     *
+     * Put the duplicate theme controls inside
+     * the visible edge of the menu instead.
+     */
+    .side-menu-theme-controls {
+        right: auto;
+        left: 12px;
+        top: 1.25rem;
+
+        transform: none;
+        flex-direction: row;
+    }
+
+    body.side-menu-open .side-menu-theme-controls {
+        transform: none;
+    }
+
+    .side-menu-theme-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
     }
 }
