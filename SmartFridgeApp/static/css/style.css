@@ -137,8 +137,9 @@ body {
     width: 100%;
     height: 100%;
 
-    -webkit-mask-image: -webkit-linear-gradient(to right, transparent 0%, black 25%);
-    mask-image: linear-gradient(to right, transparent 0%, black 25%);
+    -webkit-mask-image: -webkit-linear-gradient(to right, transparent 2%, black 10%);
+    mask-image: linear-gradient(to right, transparent 2%, black 10%);
+    /*TODO change login/register backgrounds to match all images better*/
 }
 
 /* Domyślnie w motywie jasnym ukryj ciemny obrazek */

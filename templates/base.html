@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %} SmartFridge+ {% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/favicon.png' %}">
     <script>
         (function () {
             try {
@@ -41,7 +43,9 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="#">A</a></li>
-                    {% comment %}<li><a class="dropdown-item" href="#"></a></li>{% endcomment %}
+                    {% comment %}
+                    <li><a class="dropdown-item" href="#"></a></li>
+                    {% endcomment %}
                 </ul>
             </div>
 
@@ -52,11 +56,11 @@
             </button>
 
             {% if user.is_authenticated %}
-                <button class="btn btn-link text-white p-0 shadow-none border-0 d-flex align-items-center" id="menu"
-                        type="button" aria-label="Open menu"
-                        data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu">
-                    <i class="bi bi-list fs-5" id="menuIcon"></i>
-                </button>
+            <button class="btn btn-link text-white p-0 shadow-none border-0 d-flex align-items-center" id="menu"
+                    type="button" aria-label="Open menu"
+                    data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu">
+                <i class="bi bi-list fs-5" id="menuIcon"></i>
+            </button>
             {% endif %}
 
         </div>
@@ -65,75 +69,75 @@
 
 <!-- Theme controls shown beside the open side menu -->
 {% if user.is_authenticated %}
-    <!-- Side Menu (offcanvas) -->
-    <div class="offcanvas offcanvas-end side-menu" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
+<!-- Side Menu (offcanvas) -->
+<div class="offcanvas offcanvas-end side-menu" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
 
-        <div class="side-menu-theme-controls" id="sideMenuThemeControls" aria-label="Theme controls">
-            <button
-                    type="button"
-                    class="side-menu-theme-btn"
-                    id="sideMenuLightBtn"
-                    aria-label="Light mode"
-                    title="Light mode">
-                <i class="bi bi-sun"></i>
-            </button>
+    <div class="side-menu-theme-controls" id="sideMenuThemeControls" aria-label="Theme controls">
+        <button
+                type="button"
+                class="side-menu-theme-btn"
+                id="sideMenuLightBtn"
+                aria-label="Light mode"
+                title="Light mode">
+            <i class="bi bi-sun"></i>
+        </button>
 
-            <button
-                    type="button"
-                    class="side-menu-theme-btn"
-                    id="sideMenuDarkBtn"
-                    aria-label="Dark mode"
-                    title="Dark mode">
-                <i class="bi bi-moon"></i>
-            </button>
-        </div>
-
-        <div class="side-menu-header d-flex align-items-center justify-content-between">
-            <button type="button" class="side-menu-close" data-bs-dismiss="offcanvas" aria-label="Close menu">
-                <i class="bi bi-x-lg"></i>
-            </button>
-            <span class="side-menu-title" id="sideMenuLabel">MENU</span>
-            <span class="side-menu-header-spacer" aria-hidden="true"></span>
-        </div>
-
-        <div class="side-menu-user">
-            <div class="side-menu-avatar">
-                {% if user.avatar %}
-                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}">
-                {% else %}
-                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"
-                         aria-hidden="true">
-                        <rect width="40" height="40" rx="20" fill="white"/>
-                        <path fill-rule="evenodd" clip-rule="evenodd"
-                              d="M26.0002 16C26.0002 19.3137 23.314 22 20.0002 22C16.6865 22 14.0002 19.3137 14.0002 16C14.0002 12.6863 16.6865 10 20.0002 10C23.314 10 26.0002 12.6863 26.0002 16ZM24.0002 16C24.0002 18.2091 22.2094 20 20.0002 20C17.7911 20 16.0002 18.2091 16.0002 16C16.0002 13.7909 17.7911 12 20.0002 12C22.2094 12 24.0002 13.7909 24.0002 16Z"
-                              fill="black"/>
-                        <path d="M20.0002 25C13.5259 25 8.00952 28.8284 5.9082 34.192C6.4201 34.7004 6.95934 35.1812 7.52353 35.6321C9.08827 30.7077 13.997 27 20.0002 27C26.0035 27 30.9122 30.7077 32.477 35.6321C33.0412 35.1812 33.5804 34.7004 34.0923 34.1921C31.991 28.8284 26.4746 25 20.0002 25Z"
-                              fill="black"/>
-                    </svg>
-                {% endif %}
-            </div>
-            <span class="side-menu-username">{{ user.username }}</span>
-        </div>
-
-        <nav class="side-menu-nav">
-            <a href="#" class="side-menu-link">Areas</a>
-            <a href="#" class="side-menu-link">Shopping lists</a>
-            <a href="#" class="side-menu-link">My products</a>
-            <a href="#" class="side-menu-link">My expenses</a>
-            <a href="#" class="side-menu-link">My menu</a>
-            <a href="#" class="side-menu-link">Profile</a>
-            {% if user.role == 'ADMIN' %}
-                <a href="#" class="side-menu-link side-menu-link-admin">Administrator panel</a>
-            {% endif %}
-        </nav>
-
-        <div class="side-menu-footer">
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit" class="side-menu-logout">Log out</button>
-            </form>
-        </div>
+        <button
+                type="button"
+                class="side-menu-theme-btn"
+                id="sideMenuDarkBtn"
+                aria-label="Dark mode"
+                title="Dark mode">
+            <i class="bi bi-moon"></i>
+        </button>
     </div>
+
+    <div class="side-menu-header d-flex align-items-center justify-content-between">
+        <button type="button" class="side-menu-close" data-bs-dismiss="offcanvas" aria-label="Close menu">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <span class="side-menu-title" id="sideMenuLabel">MENU</span>
+        <span class="side-menu-header-spacer" aria-hidden="true"></span>
+    </div>
+
+    <div class="side-menu-user">
+        <div class="side-menu-avatar">
+            {% if user.avatar %}
+            <img src="{{ user.avatar.url }}" alt="{{ user.username }}">
+            {% else %}
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"
+                 aria-hidden="true">
+                <rect width="40" height="40" rx="20" fill="white"/>
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                      d="M26.0002 16C26.0002 19.3137 23.314 22 20.0002 22C16.6865 22 14.0002 19.3137 14.0002 16C14.0002 12.6863 16.6865 10 20.0002 10C23.314 10 26.0002 12.6863 26.0002 16ZM24.0002 16C24.0002 18.2091 22.2094 20 20.0002 20C17.7911 20 16.0002 18.2091 16.0002 16C16.0002 13.7909 17.7911 12 20.0002 12C22.2094 12 24.0002 13.7909 24.0002 16Z"
+                      fill="black"/>
+                <path d="M20.0002 25C13.5259 25 8.00952 28.8284 5.9082 34.192C6.4201 34.7004 6.95934 35.1812 7.52353 35.6321C9.08827 30.7077 13.997 27 20.0002 27C26.0035 27 30.9122 30.7077 32.477 35.6321C33.0412 35.1812 33.5804 34.7004 34.0923 34.1921C31.991 28.8284 26.4746 25 20.0002 25Z"
+                      fill="black"/>
+            </svg>
+            {% endif %}
+        </div>
+        <span class="side-menu-username">{{ user.username }}</span>
+    </div>
+
+    <nav class="side-menu-nav">
+        <a href="#" class="side-menu-link">Areas</a>
+        <a href="#" class="side-menu-link">Shopping lists</a>
+        <a href="#" class="side-menu-link">My products</a>
+        <a href="#" class="side-menu-link">My expenses</a>
+        <a href="#" class="side-menu-link">My menu</a>
+        <a href="#" class="side-menu-link">Profile</a>
+        {% if user.role == 'ADMIN' %}
+        <a href="#" class="side-menu-link side-menu-link-admin">Administrator panel</a>
+        {% endif %}
+    </nav>
+
+    <div class="side-menu-footer">
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="side-menu-logout">Log out</button>
+        </form>
+    </div>
+</div>
 {% endif %}
 
 {% block content %}
