@@ -3,12 +3,34 @@
 {% block title %} Register {% endblock %}
 
 {% block content %}
-    <div class="register-bg">
-        <div class="container-fluid p-0 login-wrapper">
-            <div class="row g-0 h-100 min-vh-100">
+    <div class="register-bg position-relative overflow-hidden">
+        <div class="container-fluid p-0 login-wrapper min-vh-100 position-relative">
 
-                <!-- Left Column: Form -->
-                <div class="col-12 col-md-6 col-lg-5 d-flex align-items-center justify-content-center p-4 p-md-5 form-container z-2">
+            <!-- Background Image Container -->
+            <div class="image-section">
+
+                <!-- Light Theme Images -->
+                <picture class="theme-img-light">
+                    <!-- Mobile Image -->
+{#                    <source media="(max-width: 768px)" srcset="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop">#}
+                    <!-- Desktop Image -->
+                    <img src="https://i.imgur.com/BbeJtzu.jpeg" alt="Light background" class="responsive-bg-img">
+                </picture>
+
+                <!-- Dark Theme Images -->
+                <picture class="theme-img-dark">
+                    <!-- Mobile Image -->
+{#                    <source media="(max-width: 768px)" srcset="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800&auto=format&fit=crop">#}
+                    <!-- Desktop Image -->
+                    <img src="https://i.imgur.com/kGrWE0H.jpeg" alt="Dark background" class="responsive-bg-img">
+                </picture>
+
+            </div>
+
+            <!-- Foreground Content -->
+            <div class="row g-0 h-100 min-vh-100 position-relative z-2">
+                <!-- Form Column -->
+                <div class="col-12 col-md-6 col-lg-5 d-flex align-items-center justify-content-center p-4 p-md-5 form-container">
                     <div class="login-box w-100" style="max-width: 400px;">
                         <h1 class="login-title mb-4">Register</h1>
 
@@ -22,13 +44,12 @@
 
                         <form method="post" action="">
                             {% csrf_token %}
+                            <!-- Form inputs... (Keep your exact inputs here) -->
 
                             <!-- E-mail -->
                             <div class="mb-3">
                                 <label for="emailInput" class="form-label custom-label">E-mail</label>
-                                <input type="email" name="email"
-                                       class="form-control custom-input rounded-pill {% if form.email.errors %}is-invalid{% endif %}"
-                                       id="emailInput" value="{{ form.email.value|default:'' }}" required>
+                                <input type="email" name="email" class="form-control custom-input rounded-pill {% if form.email.errors %}is-invalid{% endif %}" id="emailInput" value="{{ form.email.value|default:'' }}" required>
                                 {% for error in form.email.errors %}
                                     <div class="invalid-feedback d-block ms-2">{{ error }}</div>
                                 {% endfor %}
@@ -37,9 +58,7 @@
                             <!-- Name -->
                             <div class="mb-3">
                                 <label for="nameInput" class="form-label custom-label">Name</label>
-                                <input type="text" name="first_name"
-                                       class="form-control custom-input rounded-pill {% if form.first_name.errors %}is-invalid{% endif %}"
-                                       id="nameInput" value="{{ form.first_name.value|default:'' }}">
+                                <input type="text" name="first_name" class="form-control custom-input rounded-pill {% if form.first_name.errors %}is-invalid{% endif %}" id="nameInput" value="{{ form.first_name.value|default:'' }}">
                                 {% for error in form.first_name.errors %}
                                     <div class="invalid-feedback d-block ms-2">{{ error }}</div>
                                 {% endfor %}
@@ -48,9 +67,7 @@
                             <!-- Login -->
                             <div class="mb-3">
                                 <label for="loginInput" class="form-label custom-label">Login</label>
-                                <input type="text" name="username"
-                                       class="form-control custom-input rounded-pill {% if form.username.errors %}is-invalid{% endif %}"
-                                       id="loginInput" value="{{ form.username.value|default:'' }}" required>
+                                <input type="text" name="username" class="form-control custom-input rounded-pill {% if form.username.errors %}is-invalid{% endif %}" id="loginInput" value="{{ form.username.value|default:'' }}" required>
                                 {% for error in form.username.errors %}
                                     <div class="invalid-feedback d-block ms-2">{{ error }}</div>
                                 {% endfor %}
@@ -61,25 +78,18 @@
                                 <div class="col-6">
                                     <label for="passwordInput" class="form-label custom-label">Password</label>
                                     <div class="position-relative">
-                                        <input type="password" name="password1"
-                                               class="form-control custom-input rounded-pill pe-5 {% if form.password1.errors %}is-invalid{% endif %}"
-                                               id="passwordInput" required>
-                                        <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 custom-eye-icon"
-                                           onclick="togglePasswordVisibility('passwordInput', this)"></i>
+                                        <input type="password" name="password1" class="form-control custom-input rounded-pill pe-5 {% if form.password1.errors %}is-invalid{% endif %}" id="passwordInput" required>
+                                        <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 custom-eye-icon" onclick="togglePasswordVisibility('passwordInput', this)"></i>
                                     </div>
                                     {% for error in form.password1.errors %}
                                         <div class="invalid-feedback d-block ms-2">{{ error }}</div>
                                     {% endfor %}
                                 </div>
                                 <div class="col-6">
-                                    <label for="confirmPasswordInput" class="form-label custom-label">Confirm
-                                        password</label>
+                                    <label for="confirmPasswordInput" class="form-label custom-label">Confirm password</label>
                                     <div class="position-relative">
-                                        <input type="password" name="password2"
-                                               class="form-control custom-input rounded-pill pe-5 {% if form.password2.errors %}is-invalid{% endif %}"
-                                               id="confirmPasswordInput" required>
-                                        <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 custom-eye-icon"
-                                           onclick="togglePasswordVisibility('confirmPasswordInput', this)"></i>
+                                        <input type="password" name="password2" class="form-control custom-input rounded-pill pe-5 {% if form.password2.errors %}is-invalid{% endif %}" id="confirmPasswordInput" required>
+                                        <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 custom-eye-icon" onclick="togglePasswordVisibility('confirmPasswordInput', this)"></i>
                                     </div>
                                     {% for error in form.password2.errors %}
                                         <div class="invalid-feedback d-block ms-2">{{ error }}</div>
@@ -87,8 +97,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit"
-                                    class="btn btn-custom-orange rounded-pill w-100 py-2.5 mb-4 d-flex align-items-center justify-content-center gap-1">
+                            <button type="submit" class="btn btn-custom-orange rounded-pill w-100 py-2.5 mb-4 d-flex align-items-center justify-content-center gap-1">
                                 Sign up <i class="bi bi-chevron-right fs-6"></i>
                             </button>
 
@@ -99,20 +108,7 @@
                         </form>
                     </div>
                 </div>
-
-                <!-- Right Column: Images for Light and Dark theme -->
-                <div class="col-12 col-md-6 col-lg-7 image-section position-absolute end-0 top-0 h-100">
-                    <img src="https://i.imgur.com/BbeJtzu.jpeg"
-                         alt="Light background"
-                         class="theme-img-light w-100 h-100 object-fit-cover">
-
-                    <img src="https://i.imgur.com/kGrWE0H.jpeg"
-                         alt="Dark background"
-                         class="theme-img-dark w-100 h-100 object-fit-cover">
-                </div>
-
             </div>
         </div>
     </div>
-
 {% endblock %}

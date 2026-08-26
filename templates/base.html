@@ -92,7 +92,7 @@
         </button>
     </div>
 
-    <div class="offcanvas offcanvas-end side-menu" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
+    <div class="offcanvas offcanvas-end side-menu" tabindex="-1" id="sideMenu" aria-labelledby="sideMenuLabel" >
 
     <div class="side-menu-header d-flex align-items-center justify-content-between">
         <button type="button" class="side-menu-close" data-bs-dismiss="offcanvas" aria-label="Close menu">
@@ -125,7 +125,7 @@
         <a href="#" class="side-menu-link">Areas</a>
         <a href="#" class="side-menu-link">Shopping lists</a>
         <a href="#" class="side-menu-link">My products</a>
-        <a href="#" class="side-menu-link">My expenses</a>
+        <a href="{% url 'expenses' %}" class="side-menu-link">My expenses</a>
         <a href="#" class="side-menu-link">My menu</a>
         <a href="{% url 'profile' %}" class="side-menu-link">Profile</a>
         {% if user.role == 'ADMIN' %}

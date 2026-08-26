@@ -1,8 +1,9 @@
 /* Custom Palette Variables */
 :root, [data-bs-theme="light"] {
     --page-bg: #e2cbab;
+    --login-page-bg: #e2cbab;
     --landing-page-bg: #f4e5d0;
-    --register-page-bg: #f3e1cc;
+    --register-page-bg: #dbceca;
     --nav-bg: rgba(184, 157, 126, 0.85);
     --title-color: #514336;
     --label-color: #514336;
@@ -29,8 +30,9 @@
 
 [data-bs-theme="dark"] {
     --page-bg: #090a0c;
+    --login-page-bg: #111214;
     --landing-page-bg: #090a0c;
-    --register-page-bg: #090a0c;
+    --register-page-bg: #21181d;
     --nav-bg: rgba(0, 0, 0, 0.85);
     --title-color: #ad9477;
     --label-color: #ad9477;
@@ -57,6 +59,10 @@ body {
 
 .register-bg {
     background-color: var(--register-page-bg);
+}
+
+.login-bg {
+    background-color: var(--login-page-bg);
 }
 
 .custom-navbar {
@@ -136,50 +142,112 @@ body {
 .custom-link:hover {
     color: #cc441b;
 }
-
-/* Obrazek i maska przezroczystości dla komputerów */
-.image-section img {
-    min-height: 100%;
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
-
-    /*-webkit-mask-image: -webkit-linear-gradient(to right, transparent 2%, black 10%);*/
-    /*mask-image: linear-gradient(to right, transparent 2%, black 10%);*/
-}
-
-/*TODO change login/register backgrounds to match all images better*/
-
 /* =========================================
-   Fake Mask (because mozilla sucks "vitamin D" )
+   Free-floating Background Container
    ========================================= */
 .image-section {
-    position: relative;
+    position: absolute;
+    top: 0;
+    height: 100%;
+
+    /* Desktop size & positioning */
+    width: 58.33%;
+    right: 0;
+    z-index: 0;
+    /*transform: translateX(-80px);*/
 }
 
-/* Default (Login Page) Fade - Uses --page-bg */
+/* Make <picture> tags behave like block elements */
+.theme-img-light, .theme-img-dark {
+    width: 100%;
+    height: 100%;
+}
+
+/* The actual responsive image styling */
+.responsive-bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+
+    /* Anchors desktop image to the right edge */
+    object-position: right center;
+}
+
+/* =========================================
+   Fading Gradient Mask
+   ========================================= */
+/* Desktop Fade */
 .image-section::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to right, var(--page-bg) 2%, transparent 10%);
+    background: linear-gradient(to right, var(--login-page-bg) 0%, transparent 20%);
     pointer-events: none;
 }
 
-/* Register Page Override — Uses --register-page-bg */
 .register-bg .image-section::after {
-    background: linear-gradient(to right, var(--register-page-bg) 2%, transparent 10%);
+    background: linear-gradient(to right, var(--register-page-bg) 0%, transparent 20%);
 }
 
+/* =========================================
+   Mobile View (max-width: 768px)
+   ========================================= */
 @media (max-width: 768px) {
-    /* Default Mobile Fade (Login Page) */
-    .image-section::after {
-        background: linear-gradient(to bottom, var(--page-bg) 0%, transparent 30%);
+    /* --- Image & Gradient Adjustments --- */
+    .image-section {
+        width: 100%;
+        transform: translateX(0); /* Fills the whole screen behind the form */
     }
 
-    /* Register Page Mobile Override */
+    .responsive-bg-img {
+        object-position: center center;
+    }
+
+    /* Gradient fades out lower down on mobile */
+    .image-section::after {
+        background: linear-gradient(to top, var(--login-page-bg) 0%, var(--login-page-bg) 10%, transparent 100%);
+    }
+
     .register-bg .image-section::after {
-        background: linear-gradient(to bottom, var(--register-page-bg) 0%, transparent 30%);
+        background: linear-gradient(to top, var(--register-page-bg) 0%, var(--register-page-bg) 10%, transparent 100%);
+    }
+
+    /* --- Form Spacing (More Padding) --- */
+    .form-container {
+        /* Increases edge padding slightly so it doesn't touch the screen borders */
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+        padding-top: 2.5rem !important;
+    }
+
+    /* --- Typography & Input Resizing --- */
+    .login-title {
+        font-size: 2.25rem; /* Down from 2.75rem */
+        margin-bottom: 1.25rem !important;
+    }
+
+    .custom-label {
+        font-size: 0.85rem; /* Down from 0.95rem */
+    }
+
+    .custom-input {
+        font-size: 0.9rem; /* Makes the typed text slightly smaller */
+        padding: 0.55rem 1rem; /* Reduces the height/bulkiness of the input field */
+    }
+
+    .btn-custom-orange {
+        font-size: 1.05rem; /* Down from 1.15rem */
+        padding-top: 0.6rem !important;
+        padding-bottom: 0.6rem !important;
+    }
+
+    .custom-subtext {
+        font-size: 0.8rem; /* Down from 0.9rem */
+    }
+
+    /* Slightly adjust the eye icon position due to the smaller input padding */
+    .custom-eye-icon {
+        margin-right: -0.2rem;
     }
 }
 
@@ -213,20 +281,20 @@ body {
 /*    color: #ffffff;*/
 /*}*/
 
-/* Reguły responsywne (Mobile) */
-@media (max-width: 768px) {
-    /*.image-section img {*/
-    /*    -webkit-mask-image: -webkit-linear-gradient(to bottom, transparent 0%, black 30%);*/
-    /*    mask-image: linear-gradient(to bottom, transparent 0%, black 30%);*/
-    /*}*/
-    .login-wrapper {
-        padding-top: 60px;
-    }
+/*!* Reguły responsywne (Mobile) *!*/
+/*@media (max-width: 768px) {*/
+/*    !*.image-section img {*!*/
+/*    !*    -webkit-mask-image: -webkit-linear-gradient(to bottom, transparent 0%, black 30%);*!*/
+/*    !*    mask-image: linear-gradient(to bottom, transparent 0%, black 30%);*!*/
+/*    !*}*!*/
+/*    .login-wrapper {*/
+/*        padding-top: 60px;*/
+/*    }*/
 
-    .form-container {
-        padding-top: 2rem !important;
-    }
-}
+/*    .form-container {*/
+/*        padding-top: 2rem !important;*/
+/*    }*/
+/*}*/
 
 /* =========================================
    Landing Page
@@ -855,6 +923,163 @@ body.side-menu-open .side-menu-theme-controls {
     color: #111111;
 }
 
+
+/* =========================================
+   Mobile Overrides
+   ========================================= */
+@media (max-width: 480px) {
+    .side-menu-theme-controls {
+        right: 1.5rem;
+        left: auto;
+        top: auto;
+        bottom: 1.5rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+
+        /* Since buttons move to the bottom on mobile, they slide from the bottom (Y axis) instead of the right */
+        transform: translateY(20px);
+    }
+
+    body.side-menu-open .side-menu-theme-controls,
+    body:has(.side-menu.show) .side-menu-theme-controls {
+        transform: translateY(0);
+    }
+
+    .side-menu-theme-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1rem;
+    }
+}
+
+/* Transitions.dev — Reduced Motion Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .side-menu, body.side-menu-open .side-menu, .side-menu.show {
+        transition: none !important;
+        transform: translateX(0) !important;
+        filter: blur(0) !important;
+    }
+}
+
+
+/* =========================================
+   FIREFOX-ONLY EXCEPTIONS (Performance Fix)
+   ========================================= */
+@supports (-moz-appearance: none) {
+    /* 2. Kill the navbar blur */
+    .custom-navbar {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+
+        /* Make the navbar slightly more opaque since it no longer blurs the background */
+        background-color: rgba(184, 157, 126, 0.98) !important;
+    }
+
+    /* 3. Dark mode opaque fallback for Firefox navbar */
+    [data-bs-theme="dark"] .custom-navbar {
+        background-color: rgba(0, 0, 0, 0.96) !important;
+    }
+
+}
+
+
+/* Custom Styles for Profile Page */
+.profile-title {
+    color: var(--title-color);
+    font-size: 1.8rem;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    transition: color 0.3s ease;
+}
+
+.profile-avatar-box {
+    width: 150px;
+    height: 150px;
+    background-color: #ffffff;
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-avatar-icon {
+    font-size: 5rem;
+    color: #1a1a1a;
+}
+
+.profile-username {
+    color: var(--title-color);
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+}
+
+.profile-email {
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
+}
+
+.profile-email a {
+    color: var(--title-color);
+}
+
+.profile-date-box {
+    color: var(--title-color);
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    line-height: 1.5;
+}
+
+.max-w-280 {
+    max-width: 280px;
+}
+
+/* Edit & Delete Buttons */
+.btn-profile-edit {
+    background-color: #d8c4b2;
+    color: #3b2f28;
+    border: none;
+    font-size: 1.05rem;
+    letter-spacing: 0.05em;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-profile-edit:hover {
+    background-color: #c4b09e;
+    color: #261f1a;
+}
+
+[data-bs-theme="dark"] .btn-profile-edit {
+    background-color: #4a3e35;
+    color: #e2cbab;
+}
+
+[data-bs-theme="dark"] .btn-profile-edit:hover {
+    background-color: #5c4d43;
+    color: #ffffff;
+}
+
+.btn-profile-delete {
+    background-color: #d9534f;
+    color: #ffffff;
+    border: none;
+    font-size: 1.05rem;
+    letter-spacing: 0.05em;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-profile-delete:hover {
+    background-color: #c9302c;
+    color: #ffffff;
+}
+
+
 /*
 EXPENSE TRACKER MOJA CZĘŚĆ
 =======================
@@ -1084,158 +1309,11 @@ EXPENSE TRACKER MOJA CZĘŚĆ
     border: 1px solid rgba(255, 215, 0, 0.2);
 }
 
-/*=========================================*/
 
-/* =========================================
-   Mobile Overrides
-   ========================================= */
-@media (max-width: 480px) {
-    .side-menu-theme-controls {
-        right: 1.5rem;
-        left: auto;
-        top: auto;
-        bottom: 1.5rem;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: flex-end;
+/*
+FIXME wszyscy kochamy ładne glassmorphismy tylko mozzila firefox nie, proponuję dodać exception dla mozzili bo ta strona (expenses) laguje na firefoxie
+albo możemy mieć w dupie mozzile to też opcja XD
+(ogólnie to mozzila używa silnika do renderowania stron który zleca zadania graficzne takie jak blury na CPU, tak ci debile używają cpu do zadań graficznych)
 
-        /* Since buttons move to the bottom on mobile, they slide from the bottom (Y axis) instead of the right */
-        transform: translateY(20px);
-    }
-
-    body.side-menu-open .side-menu-theme-controls,
-    body:has(.side-menu.show) .side-menu-theme-controls {
-        transform: translateY(0);
-    }
-
-    .side-menu-theme-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 1rem;
-    }
-}
-
-/* Transitions.dev — Reduced Motion Accessibility */
-@media (prefers-reduced-motion: reduce) {
-    .side-menu, body.side-menu-open .side-menu, .side-menu.show {
-        transition: none !important;
-        transform: translateX(0) !important;
-        filter: blur(0) !important;
-    }
-}
-
-
-/* =========================================
-   FIREFOX-ONLY EXCEPTIONS (Performance Fix)
-   ========================================= */
-@supports (-moz-appearance: none) {
-    /* 2. Kill the navbar blur */
-    .custom-navbar {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-
-        /* Make the navbar slightly more opaque since it no longer blurs the background */
-        background-color: rgba(184, 157, 126, 0.98) !important;
-    }
-
-    /* 3. Dark mode opaque fallback for Firefox navbar */
-    [data-bs-theme="dark"] .custom-navbar {
-        background-color: rgba(0, 0, 0, 0.96) !important;
-    }
-
-}
-
-/* Custom Styles for Profile Page */
-.profile-title {
-    color: var(--title-color);
-    font-size: 1.8rem;
-    font-weight: 400;
-    letter-spacing: 0.3em;
-    transition: color 0.3s ease;
-}
-
-.profile-avatar-box {
-    width: 150px;
-    height: 150px;
-    background-color: #ffffff;
-    border-radius: 40px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.profile-avatar-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.profile-avatar-icon {
-    font-size: 5rem;
-    color: #1a1a1a;
-}
-
-.profile-username {
-    color: var(--title-color);
-    font-size: 1.75rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-}
-
-.profile-email {
-    font-size: 1.05rem;
-    letter-spacing: 0.08em;
-}
-
-.profile-email a {
-    color: var(--title-color);
-}
-
-.profile-date-box {
-    color: var(--title-color);
-    font-size: 1rem;
-    letter-spacing: 0.05em;
-    line-height: 1.5;
-}
-
-.max-w-280 {
-    max-width: 280px;
-}
-
-/* Edit & Delete Buttons */
-.btn-profile-edit {
-    background-color: #d8c4b2;
-    color: #3b2f28;
-    border: none;
-    font-size: 1.05rem;
-    letter-spacing: 0.05em;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-}
-
-.btn-profile-edit:hover {
-    background-color: #c4b09e;
-    color: #261f1a;
-}
-
-[data-bs-theme="dark"] .btn-profile-edit {
-    background-color: #4a3e35;
-    color: #e2cbab;
-}
-
-[data-bs-theme="dark"] .btn-profile-edit:hover {
-    background-color: #5c4d43;
-    color: #ffffff;
-}
-
-.btn-profile-delete {
-    background-color: #d9534f;
-    color: #ffffff;
-    border: none;
-    font-size: 1.05rem;
-    letter-spacing: 0.05em;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-}
-
-.btn-profile-delete:hover {
-    background-color: #c9302c;
-    color: #ffffff;
-}
+also edytowałem style gdy przyszedł wasz update, sprawdźcie czy macie wszystko na stronach
+*/
