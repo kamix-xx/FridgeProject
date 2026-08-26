@@ -18,6 +18,13 @@
     --sidemenu-accent: #d9ff00;
     --sidemenu-logout: #ff8a65;
     --sidemenu-logout-hover: #f3091c;
+
+    --panel-open-dur: 400ms;
+    --panel-close-dur: 350ms;
+    /* Adapted to X-axis for a side menu. Increase/decrease for more/less travel */
+    --panel-translate-x: 60px;
+    --panel-blur: 2px;
+    --panel-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 [data-bs-theme="dark"] {
@@ -137,9 +144,43 @@ body {
     width: 100%;
     height: 100%;
 
-    -webkit-mask-image: -webkit-linear-gradient(to right, transparent 2%, black 10%);
-    mask-image: linear-gradient(to right, transparent 2%, black 10%);
+    /*-webkit-mask-image: -webkit-linear-gradient(to right, transparent 2%, black 10%);*/
+    /*mask-image: linear-gradient(to right, transparent 2%, black 10%);*/
+}
+
     /*TODO change login/register backgrounds to match all images better*/
+
+/* =========================================
+   Fake Mask (because mozilla sucks "vitamin D" )
+   ========================================= */
+.image-section {
+    position: relative;
+}
+
+/* Default (Login Page) Fade - Uses --page-bg */
+.image-section::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, var(--page-bg) 2%, transparent 10%);
+    pointer-events: none;
+}
+
+/* Register Page Override — Uses --register-page-bg */
+.register-bg .image-section::after {
+    background: linear-gradient(to right, var(--register-page-bg) 2%, transparent 10%);
+}
+
+@media (max-width: 768px) {
+    /* Default Mobile Fade (Login Page) */
+    .image-section::after {
+        background: linear-gradient(to bottom, var(--page-bg) 0%, transparent 30%);
+    }
+
+    /* Register Page Mobile Override */
+    .register-bg .image-section::after {
+        background: linear-gradient(to bottom, var(--register-page-bg) 0%, transparent 30%);
+    }
 }
 
 /* Domyślnie w motywie jasnym ukryj ciemny obrazek */
@@ -174,10 +215,10 @@ body {
 
 /* Reguły responsywne (Mobile) */
 @media (max-width: 768px) {
-    .image-section img {
-        -webkit-mask-image: -webkit-linear-gradient(to bottom, transparent 0%, black 30%);
-        mask-image: linear-gradient(to bottom, transparent 0%, black 30%);
-    }
+    /*.image-section img {*/
+    /*    -webkit-mask-image: -webkit-linear-gradient(to bottom, transparent 0%, black 30%);*/
+    /*    mask-image: linear-gradient(to bottom, transparent 0%, black 30%);*/
+    /*}*/
 
     .login-wrapper {
         padding-top: 60px;
@@ -217,8 +258,8 @@ body {
     height: 100%;
     object-fit: cover;
 
-    -webkit-mask-image: -webkit-linear-gradient(to top, transparent 2%, black 70%);
-    mask-image: linear-gradient(to top, transparent 2%, black 70%);
+    /*-webkit-mask-image: -webkit-linear-gradient(to top, transparent 2%, black 70%);*/
+    /*mask-image: linear-gradient(to top, transparent 2%, black 70%);*/
 }
 
 [data-bs-theme="light"] .hero-bg img {
@@ -228,8 +269,8 @@ body {
     height: 100%;
     object-fit: cover;
 
-    -webkit-mask-image: -webkit-linear-gradient(to top, transparent 5%, black 60%);
-    mask-image: linear-gradient(to top, transparent 5%, black 60%);
+    /*-webkit-mask-image: -webkit-linear-gradient(to top, transparent 5%, black 60%);*/
+    /*mask-image: linear-gradient(to top, transparent 5%, black 60%);*/
 }
 
 [data-bs-theme="dark"] .hero-overlay {
@@ -238,16 +279,32 @@ body {
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.44) 0%, rgba(0, 0, 0, 0.53) 50%, rgb(0, 0, 0) 100%);
     z-index: 1;
 
-    -webkit-mask-image: -webkit-linear-gradient(to top, transparent 0%, black 50%);
-    mask-image: linear-gradient(to top, transparent 0%, black 50%);
+    /*-webkit-mask-image: -webkit-linear-gradient(to top, transparent 0%, black 50%);*/
+    /*mask-image: linear-gradient(to top, transparent 0%, black 50%);*/
 }
 
 [data-bs-theme="light"] .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.23) 50%, rgba(0, 0, 0, 0.53) 100%);
-    -webkit-mask-image: -webkit-linear-gradient(to top, transparent 0%, black 50%);
-    mask-image: linear-gradient(to top, transparent 0%, black 50%);
+    /*background: linear-gradient(to bottom, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.23) 50%, rgba(0, 0, 0, 0.53) 100%);*/
+    /*-webkit-mask-image: -webkit-linear-gradient(to top, transparent 0%, black 50%);*/
+    /*mask-image: linear-gradient(to top, transparent 0%, black 50%);*/
+}
+
+[data-bs-theme="dark"] .hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    /* Fades perfectly into the dark background at the bottom */
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.44) 0%, rgba(0, 0, 0, 0.53) 50%, var(--landing-page-bg) 100%);
+}
+
+[data-bs-theme="light"] .hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    /* Fades perfectly into the light background at the bottom */
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.23) 50%, var(--landing-page-bg) 100%);
 }
 
 .landing-hero > .container {
@@ -506,16 +563,59 @@ body {
     flex-direction: column;
     overflow-y: auto;
 
+    /* Transitions.dev — Closed State */
+    transform: translateX(var(--panel-translate-x));
+    opacity: 0;
+    filter: blur(var(--panel-blur));
+    visibility: hidden;
+    pointer-events: none;
+
+    /* Combined your color transitions with the panel close transitions */
     transition: background-color 0.3s ease,
     color 0.3s ease,
-    opacity 0.2s ease,
-    visibility 0.2s ease;
+    transform var(--panel-close-dur) var(--panel-ease),
+    opacity var(--panel-close-dur) var(--panel-ease),
+    filter var(--panel-close-dur) var(--panel-ease),
+    visibility var(--panel-close-dur) var(--panel-ease);
+
+    will-change: transform, opacity, filter;
+}
+
+/* Transitions.dev — Open State (Supports Bootstrap .show or your body class) */
+body.side-menu-open .side-menu,
+.side-menu.show {
+    transform: translateX(0);
+    opacity: 1;
+    filter: blur(0);
+    visibility: visible;
+    pointer-events: auto;
+
+    /* Combined your color transitions with the panel open transitions */
+    transition: background-color 0.3s ease,
+    color 0.3s ease,
+    transform var(--panel-open-dur) var(--panel-ease),
+    opacity var(--panel-open-dur) var(--panel-ease),
+    filter var(--panel-open-dur) var(--panel-ease),
+    visibility var(--panel-open-dur) var(--panel-ease);
 }
 
 .offcanvas-backdrop {
     z-index: 1045;
     background-color: var(--sidemenu-overlay);
     transition: opacity 0.2s linear;
+}
+
+/* Forces Bootstrap's closing state to animate immediately with no stall */
+.offcanvas.side-menu.hiding {
+    transform: translateX(var(--panel-translate-x)) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+
+    transition: background-color 0.3s ease,
+    color 0.3s ease,
+    transform var(--panel-close-dur) var(--panel-ease),
+    opacity var(--panel-close-dur) var(--panel-ease),
+    visibility var(--panel-close-dur) var(--panel-ease) !important;
 }
 
 /* Themed backdrop scrim behind the panel */
@@ -643,11 +743,9 @@ body {
     padding-left: 0.2rem;
 }
 
-
 /* =========================================
    Responsive Side Menu
    ========================================= */
-
 @media (max-width: 480px) {
     :root,
     [data-bs-theme="light"],
@@ -659,77 +757,84 @@ body {
         width: 100vw;
     }
 
-
     .side-menu-link {
         font-size: 1.15rem;
     }
 }
 
-
 /* =========================================
    Theme controls beside Side Menu
    ========================================= */
-
 .side-menu-theme-controls {
     position: fixed;
-
-    /*
-     * Side menu is on the right.
-     * Put these controls immediately to its left.
-     */
     right: calc(var(--sidemenu-width) + 12px);
     top: 20px;
-
     z-index: 1055;
 
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 
+    /* 1. Start closed: match the exact same slide, fade, and blur as the menu */
+    transform: translateX(var(--panel-translate-x));
     opacity: 0;
+    filter: blur(var(--panel-blur));
     visibility: hidden;
     pointer-events: none;
+    will-change: transform, opacity, filter, visibility;
 
-    transition: opacity 0.2s ease,
-    visibility 0.2s ease;
+    /* 2. Transition matching the panel close */
+    transition: transform var(--panel-close-dur) var(--panel-ease),
+    opacity var(--panel-close-dur) var(--panel-ease),
+    filter var(--panel-close-dur) var(--panel-ease),
+    visibility var(--panel-close-dur) var(--panel-ease);
 }
 
-/*
- * Show the controls only while the Bootstrap
- * offcanvas is open.
- */
+/* 3. Triggered when menu is open
+   (Added :has(.show) as a fallback if native Bootstrap JS is used) */
 body.side-menu-open .side-menu-theme-controls {
+    transform: translateX(0);
     opacity: 1;
+    filter: blur(0);
     visibility: visible;
     pointer-events: auto;
+
+    /* 4. Transition matching the panel open */
+    transition: transform var(--panel-open-dur) var(--panel-ease),
+    opacity var(--panel-open-dur) var(--panel-ease),
+    filter var(--panel-open-dur) var(--panel-ease),
+    visibility var(--panel-open-dur) var(--panel-ease);
+}
+
+.offcanvas.side-menu.hiding .side-menu-theme-controls {
+    transform: translateX(var(--panel-translate-x)) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+
+    transition: background-color 0.3s ease,
+    color 0.3s ease,
+    transform var(--panel-close-dur) var(--panel-ease),
+    opacity var(--panel-close-dur) var(--panel-ease),
+    visibility var(--panel-close-dur) var(--panel-ease) !important;
 }
 
 .side-menu-theme-btn {
     width: 42px;
     height: 42px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     padding: 0;
-
     border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 50%;
-
     background-color: var(--sidemenu-bg);
     color: var(--sidemenu-text);
-
     font-size: 1.1rem;
-
     cursor: pointer;
-
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 
-    transition: background-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.15s ease,
-    border-color 0.2s ease;
+    /* Keep button hover animations fast */
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
 }
 
 .side-menu-theme-btn:hover {
@@ -741,8 +846,6 @@ body.side-menu-open .side-menu-theme-controls {
     transform: scale(0.95);
 }
 
-
-/* Highlight the currently selected theme */
 [data-bs-theme="light"] #sideMenuLightBtn {
     background-color: #ffffff;
     color: #514336;
@@ -755,23 +858,25 @@ body.side-menu-open .side-menu-theme-controls {
 
 
 /* =========================================
-   Mobile
+   Mobile Overrides
    ========================================= */
-
 @media (max-width: 480px) {
     .side-menu-theme-controls {
-        right: 1.5rem;   /* Pin to the right side */
-        left: auto;      /* Remove the left positioning */
-        top: auto;       /* Remove the top positioning */
-        bottom: 1.5rem;  /* Pin to the bottom */
-
+        right: 1.5rem;
+        left: auto;
+        top: auto;
+        bottom: 1.5rem;
         flex-direction: row;
-        flex-wrap: wrap; /* Allows a second column to wrap cleanly */
+        flex-wrap: wrap;
         justify-content: flex-end;
+
+        /* Since buttons move to the bottom on mobile, they slide from the bottom (Y axis) instead of the right */
+        transform: translateY(20px);
     }
 
-    body.side-menu-open .side-menu-theme-controls {
-        transform: none;
+    body.side-menu-open .side-menu-theme-controls,
+    body:has(.side-menu.show) .side-menu-theme-controls {
+        transform: translateY(0);
     }
 
     .side-menu-theme-btn {
@@ -779,4 +884,34 @@ body.side-menu-open .side-menu-theme-controls {
         height: 50px;
         font-size: 1rem;
     }
+}
+
+/* Transitions.dev — Reduced Motion Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .side-menu, body.side-menu-open .side-menu, .side-menu.show {
+        transition: none !important;
+        transform: translateX(0) !important;
+        filter: blur(0) !important;
+    }
+}
+
+
+/* =========================================
+   FIREFOX-ONLY EXCEPTIONS (Performance Fix)
+   ========================================= */
+@supports (-moz-appearance: none) {
+    /* 2. Kill the navbar blur */
+    .custom-navbar {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+
+        /* Make the navbar slightly more opaque since it no longer blurs the background */
+        background-color: rgba(184, 157, 126, 0.98) !important;
+    }
+
+    /* 3. Dark mode opaque fallback for Firefox navbar */
+    [data-bs-theme="dark"] .custom-navbar {
+        background-color: rgba(0, 0, 0, 0.96) !important;
+    }
+
 }
