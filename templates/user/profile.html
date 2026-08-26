@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Profile {% endblock %}
+
+{% block content %}
+    <div class="container-fluid p-0 login-wrapper">
+        <div class="row g-0 h-100 min-vh-100">
+
+            <!-- Left Column: Profile Info -->
+            <div class="col-12 col-md-6 col-lg-5 d-flex align-items-center justify-content-center p-4 p-md-5 form-container z-2">
+                <div class="profile-box w-100 text-center" style="max-width: 360px;">
+
+                    <h1 class="profile-title mb-4">PROFILE</h1>
+
+                    <!-- Avatar Box -->
+                    <div class="profile-avatar-box mx-auto mb-3 d-flex align-items-center justify-content-center">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" alt="{{ user.username }}" class="profile-avatar-img">
+                        {% else %}
+                            <i class="bi bi-person profile-avatar-icon"></i>
+                        {% endif %}
+                    </div>
+
+                    <!-- Username -->
+                    <h2 class="profile-username mb-3">{{ user.username }}</h2>
+
+                    <!-- Email -->
+                    <p class="profile-email mb-3">
+                        <a href="mailto:{{ user.email }}" class="text-decoration-underline">{{ user.email }}</a>
+                    </p>
+
+                    <!-- Account Creation Date -->
+                    <div class="profile-date-box mb-4">
+                        <span class="profile-date-label">Account creation date:</span><br>
+                        <span class="profile-date-value">{{ user.date_joined|date:"d.m.Y" }}</span>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex flex-column gap-2 max-w-280 mx-auto">
+                        <a href="#"
+                           class="btn btn-profile-edit rounded-3 py-2 d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-pencil fs-6"></i> Edit account
+                        </a>
+
+                        <button type="button"
+                                class="btn btn-profile-delete rounded-3 py-2 d-flex align-items-center justify-content-center gap-2"
+                                data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                            <i class="bi bi-trash fs-6"></i> Delete account
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Right Column: Background Images -->
+            <div class="col-12 col-md-6 col-lg-7 image-section position-absolute end-0 top-0 h-100">
+                <img src="https://i.imgur.com/7vRyNsP.jpeg"
+                     alt="Light background"
+                     class="theme-img-light w-100 h-100 object-fit-cover">
+
+                <img src="https://i.imgur.com/7vRyNsP.jpeg"
+                     alt="Dark background"
+                     class="theme-img-dark w-100 h-100 object-fit-cover">
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal Potwierdzenia Usunięcia Konta -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold">Delete Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-start">
+                    Are you sure you want to delete your account? This action cannot be undone.
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel
+                    </button>
+                    <form method="post" action="#">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger rounded-pill px-4">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

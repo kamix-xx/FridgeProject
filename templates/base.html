@@ -127,7 +127,7 @@
         <a href="#" class="side-menu-link">My products</a>
         <a href="#" class="side-menu-link">My expenses</a>
         <a href="#" class="side-menu-link">My menu</a>
-        <a href="#" class="side-menu-link">Profile</a>
+        <a href="{% url 'profile' %}" class="side-menu-link">Profile</a>
         {% if user.role == 'ADMIN' %}
         <a href="#" class="side-menu-link side-menu-link-admin">Administrator panel</a>
         {% endif %}

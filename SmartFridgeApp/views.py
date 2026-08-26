@@ -1,4 +1,5 @@
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .forms import CustomUserCreationForm
 from django.contrib import messages
@@ -15,7 +16,7 @@ def landing(request):
 
 
 def register(request):
-    # Przekieruj zalogowanego użytkownika
+    # Redirect the logged-in user:
     if request.user.is_authenticated:
         return redirect('home')
 
@@ -23,10 +24,16 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # Automatyczne zalogowanie po rejestracji
-            messages.success(request, 'Konto zostało pomyślnie utworzone!')
-            return redirect('home')  # Zmień na docelowy URL
+            login(request, user)
+            messages.success(request, 'Account has been successfully created')
+            return redirect('home')
     else:
         form = CustomUserCreationForm()
 
     return render(request, 'registration/register.html', {'form': form})
+
+
+@login_required(login_url='login')
+# If a user is logged-in, Django automatically passes 'request.user' object to every template as 'user'
+def profile(request):
+    return render(request, 'user/profile.html')

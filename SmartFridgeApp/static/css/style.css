@@ -148,7 +148,7 @@ body {
     /*mask-image: linear-gradient(to right, transparent 2%, black 10%);*/
 }
 
-    /*TODO change login/register backgrounds to match all images better*/
+/*TODO change login/register backgrounds to match all images better*/
 
 /* =========================================
    Fake Mask (because mozilla sucks "vitamin D" )
@@ -219,7 +219,6 @@ body {
     /*    -webkit-mask-image: -webkit-linear-gradient(to bottom, transparent 0%, black 30%);*/
     /*    mask-image: linear-gradient(to bottom, transparent 0%, black 30%);*/
     /*}*/
-
     .login-wrapper {
         padding-top: 60px;
     }
@@ -914,4 +913,99 @@ body.side-menu-open .side-menu-theme-controls {
         background-color: rgba(0, 0, 0, 0.96) !important;
     }
 
+}
+
+/* Custom Styles for Profile Page */
+.profile-title {
+    color: var(--title-color);
+    font-size: 1.8rem;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    transition: color 0.3s ease;
+}
+
+.profile-avatar-box {
+    width: 150px;
+    height: 150px;
+    background-color: #ffffff;
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-avatar-icon {
+    font-size: 5rem;
+    color: #1a1a1a;
+}
+
+.profile-username {
+    color: var(--title-color);
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+}
+
+.profile-email {
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
+}
+
+.profile-email a {
+    color: var(--title-color);
+}
+
+.profile-date-box {
+    color: var(--title-color);
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    line-height: 1.5;
+}
+
+.max-w-280 {
+    max-width: 280px;
+}
+
+/* Edit & Delete Buttons */
+.btn-profile-edit {
+    background-color: #d8c4b2;
+    color: #3b2f28;
+    border: none;
+    font-size: 1.05rem;
+    letter-spacing: 0.05em;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-profile-edit:hover {
+    background-color: #c4b09e;
+    color: #261f1a;
+}
+
+[data-bs-theme="dark"] .btn-profile-edit {
+    background-color: #4a3e35;
+    color: #e2cbab;
+}
+
+[data-bs-theme="dark"] .btn-profile-edit:hover {
+    background-color: #5c4d43;
+    color: #ffffff;
+}
+
+.btn-profile-delete {
+    background-color: #d9534f;
+    color: #ffffff;
+    border: none;
+    font-size: 1.05rem;
+    letter-spacing: 0.05em;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-profile-delete:hover {
+    background-color: #c9302c;
+    color: #ffffff;
 }
