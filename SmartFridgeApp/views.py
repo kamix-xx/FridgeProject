@@ -32,6 +32,11 @@ def register(request):
 
     return render(request, 'registration/register.html', {'form': form})
 
+def expenses(request):
+    return render(request, 'expense-tracker/expense-tracker.html')
+
+def expense_details(request):
+    return render(request, 'expense-tracker/expense-details.html')
 
 @login_required(login_url='login')
 # If a user is logged-in, Django automatically passes 'request.user' object to every template as 'user'

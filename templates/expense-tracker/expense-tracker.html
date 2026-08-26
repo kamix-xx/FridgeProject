@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}SmartFridge+ — Expense Tracker{% endblock %}
+
+{% block content %}
+    <main class="expense-page-wrapper position-relative min-vh-100 d-flex align-items-center pt-5">
+
+        <div class="container position-relative z-2 my-5">
+
+            <div class="glass-card mx-auto p-4 p-md-5">
+
+                <h1 class="text-center mb-5 expense-title">Expense Tracker</h1>
+
+                <div class="d-flex justify-content-end mb-4">
+                    <button class="btn date-picker-btn rounded-pill d-flex align-items-center gap-2 shadow-sm">
+                        <i class="bi bi-calendar3"></i>
+                        <span>01.01.2027 - 31.01.2027</span>
+                    </button>
+                </div>
+
+                <div class="chart-container position-relative w-100 mb-5">
+                    <!-- Tu Chart.js wygeneruje wykres -->
+                    <canvas id="expenseChart"></canvas>
+                </div>
+
+
+                <div class="expense-summary text-center position-relative mt-4">
+                    <p class="summary-label mb-2">Your monthly expense</p>
+                    <h2 class="summary-total mb-4">1375 USD</h2>
+
+
+                    <div class="d-flex align-items-center justify-content-center mx-auto mt-4" style="width: 60%;">
+                        <div class="summary-divider flex-grow-1"></div>
+
+
+                        <a href="{% url 'expense_details' %}" class="btn btn-scroll-down rounded-circle d-flex align-items-center justify-content-center shadow-sm text-decoration-none" aria-label="Go to details">
+                            <i class="bi bi-arrow-down"></i>
+                        </a>
+
+                        <div class="summary-divider flex-grow-1"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+{% endblock %}

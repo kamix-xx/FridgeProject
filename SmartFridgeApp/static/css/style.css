@@ -855,6 +855,236 @@ body.side-menu-open .side-menu-theme-controls {
     color: #111111;
 }
 
+/*
+EXPENSE TRACKER MOJA CZĘŚĆ
+=======================
+ */
+
+
+/* Tło i nakładka  */
+.expense-overlay {
+    background: rgba(226, 203, 171, 0.3);
+}
+[data-bs-theme="dark"] .expense-overlay {
+    background: rgba(9, 10, 12, 0.6);
+}
+
+
+.glass-card {
+    max-width: 900px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+
+    border: none !important;
+
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    color: var(--title-color);
+    transition: background 0.3s ease, border 0.3s ease, color 0.3s ease;
+}
+
+
+.expense-page-wrapper {
+    background-image: url('https://i.imgur.com/2SjgpvQ.jpeg'); /*podmień to w przyszłości */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+
+.expense-page-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(226, 203, 171, 0.3);
+    z-index: 1;
+}
+
+
+[data-bs-theme="dark"] .expense-page-wrapper::before {
+    background: rgba(9, 10, 12, 0.75);
+}
+
+[data-bs-theme="dark"] .glass-card {
+    background: rgba(30, 30, 30, 0.55);
+    border: none !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+
+.expense-title {
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    font-size: clamp(2rem, 4vw, 2.75rem);
+}
+
+.summary-label {
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--subtext-color);
+}
+
+.summary-total {
+    font-size: 2.2rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+
+.date-picker-btn {
+    background-color: #ffffff;
+    color: var(--title-color);
+    border: none;
+    padding: 0.6rem 1.25rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: transform 0.2s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+.date-picker-btn:hover {
+    transform: translateY(-2px);
+    background-color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] .date-picker-btn {
+    background-color: #1a1a1a;
+    color: var(--sidemenu-text);
+}
+
+/* Miejsce na Chart.js */
+.chart-container {
+    min-height: 300px;
+    max-height: 400px;
+}
+
+
+.summary-divider {
+    height: 1px;
+    background-color: var(--title-color);
+    opacity: 0.4;
+
+}
+
+
+.btn-scroll-down {
+    width: 48px;
+    height: 48px;
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: var(--title-color);
+    font-size: 1.5rem;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.btn-scroll-down:hover {
+    background-color: #ffffff;
+    transform: scale(1.08);
+}
+
+[data-bs-theme="dark"] .btn-scroll-down {
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+[data-bs-theme="dark"] .btn-scroll-down:hover {
+    background-color: #1a1a1a;
+}
+
+/* =========================================
+   Expense Tracker - Panel 2 (Szczegóły)
+   ========================================= */
+
+
+.custom-legend {
+    font-size: 1.15rem;
+    color: var(--title-color);
+}
+
+.legend-item {
+    transition: transform 0.2s ease;
+}
+
+.legend-item:hover {
+    transform: translateX(5px);
+}
+
+.legend-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+}
+
+[data-bs-theme="dark"] .legend-dot {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/*
+   KOLORY LEGENDY I WYKRESÓW
+*/
+.color-fats     { background-color: #ffeb3b; }
+.color-proteins { background-color: #ffffff; border: 1px solid #ddd; }
+.color-nutri-a  { background-color: #00e676; }
+.color-nutri-b  { background-color: #76ff03; }
+.color-nutri-c  { background-color: #c6ff00; }
+.color-nutri-d  { background-color: #ffca28; }
+.color-nutri-e  { background-color: #ff5252; }
+
+/* Kontener specjalnie dla wykresu kołowego */
+.donut-container {
+    min-height: 350px;
+}
+
+
+.glass-chart-label {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    padding: 8px 18px;
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--title-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    z-index: 5;
+    pointer-events: none;
+}
+
+
+.label-top-right {
+    top: 15%;
+    right: 20%;
+}
+
+.label-bottom-left {
+    bottom: 15%;
+    left: 20%;
+    background: rgba(255, 235, 59, 0.7);
+    border: 1px solid rgba(255, 235, 59, 0.4);
+}
+
+[data-bs-theme="dark"] .glass-chart-label {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+[data-bs-theme="dark"] .label-bottom-left {
+    background: rgba(255, 215, 0, 0.4);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+/*=========================================*/
 
 /* =========================================
    Mobile Overrides

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}SmartFridge+ — Expense Details{% endblock %}
+
+{% block content %}
+    <main class="expense-page-wrapper position-relative min-vh-100 d-flex align-items-center pt-5">
+        <div class="container position-relative z-2 my-5">
+            
+            <div class="glass-card mx-auto p-4 p-md-5">
+                
+
+                <div class="text-center mb-5">
+                    <a href="{% url 'expenses' %}" class="btn btn-scroll-down rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm text-decoration-none mb-3" aria-label="Go back">
+                        <i class="bi bi-arrow-up"></i>
+                    </a>
+                    <h2 class="expense-title">Expense Tracker</h2>
+                </div>
+
+                <!-- Testowa zawartość, żeby zobaczyć jak to wygląda wgl -->
+                <div class="row g-5">
+
+                    <div class="col-lg-6 d-flex flex-column">
+
+
+                        <div class="custom-legend mb-4">
+                            <div class="legend-item d-flex align-items-center mb-3">
+                                <span class="legend-dot color-fats me-3"></span>
+                                <span class="legend-text">Expenses per fats</span>
+                            </div>
+                            <div class="legend-item d-flex align-items-center">
+                                <span class="legend-dot color-proteins me-3"></span>
+                                <span class="legend-text">Expenses per proteins</span>
+                            </div>
+                        </div>
+
+                        <div class="chart-container donut-container flex-grow-1 position-relative d-flex justify-content-center align-items-center">
+                            <div class="glass-chart-label label-top-right">67%</div>
+                            <div class="glass-chart-label label-bottom-left">33%</div>
+                            <canvas id="macrosChart"></canvas>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-6 d-flex flex-column">
+
+                        <div class="custom-legend mb-4">
+                            <div class="legend-item d-flex align-items-center mb-3">
+                                <span class="legend-dot color-nutri-a me-3"></span>
+                                <span class="legend-text">Products with nutriscore A</span>
+                            </div>
+                            <div class="legend-item d-flex align-items-center mb-3">
+                                <span class="legend-dot color-nutri-b me-3"></span>
+                                <span class="legend-text">Products with nutriscore B</span>
+                            </div>
+                            <div class="legend-item d-flex align-items-center mb-3">
+                                <span class="legend-dot color-nutri-c me-3"></span>
+                                <span class="legend-text">Products with nutriscore C</span>
+                            </div>
+                            <div class="legend-item d-flex align-items-center mb-3">
+                                <span class="legend-dot color-nutri-d me-3"></span>
+                                <span class="legend-text">Products with nutriscore D</span>
+                            </div>
+                            <div class="legend-item d-flex align-items-center">
+                                <span class="legend-dot color-nutri-e me-3"></span>
+                                <span class="legend-text">Products with nutriscore E</span>
+                            </div>
+                        </div>
+
+                        <div class="chart-container flex-grow-1 position-relative">
+                            <canvas id="nutriscoreChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+{% endblock %}
