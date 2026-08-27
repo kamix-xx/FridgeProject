@@ -3,7 +3,8 @@
 
 {% block title %} Profile {% endblock %}
 
-{% block css %} <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=8"> {% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=8"> {% endblock %}
 
 {% block content %}
     <div class="container-fluid p-0 login-wrapper profile-bg">
@@ -41,7 +42,8 @@
                     <!-- Action Buttons -->
                     <div class="d-flex flex-column gap-2 max-w-280 mx-auto">
                         <a href="#"
-                           class="btn btn-profile-edit rounded-3 py-2 d-flex align-items-center justify-content-center gap-2">
+                           class="btn btn-profile-edit rounded-3 py-2 d-flex align-items-center justify-content-center gap-2"
+                           data-bs-toggle="modal" data-bs-target="#editAccountModal">
                             <i class="bi bi-pencil fs-6"></i> Edit account
                         </a>
 
@@ -70,35 +72,40 @@
     </div>
 
     <!-- Modal Potwierdzenia Usunięcia Konta -->
-<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered custom-delete-modal-dialog">
-        <div class="modal-content custom-delete-modal-content text-center text-white py-5 px-4">
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered custom-delete-modal-dialog">
+            <div class="modal-content custom-delete-modal-content text-center text-white py-5 px-4">
 
-            <!-- Główny tekst -->
-            <h2 class="delete-modal-title mb-2">Are you sure you want to delete your account?</h2>
-            <p class="delete-modal-subtitle mb-4">This action is irreversible</p>
+                <!-- Główny tekst -->
+                <h2 class="delete-modal-title mb-2">Are you sure you want to delete your account?</h2>
+                <p class="delete-modal-subtitle mb-4">This action is irreversible</p>
 
-            <!-- Przycisk YES -->
-            <form method="post" action="{% url 'delete_account' %}" class="w-100">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-delete-action text-white bg-transparent border-0 p-0 d-inline-flex align-items-center justify-content-center gap-2">
-                    <i class="bi bi-check-circle fs-3"></i>
-                    <span class="fst-italic fs-4 fw-normal">YES</span>
-                </button>
-            </form>
+                <!-- Przycisk YES -->
+                <form method="post" action="{% url 'delete_account' %}" class="w-100">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="btn btn-delete-action text-white bg-transparent border-0 p-0 d-inline-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-check-circle fs-3"></i>
+                        <span class="fst-italic fs-4 fw-normal">YES</span>
+                    </button>
+                </form>
 
-            <!-- Linia podziału -->
-            <div class="delete-modal-divider mx-auto my-3"></div>
+                <!-- Linia podziału -->
+                <div class="delete-modal-divider mx-auto my-3"></div>
 
-            <!-- Przycisk NO -->
-            <div>
-                <button type="button" class="btn btn-delete-action text-white bg-transparent border-0 p-0 d-inline-flex align-items-center justify-content-center gap-2" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle fs-3"></i>
-                    <span class="fst-italic fs-4 fw-normal">NO</span>
-                </button>
+                <!-- Przycisk NO -->
+                <div>
+                    <button type="button"
+                            class="btn btn-delete-action text-white bg-transparent border-0 p-0 d-inline-flex align-items-center justify-content-center gap-2"
+                            data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle fs-3"></i>
+                        <span class="fst-italic fs-4 fw-normal">NO</span>
+                    </button>
+                </div>
+
             </div>
-
         </div>
     </div>
-</div>
+
+
 {% endblock %}
