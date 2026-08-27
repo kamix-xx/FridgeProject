@@ -3,8 +3,10 @@
 
 {% block title %} Profile {% endblock %}
 
+{% block css %} <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=8"> {% endblock %}
+
 {% block content %}
-    <div class="container-fluid p-0 login-wrapper">
+    <div class="container-fluid p-0 login-wrapper profile-bg">
         <div class="row g-0 h-100 min-vh-100">
 
             <!-- Left Column: Profile Info -->
@@ -54,7 +56,7 @@
             </div>
 
             <!-- Right Column: Background Images -->
-            <div class="col-12 col-md-6 col-lg-7 image-section position-absolute end-0 top-0 h-100">
+            <div class="image-section profile-image-section position-absolute end-0 top-0 h-100 z-1">
                 <img src="https://i.imgur.com/7vRyNsP.jpeg"
                      alt="Light background"
                      class="theme-img-light w-100 h-100 object-fit-cover">
