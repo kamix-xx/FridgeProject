@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}SmartFridge+ — My Areas{% endblock %}
+
+{% block content %}
+    <main class="areas-page-wrapper position-relative min-vh-100 d-flex align-items-center pt-5 pb-5">
+
+        <div class="container position-relative z-2">
+
+
+            <div class="glass-card areas-glass-card mx-auto p-4 p-md-5 position-relative">
+
+                <h2 class="text-center mb-4 expense-title" style="letter-spacing: 0.1em;">Areas</h2>
+
+
+                <div class="areas-scroll-container pe-2 pe-md-4">
+                    <div class="row g-4">
+
+
+                        {% for area in user_areas %}
+                            <div class="col-12 col-md-6 col-lg-4">
+
+
+                                <div class="area-card {% if area.is_shared %}bg-yellow{% else %}bg-orange{% endif %}">
+                                    <div class="area-card-header">
+                                        <h3 class="area-card-title">{{ area.name }}</h3>
+                                        <button class="area-icon-btn" aria-label="Share">
+                                            <i class="bi bi-share"></i>
+                                        </button>
+                                    </div>
+                                    <div class="area-card-body">
+                                        <p>created at: <u>{{ area.created_at }}</u></p>
+                                    </div>
+                                    <div class="area-card-footer">
+                                        <button class="area-icon-btn" aria-label="Delete" data-bs-toggle="modal"
+                                                data-bs-target="#deleteAreaModal">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+
+
+                                        {% if area.is_shared and area.shared_with %}
+                                            <div class="shared-with-text text-center">
+                                                shared with:<br>{{ area.shared_with }}
+                                            </div>
+                                        {% endif %}
+
+                                        <button class="area-icon-btn" aria-label="Edit">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        {% empty %}
+                            <div class="col-12 text-center mt-5">
+                                <p class="fs-4 text-muted">You don't have any areas yet.</p>
+                            </div>
+                        {% endfor %}
+
+                        <div class="col-12 d-flex justify-content-center mt-4 mb-2">
+                            <button class="btn-add-area" aria-label="Add new area" data-bs-toggle="modal"
+                                    data-bs-target="#addAreaModal">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+    </main>
+
+
+    <div class="modal fade" id="deleteAreaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup">
+                <div class="modal-body text-center p-4 p-md-5">
+
+                    <h3 class="popup-title mb-5">Are you sure you want to delete the ...?</h3>
+
+                    <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                            data-bs-dismiss="modal">
+                        Nah, just kidding
+                    </button>
+
+                    <hr class="popup-divider mx-auto mb-4">
+
+                    <button type="button" class="btn btn-link text-decoration-none popup-btn-danger">
+                        Yes, destroy the ...!
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- POP-UP: Add Area -->
+    <!-- ========================================== -->
+    <div class="modal fade" id="addAreaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup">
+
+                <button type="button" class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div class="modal-body text-center p-4 p-md-5">
+                    <h3 class="popup-title mb-4">Add Area</h3>
+
+                    <div class="text-start mb-2">
+                        <label for="newAreaName" class="form-label popup-label">Area Name</label>
+                        <input type="text" class="form-control popup-input shadow-none" id="newAreaName">
+                    </div>
+
+                    <p class="custom-subtext mb-5">
+                        Add a shared area <a href="#" class="custom-link" style="color: #ff9166;">HERE</a>
+                    </p>
+
+                    <button type="button" class="popup-circular-btn mx-auto">
+                        <i class="bi bi-plus"></i>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

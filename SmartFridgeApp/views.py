@@ -90,6 +90,24 @@ def register(request):
 
     return render(request, 'registration/register.html', {'form': form})
 
+
+def areas(request):
+    # mock data
+    fake_areas = [
+        {"id": 1, "name": "Fridge", "created_at": "01.01.2026", "is_shared": False},
+        {"id": 2, "name": "Pantry", "created_at": "01.01.2026", "is_shared": True, "shared_with": "Gacek and more ..."},
+        {"id": 3, "name": "Freezer", "created_at": "12.02.2026", "is_shared": False},
+        {"id": 4, "name": "Attic", "created_at": "08.03.2026", "is_shared": False},
+        {"id": 5, "name": "Room fridge", "created_at": "20.04.2026", "is_shared": False},
+        {"id": 6, "name": "Kitchen cabinet", "created_at": "23.04.2026", "is_shared": False},
+    ]
+
+    context = {
+        'user_areas': fake_areas
+    }
+
+    return render(request, 'areas/areas.html', context)
+
 def expenses(request):
     return render(request, 'expense-tracker/expense-tracker.html')
 
