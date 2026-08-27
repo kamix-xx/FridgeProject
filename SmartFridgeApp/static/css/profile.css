@@ -1,0 +1,170 @@
+/* =========================================
+   PROFILE PAGE & DELETE MODAL STYLES
+   ========================================= */
+
+/* Profil - układ i typografia */
+.profile-title {
+    color: var(--title-color);
+    font-size: 1.8rem;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    transition: color 0.3s ease;
+}
+
+.profile-avatar-box {
+    width: 150px;
+    height: 150px;
+    background-color: #ffffff;
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-avatar-icon {
+    font-size: 5rem;
+    color: #1a1a1a;
+}
+
+.profile-username {
+    color: var(--title-color);
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+}
+
+.profile-email {
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
+}
+
+.profile-email a {
+    color: var(--title-color);
+}
+
+.profile-date-box {
+    color: var(--title-color);
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    line-height: 1.5;
+}
+
+.max-w-280 {
+    max-width: 280px;
+}
+
+/* Przyciski profilu */
+.btn-profile-edit {
+    background-color: #d8c4b2;
+    color: #3b2f28;
+    border: none;
+    font-size: 1.05rem;
+    letter-spacing: 0.05em;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-profile-edit:hover {
+    background-color: #c4b09e;
+    color: #261f1a;
+}
+
+[data-bs-theme="dark"] .btn-profile-edit {
+    background-color: #4a3e35;
+    color: #e2cbab;
+}
+
+[data-bs-theme="dark"] .btn-profile-edit:hover {
+    background-color: #5c4d43;
+    color: #ffffff;
+}
+
+.btn-profile-delete {
+    background-color: #d9534f;
+    color: #ffffff;
+    border: none;
+    font-size: 1.05rem;
+    letter-spacing: 0.05em;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-profile-delete:hover {
+    background-color: #c9302c;
+    color: #ffffff;
+}
+
+/* Tło i maskowanie obrazka profilu */
+.profile-bg {
+    background-color: var(--profile-page-bg);
+}
+
+@media (min-width: 769px) {
+    .profile-image-section {
+        width: 80% !important;
+        right: 0 !important;
+        left: auto !important;
+    }
+
+    .profile-bg .image-section::after {
+        background: linear-gradient(to right, var(--profile-page-bg) 0%, transparent 30%);
+    }
+
+    .profile-image-section img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        -webkit-mask-image: linear-gradient(to right, transparent 0%, black 25%) !important;
+        mask-image: linear-gradient(to right, transparent 0%, black 25%) !important;
+    }
+}
+
+/* Czerwony Modal Potwierdzenia Usunięcia Konta */
+.custom-delete-modal-dialog {
+    max-width: 520px;
+}
+
+.custom-delete-modal-content {
+    background: linear-gradient(135deg, rgba(140, 18, 18, 0.92) 0%, rgba(70, 8, 8, 0.95) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+}
+
+.delete-modal-title {
+    font-size: 1.65rem;
+    font-weight: 400;
+    line-height: 1.35;
+    letter-spacing: 0.02em;
+}
+
+.delete-modal-subtitle {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 300;
+}
+
+.delete-modal-divider {
+    width: 65%;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.35);
+}
+
+.btn-delete-action {
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-delete-action:hover {
+    transform: scale(1.08);
+    opacity: 0.85;
+}
+
+.btn-delete-action:active {
+    transform: scale(0.96);
+}
