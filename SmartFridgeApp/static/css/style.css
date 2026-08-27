@@ -1,10 +1,11 @@
 /* Custom Palette Variables */
 :root, [data-bs-theme="light"] {
     --page-bg: #e2cbab;
+    --dashboard-page-bg: #e2cbab;
     --login-page-bg: #e2cbab;
     --landing-page-bg: #f4e5d0;
     --register-page-bg: #dbceca;
-    --nav-bg: rgba(184, 157, 126, 0.85);
+    --nav-bg: rgb(207 185 151 / 0.85);
     --title-color: #514336;
     --label-color: #514336;
     --subtext-color: #514336;
@@ -30,6 +31,7 @@
 
 [data-bs-theme="dark"] {
     --page-bg: #090a0c;
+    --dashboard-page-bg: #090a0c;
     --login-page-bg: #111214;
     --landing-page-bg: #090a0c;
     --register-page-bg: #21181d;
@@ -142,6 +144,7 @@ body {
 .custom-link:hover {
     color: #cc441b;
 }
+
 /* =========================================
    Free-floating Background Container
    ========================================= */
@@ -410,10 +413,20 @@ body {
     gap: 1rem;
 }
 
+/*!* Outline variant of the orange button, for secondary actions like "Sign in" *!*/
+/*[data-bs-theme="light"] .btn-outline-custom {*/
+/*    background-color: transparent;*/
+/*    color: #ffdfa4;*/
+/*    border: 2px solid #ffdfa4;*/
+/*    font-weight: 500;*/
+/*    font-size: 1.15rem;*/
+/*    transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;*/
+/*}*/
+
 /* Outline variant of the orange button, for secondary actions like "Sign in" */
 .btn-outline-custom {
     background-color: transparent;
-    color: #f3dbad;
+    color: #f3d2ad;
     border: 2px solid #f3dbad;
     font-weight: 500;
     font-size: 1.15rem;
@@ -429,48 +442,48 @@ body {
     transform: scale(0.98);
 }
 
-/* Notification badge, floating over the hero photo */
-.notify-badge {
-    position: absolute;
-    top: 130px;
-    right: 6%;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background-color: #e25327;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
-    z-index: 3;
-}
+/*!* Notification badge, floating over the hero photo *!*/
+/*.notify-badge {*/
+/*    position: absolute;*/
+/*    top: 130px;*/
+/*    right: 6%;*/
+/*    width: 52px;*/
+/*    height: 52px;*/
+/*    border-radius: 50%;*/
+/*    background-color: #e25327;*/
+/*    color: #ffffff;*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    justify-content: center;*/
+/*    font-size: 1.3rem;*/
+/*    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);*/
+/*    z-index: 3;*/
+/*}*/
 
-@media (max-width: 768px) {
-    .notify-badge {
-        display: none;
-    }
-}
+/*@media (max-width: 768px) {*/
+/*    .notify-badge {*/
+/*        display: none;*/
+/*    }*/
+/*}*/
 
-.notify-ping {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    border: 2px solid #e25327;
-    animation: sf-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
+/*.notify-ping {*/
+/*    position: absolute;*/
+/*    inset: 0;*/
+/*    border-radius: 50%;*/
+/*    border: 2px solid #e25327;*/
+/*    animation: sf-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;*/
+/*}*/
 
-@keyframes sf-ping {
-    0% {
-        transform: scale(1);
-        opacity: 0.6;
-    }
-    100% {
-        transform: scale(1.9);
-        opacity: 0;
-    }
-}
+/*@keyframes sf-ping {*/
+/*    0% {*/
+/*        transform: scale(1);*/
+/*        opacity: 0.6;*/
+/*    }*/
+/*    100% {*/
+/*        transform: scale(1.9);*/
+/*        opacity: 0;*/
+/*    }*/
+/*}*/
 
 /* Staggered fade-in for hero content */
 .hero-fade {
@@ -1090,6 +1103,7 @@ EXPENSE TRACKER MOJA CZĘŚĆ
 .expense-overlay {
     background: rgba(226, 203, 171, 0.3);
 }
+
 [data-bs-theme="dark"] .expense-overlay {
     background: rgba(9, 10, 12, 0.6);
 }
@@ -1255,13 +1269,34 @@ EXPENSE TRACKER MOJA CZĘŚĆ
 /*
    KOLORY LEGENDY I WYKRESÓW
 */
-.color-fats     { background-color: #ffeb3b; }
-.color-proteins { background-color: #ffffff; border: 1px solid #ddd; }
-.color-nutri-a  { background-color: #00e676; }
-.color-nutri-b  { background-color: #76ff03; }
-.color-nutri-c  { background-color: #c6ff00; }
-.color-nutri-d  { background-color: #ffca28; }
-.color-nutri-e  { background-color: #ff5252; }
+.color-fats {
+    background-color: #ffeb3b;
+}
+
+.color-proteins {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+}
+
+.color-nutri-a {
+    background-color: #00e676;
+}
+
+.color-nutri-b {
+    background-color: #76ff03;
+}
+
+.color-nutri-c {
+    background-color: #c6ff00;
+}
+
+.color-nutri-d {
+    background-color: #ffca28;
+}
+
+.color-nutri-e {
+    background-color: #ff5252;
+}
 
 /* Kontener specjalnie dla wykresu kołowego */
 .donut-container {

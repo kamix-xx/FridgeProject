@@ -1,7 +1,146 @@
 {% extends "base.html" %}
 
-{% block title %}SmartFridge+ — Dashboard{% endblock %}
+{% load static %}
+{% block head %}
+    <script src="{% static 'js/dashboard.js' %}" defer></script>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block title %}SmartFridge+ | Dashboard{% endblock %}
 
 {% block content %}
+        <!-- Page-specific Background Image Container -->
+        <div class="page-bg-image" aria-hidden="true">
+            <picture class="page-bg-light">
+                <img
+                        src="https://imgur.com/0pcTzYh.jpeg"
+                        alt=""
+                        class="page-bg-img"
+                >
+            </picture>
 
+            <picture class="page-bg-dark">
+                <img
+                        src="https://imgur.com/RZ0e0CP.jpeg"
+                        alt=""
+                        class="page-bg-img"
+                >
+            </picture>
+        </div>
+
+        <main class="dashboard-page">
+            <div class="dashboard-inner">
+
+                <!-- Search bar wrapped to align with Fridge panel width perfectly -->
+                <div class="dashboard-search-wrapper">
+                    <div class="dashboard-search-bar t-clear" id="searchWrap">
+
+                        <i class="bi bi-search dashboard-search-icon" aria-hidden="true"></i>
+
+                        <input
+                                type="search"
+                                id="productSearch"
+                                class="dashboard-search-input"
+                                placeholder="Search products…"
+                                aria-label="Search products"
+                                autocomplete="off"
+                        >
+
+                        <!-- Animated copy of the typed text -->
+                        <div class="t-clear-mirror" aria-hidden="true"></div>
+
+                        <!-- Animated replacement for the native placeholder -->
+                        <div class="t-clear-placeholder" aria-hidden="true">
+                            Search products…
+                        </div>
+
+                        <!-- Per-word dissolve streaks -->
+                        <div class="t-clear-glow" aria-hidden="true"></div>
+
+                        <button
+                                type="button"
+                                class="t-clear-btn"
+                                id="searchClearBtn"
+                                aria-label="Clear Search"
+                        >
+                            <i class="bi bi-x" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Fridge area carousel -->
+                <section class="fridge-panel">
+                    <button type="button" class="btn-scroll-down carousel-arrow" id="areaPrev"
+                            aria-label="Previous area"
+                            {% if areas|length < 2 %}disabled{% endif %}>
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+
+                    <div class="fridge-panel-body">
+                        <header class="fridge-panel-header">
+                            <h2 class="fridge-panel-title" id="areaTitle">
+                                {# Fixed fallback string #}
+                                {% if areas %}{{ areas.0.name }}{% else %}No areas{% endif %}
+                            </h2>
+
+                            <!-- Moved the edit pencil here -->
+                            <a href="#" class="area-edit-btn" title="Edit area" aria-label="Edit area">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+
+                            {# Quick-add popover #}
+                            <div class="t-morph" data-open="false">
+                                <button type="button" class="t-morph-plus" aria-expanded="false"
+                                        aria-label="Quick actions">
+                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                                        <path d="M9 1v16M1 9h16" stroke="currentColor" stroke-width="2"
+                                              stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                                <nav class="t-morph-menu">
+                                    <a href="#" class="t-morph-menu-item"><i class="bi bi-plus-circle"></i> Add product</a>
+                                    <a href="#" class="t-morph-menu-item"><i class="bi bi-upc-scan"></i> Scan
+                                        barcode</a>
+                                    <a href="#" class="t-morph-menu-item"><i class="bi bi-folder-plus"></i> Add area</a>
+                                </nav>
+                            </div>
+                        </header>
+
+                        <div class="area-carousel-viewport">
+                            <div class="area-carousel" id="areaCarousel">
+                                {% for area in areas %}
+                                    <div class="area-panel" data-area-name="{{ area.name }}">
+                                        {% if area.products %}
+                                            <ul class="product-list">
+                                                {% for user_product in area.products %}
+                                                    {% include "partials/product_row.html" with up=user_product %}
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p class="dashboard-empty-state">No products in this area yet.</p>
+                                        {% endif %}
+                                    </div>
+                                {% empty %}
+                                    <div class="area-panel">
+                                        <p class="dashboard-empty-state">
+                                            You don't have any areas yet — add one to get started.
+                                        </p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-scroll-down carousel-arrow" id="areaNext" aria-label="Next area"
+                            {% if areas|length < 2 %}disabled{% endif %}>
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </section>
+
+                <div class="dashboard-actions">
+                    <a href="#" class="btn-fridge-outline">View all areas</a>
+                    <a href="#" class="btn-fridge-outline"><i class="bi bi-plus"></i> Add new area</a>
+                </div>
+            </div>
+        </main>
 {% endblock %}

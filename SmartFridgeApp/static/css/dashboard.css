@@ -1,0 +1,1346 @@
+
+/* =========================================
+   FRIDGE DASHBOARD
+   ========================================= */
+
+:root {
+    /* -----------------------------------------
+       Quick-add "+" -> menu morph
+       ----------------------------------------- */
+    --morph-open-dur: 350ms;
+    --morph-close-dur: 250ms;
+
+    --morph-ease: cubic-bezier(0.34, 1.25, 0.64, 1);
+
+    --morph-close-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    --morph-r-closed: 50%;
+    --morph-r-open: 18px;
+
+    --morph-fade-dur: 200ms;
+    --morph-slide: 24px;
+    --morph-blur: 2px;
+
+
+    /* -----------------------------------------
+       Input clear + dissolve
+       ----------------------------------------- */
+    --clear-dur: 1000ms;
+
+    --clear-out-dur: 400ms;
+    --clear-in-dur: 400ms;
+
+    --clear-out-fly: 12px;
+    --clear-in-fly: 12px;
+
+    --clear-out-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    --clear-in-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    --clear-blur: 2px;
+
+    --glow-delay: 50ms;
+    --glow-peak-at: 0.15;
+    --glow-opacity: 0.42;
+    --glow-spread: 1.5;
+
+
+    /* -----------------------------------------
+       Fridge colors
+       ----------------------------------------- */
+    --fridge-danger: #d9534f;
+    --fridge-danger-hover: #c9302c;
+}
+
+body {
+    background-color: var(--dashboard-page-bg);
+}
+
+/* =========================================
+   PAGE-SPECIFIC BACKGROUND
+   Matches login/register structure with overlays, fade masks & pushed to lower z-levels
+   ========================================= */
+
+.page-bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Pushed behind regular content */
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* Light image section: positioned on the left with tint overlay and fade to the right */
+.page-bg-light {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 58.33%;
+    height: 100%;
+    display: block;
+    z-index: 1;
+}
+
+.page-bg-light .page-bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left center;
+    position: relative;
+    z-index: 1;
+}
+
+/* Light background tint overlay */
+.page-bg-light::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgb(241 220 195 / 0.37);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Light background fading gradient mask */
+.page-bg-light::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, transparent 80%, var(--dashboard-page-bg, #ffffff) 100%);
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* Dark image section: positioned on the right with dark overlay and fade to the left */
+.page-bg-dark {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 58.33%;
+    height: 100%;
+    display: block;
+    z-index: 1;
+}
+
+.page-bg-dark .page-bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: right center;
+    position: relative;
+    z-index: 1;
+}
+
+/* Dark background tint overlay */
+.page-bg-dark::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.50);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Dark background fading gradient mask */
+.page-bg-dark::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to left, transparent 80%, var(--dashboard-page-bg, #121212) 100%);
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* =========================================
+   Theme swapping
+   ========================================= */
+
+/* Dark mode */
+[data-bs-theme="dark"] .page-bg-light {
+    display: none;
+}
+
+[data-bs-theme="dark"] .page-bg-dark {
+    display: block;
+}
+
+/* Light mode */
+[data-bs-theme="light"] .page-bg-dark {
+    display: none;
+}
+
+[data-bs-theme="light"] .page-bg-light {
+    display: block;
+}
+
+/* Default = light */
+:root:not([data-bs-theme="dark"]) .page-bg-dark {
+    display: none;
+}
+
+:root:not([data-bs-theme="dark"]) .page-bg-light {
+    display: block;
+}
+
+/* =========================================
+   Mobile View (max-width: 768px)
+   ========================================= */
+@media (max-width: 768px) {
+    .page-bg-light,
+    .page-bg-dark {
+        width: 100%;
+        left: 0;
+        right: 0;
+    }
+
+    .page-bg-img {
+        object-position: center center;
+    }
+
+    .page-bg-light::after {
+        background: linear-gradient(to top, var(--dashboard-page-bg, #ffffff) 0%, var(--dashboard-page-bg, #ffffff) 10%, transparent 100%);
+    }
+
+    .page-bg-dark::after {
+        background: linear-gradient(to top, var(--dashboard-page-bg, #121212) 0%, var(--dashboard-page-bg, #121212) 10%, transparent 100%);
+    }
+}
+
+/* =========================================
+   Dashboard Layout
+   ========================================= */
+
+.dashboard-page {
+    padding-top: calc(70px + 2rem);
+    padding-bottom: 4rem;
+}
+
+
+.dashboard-inner {
+    max-width: 1400px;
+
+    margin: 0 auto;
+
+    padding: 0 1.5rem;
+}
+
+
+/* =========================================
+   Search Bar
+   ========================================= */
+
+.dashboard-search-wrapper {
+    padding: 0 calc(34px + 1rem);
+    margin-bottom: 1.5rem;
+    margin-left: 0.8rem;
+    margin-right: 0.8rem;
+}
+
+
+.dashboard-search-bar {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    gap: 0.75rem;
+
+    background-color: rgb(207 181 154 / 0.75);
+
+    border: 1px solid #8f4c1f;
+
+    border-radius: 12px;
+
+    padding: 0;
+
+    backdrop-filter: blur(24px);
+
+    overflow: hidden;
+
+    transition: background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+
+[data-bs-theme="dark"] .dashboard-search-bar {
+    background-color: rgba(0, 0, 0, 0.35);
+
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+
+/* =========================================
+   Search Icon
+   ========================================= */
+
+.dashboard-search-icon {
+    position: absolute;
+
+    left: 1.1rem;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    z-index: 6;
+
+    color: var(--title-color);
+
+    font-size: 1.1rem;
+
+    pointer-events: none;
+
+    opacity: 0.8;
+}
+
+
+/* =========================================
+   Actual Search Input
+   ========================================= */
+
+.dashboard-search-input {
+    position: relative;
+
+    z-index: 1;
+
+    width: 100%;
+    min-width: 0;
+
+    border: 0;
+
+    outline: 0;
+
+    background: transparent;
+
+    color: var(--title-color);
+
+    font: inherit;
+
+    font-size: 1rem;
+    line-height: 1.5;
+
+    padding: 0.85rem 3rem 0.85rem 2.9rem;
+
+    box-sizing: border-box;
+}
+
+
+.dashboard-search-input::placeholder {
+    color: var(--title-color);
+    opacity: 0.6;
+}
+
+
+.dashboard-search-input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+
+    display: none;
+}
+
+
+/*
+ * Hide native text while the mirror owns it.
+ */
+.t-clear.has-value > .dashboard-search-input,
+.t-clear.is-clearing > .dashboard-search-input {
+    -webkit-text-fill-color: transparent;
+
+    color: transparent;
+}
+
+
+/*
+ * Native placeholder is also hidden while
+ * the fake placeholder is animating.
+ */
+.t-clear.is-clearing > .dashboard-search-input::placeholder {
+    opacity: 0 !important;
+    color: transparent !important;
+}
+
+
+/* =========================================
+   Mirror Text
+   ========================================= */
+
+.t-clear-mirror,
+.t-clear-placeholder {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+
+    box-sizing: border-box;
+
+    padding: 0.85rem 3rem 0.85rem 2.9rem;
+
+    pointer-events: none;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    font: inherit;
+
+    font-size: 1rem;
+    line-height: 1.5;
+
+    will-change: transform,
+    opacity,
+    filter;
+}
+
+
+/*
+ * Typed text mirror
+ */
+.t-clear-mirror {
+    z-index: 2;
+
+    color: var(--title-color);
+
+    opacity: 0;
+}
+
+
+/*
+ * Visible while there is text and during clear.
+ */
+.t-clear.has-value .t-clear-mirror,
+.t-clear.is-clearing .t-clear-mirror {
+    opacity: 1;
+}
+
+
+/* =========================================
+   Fake Placeholder
+   ========================================= */
+
+.t-clear-placeholder {
+    z-index: 1;
+
+    color: var(--title-color);
+
+    opacity: 0;
+
+    transform: translateY(
+            calc(-1 * var(--clear-in-fly))
+    );
+
+    filter: blur(var(--clear-blur));
+}
+
+
+.t-clear.is-clearing .t-clear-placeholder {
+    opacity: 0.9;
+}
+
+
+/* =========================================
+   Dissolve Glow
+   ========================================= */
+
+.t-clear-glow {
+    position: absolute;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    z-index: 3;
+
+    opacity: 0;
+
+    /*
+     * Light mode:
+     * darkens the glass surface.
+     */
+    mix-blend-mode: multiply;
+
+    will-change: opacity;
+}
+
+
+/*
+ * Dark mode:
+ * use the same glow as light, but inverted
+ * through screen blending.
+ */
+[data-bs-theme="dark"] .t-clear-glow {
+    mix-blend-mode: screen;
+}
+
+
+/* More visible streaks in dark mode */
+[data-bs-theme="dark"] .t-clear {
+    --glow-opacity: 0.85;
+}
+
+
+/* =========================================
+   Clear Button
+   ========================================= */
+
+.t-clear-btn {
+    position: absolute;
+
+    right: 0.85rem;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    z-index: 6;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 2rem;
+    height: 2rem;
+
+    padding: 0;
+
+    border: 0;
+
+    border-radius: 50%;
+
+    background: transparent;
+
+    color: var(--title-color);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    cursor: pointer;
+
+    transition: opacity 0.2s ease,
+    background-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+
+/*
+ * JS adds .has-value whenever the input isn't empty.
+ */
+.t-clear.has-value .t-clear-btn {
+    opacity: 0.65;
+
+    pointer-events: auto;
+}
+
+
+/*
+ * Hover state.
+ */
+.t-clear.has-value .t-clear-btn:hover {
+    opacity: 1;
+
+    background: rgba(0, 0, 0, 0.08);
+}
+
+
+[data-bs-theme="dark"] .t-clear.has-value .t-clear-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+
+/*
+ * Hide X while clearing.
+ */
+.t-clear.is-clearing .t-clear-btn {
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+
+/* =========================================
+   Area Edit Button
+   ========================================= */
+
+.area-edit-btn {
+    position: absolute;
+
+    right: 64px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 8px;
+
+    color: var(--title-color);
+
+    background: rgba(255, 255, 255, 0.35);
+
+    transition: background-color 0.2s ease,
+    transform 0.15s ease;
+
+    text-decoration: none;
+
+    z-index: 10;
+}
+
+
+.area-edit-btn:hover {
+    background: rgba(255, 255, 255, 0.6);
+
+    transform: scale(1.05);
+
+    color: var(--title-color);
+}
+
+
+[data-bs-theme="dark"] .area-edit-btn {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+
+[data-bs-theme="dark"] .area-edit-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+
+/* =========================================
+   Fridge Glass Panel + Carousel
+   ========================================= */
+
+.fridge-panel {
+    display: flex;
+
+    align-items: center;
+
+    gap: 1rem;
+}
+
+
+.fridge-panel-body {
+    flex: 1;
+
+    min-width: 0;
+
+    background: rgba(255, 222, 191, 0.4);
+
+    border: 1px solid #8b481c;
+
+    border-radius: 12px;
+
+    backdrop-filter: blur(32px);
+
+    padding: 1.75rem;
+
+    transition: background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+
+[data-bs-theme="dark"] .fridge-panel-body {
+    background: rgba(20, 16, 12, 0.55);
+
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+
+/* =========================================
+   Fridge Header
+   ========================================= */
+
+.fridge-panel-header {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 1.25rem;
+
+    min-height: 48px;
+}
+
+
+.fridge-panel-title {
+    color: var(--title-color);
+
+    font-size: 1.75rem;
+
+    font-weight: 500;
+
+    letter-spacing: 0.15em;
+
+    text-transform: uppercase;
+
+    margin: 0;
+
+    padding-right: 120px;
+
+    transition: color 0.3s ease;
+}
+
+
+/* =========================================
+   Carousel Controls
+   ========================================= */
+
+.carousel-arrow {
+    flex-shrink: 0;
+}
+
+
+.carousel-arrow:disabled {
+    opacity: 0.35;
+
+    cursor: default;
+
+    transform: none !important;
+}
+
+
+.area-carousel-viewport {
+    overflow: hidden;
+
+    border-radius: 8px;
+}
+
+
+.area-carousel {
+    display: flex;
+
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+
+    will-change: transform;
+}
+
+
+.area-panel {
+    flex: 0 0 100%;
+
+    min-width: 0;
+
+    height: 60vh;
+
+    min-height: 450px;
+
+    overflow-y: auto;
+
+    padding-right: 0.25rem;
+}
+
+
+/* =========================================
+   Product List
+   ========================================= */
+
+.product-list {
+    list-style: none;
+
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 0.85rem;
+}
+
+
+.product-row {
+    display: flex;
+
+    align-items: center;
+
+    gap: 1rem;
+
+    background: rgba(255, 255, 255, 0.58);
+
+    border-radius: 12px;
+
+    padding: 0.9rem 1.1rem;
+
+    transition: background-color 0.3s ease,
+    transform 0.15s ease;
+}
+
+
+.product-row:hover {
+    transform: translateY(-1px);
+}
+
+
+[data-bs-theme="dark"] .product-row {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+
+.product-icon {
+    flex-shrink: 0;
+
+    width: 52px;
+    height: 52px;
+
+    border-radius: 12px;
+
+    background-color: #e0541d;
+
+    color: #eabb9f;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.4rem;
+}
+
+
+.product-info {
+    flex-shrink: 0;
+
+    width: 190px;
+
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 0.15rem;
+}
+
+
+.product-name {
+    color: var(--title-color);
+
+    font-size: 1.05rem;
+
+    font-weight: 500;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+.product-exp {
+    color: var(--title-color);
+
+    opacity: 0.75;
+
+    font-size: 0.8rem;
+}
+
+
+.freshness-bar {
+    flex: 1;
+
+    min-width: 80px;
+
+    height: 12px;
+
+    border-radius: 50px;
+
+    background: rgba(0, 0, 0, 0.15);
+
+    overflow: hidden;
+}
+
+
+[data-bs-theme="dark"] .freshness-bar {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+
+.freshness-bar-fill {
+    height: 100%;
+
+    border-radius: 50px;
+
+    transition: width 0.4s ease;
+}
+
+
+.freshness-fresh .freshness-bar-fill {
+    background: linear-gradient(
+            90deg,
+            #6fcf3d 0%,
+            #2e7d32 100%
+    );
+}
+
+
+.freshness-warning .freshness-bar-fill {
+    background: linear-gradient(
+            90deg,
+            rgba(252, 225, 16, 0.9) 0%,
+            rgba(184, 128, 25, 0.9) 100%
+    );
+}
+
+
+.freshness-critical .freshness-bar-fill,
+.freshness-expired .freshness-bar-fill {
+    background: linear-gradient(
+            90deg,
+            var(--fridge-danger) 0%,
+            var(--fridge-danger-hover) 100%
+    );
+}
+
+
+.freshness-expired .freshness-bar-fill {
+    width: 100% !important;
+}
+
+
+.product-row-actions {
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 0.4rem;
+}
+
+
+.icon-btn {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    border-radius: 8px;
+
+    color: var(--title-color);
+
+    background: transparent;
+
+    transition: background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+
+.icon-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+
+    color: var(--title-color);
+}
+
+
+[data-bs-theme="dark"] .icon-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+
+.icon-btn-danger {
+    color: var(--fridge-danger);
+}
+
+
+.icon-btn-danger:hover {
+    background: rgba(217, 83, 79, 0.14);
+
+    color: var(--fridge-danger-hover);
+}
+
+
+.dashboard-empty-state {
+    color: var(--title-color);
+
+    opacity: 0.75;
+
+    text-align: center;
+
+    padding: 2.5rem 1rem;
+
+    font-size: 1.05rem;
+}
+
+
+.dashboard-actions {
+    display: flex;
+
+    justify-content: center;
+
+    gap: 1.5rem;
+
+    margin-top: 1.5rem;
+
+    flex-wrap: wrap;
+}
+
+
+.btn-fridge-outline {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 0.4rem;
+
+    background: rgba(241, 227, 212, 0.83);
+
+    border: 1px solid #934e20;
+
+    border-radius: 12px;
+
+    color: var(--title-color);
+
+    font-size: 0.9rem;
+
+    letter-spacing: 0.16em;
+
+    text-transform: uppercase;
+
+    text-decoration: none;
+
+    padding: 0.7rem 1.75rem;
+
+    backdrop-filter: blur(32px);
+
+    transition: background-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+
+.btn-fridge-outline:hover {
+    background: rgba(241, 227, 212, 1);
+
+    color: var(--title-color);
+
+    transform: translateY(-1px);
+}
+
+
+[data-bs-theme="dark"] .btn-fridge-outline {
+    background: rgba(255, 229, 204, 0.16);
+
+    color: var(--sidemenu-text);
+}
+
+
+[data-bs-theme="dark"] .btn-fridge-outline:hover {
+    background: rgba(255, 229, 204, 0.28);
+}
+
+
+/* =========================================
+   Quick-add "+" -> menu morph
+   ========================================= */
+
+.t-morph {
+    position: absolute;
+
+    top: 0;
+    right: 0;
+
+    width: 48px;
+    height: 48px;
+
+    border-radius: var(--morph-r-closed);
+
+    background-color: #e25327;
+
+    box-shadow: 0 6px 16px rgba(226, 83, 39, 0.35);
+
+    overflow: hidden;
+
+    z-index: 20;
+
+    transition: width var(--morph-close-dur) var(--morph-close-ease),
+    height var(--morph-close-dur) var(--morph-close-ease),
+    border-radius var(--morph-close-dur) var(--morph-close-ease),
+    background-color 0.3s ease;
+}
+
+
+.t-morph[data-open="true"] {
+    width: 220px;
+
+    height: 140px;
+
+    border-radius: var(--morph-r-open);
+
+    background-color: #ffffff;
+
+    transition: width var(--morph-open-dur) var(--morph-ease),
+    height var(--morph-open-dur) var(--morph-ease),
+    border-radius var(--morph-open-dur) var(--morph-ease),
+    background-color 0.3s ease;
+}
+
+
+[data-bs-theme="dark"] .t-morph[data-open="true"] {
+    background-color: #2a221c;
+}
+
+
+.t-morph-plus {
+    position: absolute;
+
+    inset: 0;
+
+    width: 48px;
+    height: 48px;
+
+    display: grid;
+
+    place-items: center;
+
+    border: 0;
+
+    background: transparent;
+
+    color: #ffffff;
+
+    cursor: pointer;
+
+    transition: opacity var(--morph-fade-dur) var(--morph-close-ease),
+    transform var(--morph-open-dur) var(--morph-close-ease),
+    filter var(--morph-fade-dur) var(--morph-close-ease);
+}
+
+
+.t-morph-plus svg {
+    transition: transform var(--morph-open-dur) var(--morph-close-ease);
+}
+
+
+.t-morph[data-open="true"] .t-morph-plus {
+    opacity: 0;
+
+    transform: translateX(
+            calc(-1 * var(--morph-slide))
+    );
+
+    filter: blur(var(--morph-blur));
+
+    pointer-events: none;
+}
+
+
+.t-morph[data-open="true"] .t-morph-plus svg {
+    transform: rotate(45deg);
+}
+
+
+.t-morph-menu {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    padding: 0.5rem;
+
+    gap: 0.2rem;
+
+    opacity: 0;
+
+    transform: translateX(
+            var(--morph-slide)
+    ) scale(0.97);
+
+    filter: blur(var(--morph-blur));
+
+    pointer-events: none;
+
+    transition: opacity var(--morph-fade-dur) var(--morph-close-ease),
+    transform var(--morph-open-dur) var(--morph-close-ease),
+    filter var(--morph-fade-dur) var(--morph-close-ease);
+}
+
+
+.t-morph[data-open="true"] .t-morph-menu {
+    opacity: 1;
+
+    transform: translateX(0) scale(1);
+
+    filter: blur(0);
+
+    pointer-events: auto;
+}
+
+
+.t-morph-menu-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 0.6rem;
+
+    padding: 0.5rem 0.75rem;
+
+    border-radius: 10px;
+
+    color: var(--title-color);
+
+    text-decoration: none;
+
+    font-size: 0.92rem;
+
+    white-space: nowrap;
+
+    transition: background-color 0.15s ease;
+}
+
+
+.t-morph-menu-item:hover {
+    background-color: rgba(226, 83, 39, 0.1);
+
+    color: var(--title-color);
+}
+
+
+.t-morph-menu-item i {
+    color: #e25327;
+
+    font-size: 1rem;
+}
+
+
+/* =========================================
+   Reduced Motion
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .t-morph,
+    .t-morph-plus,
+    .t-morph-plus svg,
+    .t-morph-menu,
+    .t-clear-mirror,
+    .t-clear-placeholder {
+        transition: none !important;
+    }
+
+    .area-carousel {
+        transition: none !important;
+    }
+
+    .t-clear-glow {
+        opacity: 0 !important;
+    }
+}
+
+
+/* =========================================
+   Responsive
+   ========================================= */
+
+@media (max-width: 900px) {
+
+    .dashboard-search-wrapper {
+        padding: 0;
+    }
+
+    .fridge-panel {
+        flex-wrap: wrap;
+    }
+
+    .fridge-panel-body {
+        order: 2;
+
+        flex-basis: 100%;
+    }
+
+    .carousel-arrow {
+        order: 1;
+    }
+
+    .product-row {
+        flex-wrap: wrap;
+    }
+
+    .freshness-bar {
+        order: 3;
+
+        flex-basis: 100%;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .dashboard-inner {
+        padding: 0 1rem;
+    }
+
+    .product-info {
+        width: auto;
+    }
+
+    .t-morph[data-open="true"] {
+        width: 190px;
+    }
+}
+
+
+/* =========================================
+   Firefox performance mode
+   ========================================= */
+
+@-moz-document url-prefix() {
+
+    /* Kill expensive backdrop blurs */
+    .dashboard-search-bar,
+    .fridge-panel-body,
+    .btn-fridge-outline {
+        -moz-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+
+    /* Replace glass with a solid-ish translucent surface */
+    .dashboard-search-bar {
+        background-color: rgba(207, 181, 154, 0.88);
+    }
+
+    .fridge-panel-body {
+        background-color: rgba(255, 222, 191, 0.82);
+    }
+
+    .btn-fridge-outline {
+        background-color: rgba(241, 227, 212, 0.95);
+    }
+
+    /* Firefox doesn't need to render the dissolve blur either */
+    .t-clear-mirror,
+    .t-clear-placeholder {
+        filter: none !important;
+    }
+
+    /* Remove any remaining expensive filter effects from the morph */
+    .t-morph-plus,
+    .t-morph-menu {
+        filter: none !important;
+    }
+
+    /* Dark theme */
+    [data-bs-theme="dark"] .dashboard-search-bar {
+        background-color: rgba(20, 16, 12, 0.82);
+    }
+
+    [data-bs-theme="dark"] .fridge-panel-body {
+        background-color: rgba(20, 16, 12, 0.88);
+    }
+
+    [data-bs-theme="dark"] .btn-fridge-outline {
+        background-color: rgba(40, 32, 26, 0.9);
+    }
+}
