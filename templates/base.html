@@ -10,8 +10,8 @@
     <script>
         (function () {
             try {
-                var stored = localStorage.getItem('theme');
-                var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                let stored = localStorage.getItem('theme');
+                let theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
                 document.documentElement.setAttribute('data-bs-theme', theme);
             } catch (e) { /* localStorage unavailable (e.g. private mode) - fall back to the light default */
             }
@@ -45,9 +45,6 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="#">A</a></li>
-                    {% comment %}
-                    <li><a class="dropdown-item" href="#"></a></li>
-                    {% endcomment %}
                 </ul>
             </div>
 
@@ -71,9 +68,8 @@
 
 <!-- Theme controls shown beside the open side menu -->
 {% if user.is_authenticated %}
+
     <!-- Side Menu (offcanvas) -->
-
-
     <div class="side-menu-theme-controls" id="sideMenuThemeControls" aria-label="Theme controls">
         <button
                 type="button"

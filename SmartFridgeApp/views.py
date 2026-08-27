@@ -1,4 +1,4 @@
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .forms import CustomUserCreationForm
@@ -118,3 +118,15 @@ def expense_details(request):
 # If a user is logged-in, Django automatically passes 'request.user' object to every template as 'user'
 def profile(request):
     return render(request, 'user/profile.html')
+
+
+@login_required(login_url='login')
+def delete_account(request):
+    if request.method == 'POST':
+        user = request.user
+        logout(request)
+        user.delete()
+        messages.success(request, 'Your account has been deleted.')
+        return redirect('login')
+
+    return redirect('profile')
