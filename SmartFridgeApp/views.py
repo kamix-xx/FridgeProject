@@ -47,11 +47,11 @@ def _with_freshness(user_product):
 
     return user_product
 
-
-@login_required
 def home(request):
+
     if not request.user.is_authenticated:
         return redirect('landing')
+
     """
     Dashboard / "Fridge" view. Shows a carousel of the areas the current
     user belongs to, each with the products currently stored in it.
