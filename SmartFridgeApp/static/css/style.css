@@ -1193,9 +1193,9 @@ body.side-menu-open .side-menu-theme-controls {
     -webkit-backdrop-filter: blur(6px);
 }
 
-/* Wygląd okienka */
+
 .custom-popup {
-    background-color: #fdfaf6; /* Ciepła, kremowa biel ze zrzutu ekranu */
+    background-color: #fdfaf6;
     border: none;
     border-radius: 20px;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
@@ -1207,14 +1207,14 @@ body.side-menu-open .side-menu-theme-controls {
     color: #e2cbab;
 }
 
-/* Typografia wewnątrz pop-upów */
+
 .popup-title {
     font-size: 1.6rem;
     font-weight: 500;
     line-height: 1.4;
 }
 
-/* Przyciski tekstowe (Delete modal) */
+
 .popup-btn-text {
     color: var(--title-color);
     font-size: 1.15rem;
@@ -1228,7 +1228,7 @@ body.side-menu-open .side-menu-theme-controls {
 }
 
 .popup-btn-danger {
-    color: #dc3545; /* Czerwony */
+    color: #dc3545;
     font-size: 1.15rem;
     font-weight: 400;
     padding: 0;
@@ -1238,7 +1238,7 @@ body.side-menu-open .side-menu-theme-controls {
     color: #a71d2a;
 }
 
-/* Linia oddzielająca */
+
 .popup-divider {
     border-color: rgba(81, 67, 54, 0.4);
     width: 80%;
@@ -1250,7 +1250,7 @@ body.side-menu-open .side-menu-theme-controls {
     border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Formularz w pop-upie (Add modal) */
+
 .popup-label {
     font-size: 0.85rem;
     margin-bottom: 0.2rem;
@@ -1278,12 +1278,12 @@ body.side-menu-open .side-menu-theme-controls {
     border-color: #ff9166;
 }
 
-/* Okrągły przycisk akceptacji */
+
 .popup-circular-btn {
     width: 55px;
     height: 55px;
     border-radius: 50%;
-    background-color: #ff9166; /* Ten sam pomarańczowy co karta */
+    background-color: #ff9166;
     border: none;
     color: #2c1e16;
     font-size: 2.2rem;
@@ -1296,6 +1296,17 @@ body.side-menu-open .side-menu-theme-controls {
 .popup-circular-btn:hover {
     transform: scale(1.08);
     background-color: #ffa17c;
+}
+
+
+.popup-back-btn {
+    color: var(--title-color) !important;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.popup-back-btn:hover {
+    opacity: 0.7;
+    transform: translateX(-4px);
 }
 
 /*

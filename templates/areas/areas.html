@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}SmartFridge+ — My Areas{% endblock %}
-{% block css %} <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=8"> {% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=8"> {% endblock %}
 
 {% block content %}
     <main class="areas-page-wrapper position-relative min-vh-100 d-flex align-items-center pt-5 pb-5">
@@ -98,14 +99,13 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- POP-UP: Add Area -->
-    <!-- ========================================== -->
+
     <div class="modal fade" id="addAreaModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content custom-popup">
 
-                <button type="button" class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
                         data-bs-dismiss="modal" aria-label="Close"></button>
 
                 <div class="modal-body text-center p-4 p-md-5">
@@ -117,7 +117,47 @@
                     </div>
 
                     <p class="custom-subtext mb-5">
-                        Add a shared area <a href="#" class="custom-link" style="color: #ff9166;">HERE</a>
+
+                        Add a shared area
+                        <a href="#" class="custom-link" style="color: #ff9166;" data-bs-toggle="modal"
+                           data-bs-target="#addSharedAreaModal">HERE</a>
+                    </p>
+
+                    <button type="button" class="popup-circular-btn mx-auto">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="addSharedAreaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup position-relative">
+
+
+                <button type="button"
+                        class="btn btn-link popup-back-btn position-absolute top-0 start-0 m-3 shadow-none z-3 p-0 fs-4"
+                        data-bs-toggle="modal" data-bs-target="#addAreaModal" aria-label="Go back">
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+
+
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div class="modal-body text-center p-4 p-md-5">
+                    <h3 class="popup-title mb-4">Add Area</h3>
+
+                    <div class="text-start mb-2">
+                        <label for="newAreaCode" class="form-label popup-label">Area code</label>
+                        <input type="text" class="form-control popup-input shadow-none" id="newAreaCode">
+                    </div>
+
+                    <p class="custom-subtext mb-5 invisible">
+                        Add a shared area <a href="#" class="custom-link">HERE</a>
                     </p>
 
                     <button type="button" class="popup-circular-btn mx-auto">
