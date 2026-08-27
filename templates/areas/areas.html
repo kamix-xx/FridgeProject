@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}SmartFridge+ — My Areas{% endblock %}
-{% block css %}
-    <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=8"> {% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=8">
+{% endblock %}
 
 {% block content %}
     <main class="areas-page-wrapper position-relative min-vh-100 d-flex align-items-center pt-5 pb-5">

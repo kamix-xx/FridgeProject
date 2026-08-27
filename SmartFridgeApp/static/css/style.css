@@ -830,6 +830,18 @@ body.side-menu-open .side-menu,
     padding-left: 0.2rem;
 }
 
+.side-menu-user {
+    color: inherit;
+    text-decoration: none;
+}
+
+.side-menu-user:visited,
+.side-menu-user:hover,
+.side-menu-user:active {
+    color: inherit;
+    text-decoration: none;
+}
+
 /* =========================================
    Responsive Side Menu
    ========================================= */
@@ -941,6 +953,19 @@ body.side-menu-open .side-menu-theme-controls {
 [data-bs-theme="dark"] #sideMenuDarkBtn {
     background-color: #ffffff;
     color: #111111;
+}
+
+
+.side-menu-user {
+    color: inherit;
+    text-decoration: none;
+}
+
+.side-menu-user:visited,
+.side-menu-user:hover,
+.side-menu-user:active {
+    color: inherit;
+    text-decoration: none;
 }
 
 
