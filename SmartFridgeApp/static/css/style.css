@@ -1309,6 +1309,61 @@ body.side-menu-open .side-menu-theme-controls {
     transform: translateX(-4px);
 }
 
+.popup-share-group {
+    border: 1px solid rgba(81, 67, 54, 0.5);
+    border-radius: 10px;
+    overflow: hidden; ]
+    max-width: 320px;
+}
+
+.popup-share-group .input-group-text {
+    background-color: transparent;
+    border: none;
+    color: var(--title-color);
+    font-size: 1.3rem;
+    padding-right: 0.5rem;
+}
+
+.popup-share-group .form-control {
+    background-color: transparent;
+    border: none;
+    color: var(--title-color);
+    font-size: 0.95rem;
+    padding-left: 0.2rem;
+}
+
+.popup-share-group .btn-copy {
+    background-color: transparent;
+    border: none;
+    color: var(--title-color);
+    font-size: 1.3rem;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.popup-share-group .btn-copy:hover {
+    opacity: 0.6;
+}
+
+.popup-share-group .btn-copy:active {
+    transform: scale(0.9);
+}
+
+[data-bs-theme="dark"] .popup-share-group {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+
+.share-social-icon {
+    font-size: 1.8rem;
+    color: var(--title-color) !important;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.share-social-icon:hover {
+    transform: translateY(-4px);
+    opacity: 0.7;
+}
+
 /*
 EXPENSE TRACKER MOJA CZĘŚĆ
 =======================
