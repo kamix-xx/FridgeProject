@@ -70,25 +70,35 @@
     </div>
 
     <!-- Modal Potwierdzenia Usunięcia Konta -->
-    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title fw-bold">Delete Account</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-start">
-                    Are you sure you want to delete your account? This action cannot be undone.
-                </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel
-                    </button>
-                    <form method="post" action="#">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger rounded-pill px-4">Delete</button>
-                    </form>
-                </div>
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered custom-delete-modal-dialog">
+        <div class="modal-content custom-delete-modal-content text-center text-white py-5 px-4">
+
+            <!-- Główny tekst -->
+            <h2 class="delete-modal-title mb-2">Are you sure you want to delete your account?</h2>
+            <p class="delete-modal-subtitle mb-4">This action is irreversible</p>
+
+            <!-- Przycisk YES -->
+            <form method="post" action="{% url 'delete_account' %}" class="w-100">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-delete-action text-white bg-transparent border-0 p-0 d-inline-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-check-circle fs-3"></i>
+                    <span class="fst-italic fs-4 fw-normal">YES</span>
+                </button>
+            </form>
+
+            <!-- Linia podziału -->
+            <div class="delete-modal-divider mx-auto my-3"></div>
+
+            <!-- Przycisk NO -->
+            <div>
+                <button type="button" class="btn btn-delete-action text-white bg-transparent border-0 p-0 d-inline-flex align-items-center justify-content-center gap-2" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle fs-3"></i>
+                    <span class="fst-italic fs-4 fw-normal">NO</span>
+                </button>
             </div>
+
         </div>
     </div>
+</div>
 {% endblock %}
