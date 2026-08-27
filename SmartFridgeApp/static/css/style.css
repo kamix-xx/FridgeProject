@@ -5,6 +5,7 @@
     --login-page-bg: #e2cbab;
     --landing-page-bg: #f4e5d0;
     --register-page-bg: #dbceca;
+    --profile-page-bg: #667070;
     --nav-bg: rgb(207 185 151 / 0.85);
     --title-color: #514336;
     --label-color: #514336;
@@ -35,6 +36,7 @@
     --login-page-bg: #111214;
     --landing-page-bg: #090a0c;
     --register-page-bg: #21181d;
+    --profile-page-bg: #121619;
     --nav-bg: rgba(0, 0, 0, 0.85);
     --title-color: #ad9477;
     --label-color: #ad9477;
@@ -160,6 +162,19 @@ body {
     /*transform: translateX(-80px);*/
 }
 
+.image-section {
+    width: 100%;
+    transform: translateX(0); /* Fills the whole screen behind the form */
+}
+
+.profile-image-section {
+    width: 80% !important;
+}
+
+.profile-bg {
+    background-color: var(--profile-page-bg);
+}
+
 /* Make <picture> tags behave like block elements */
 .theme-img-light, .theme-img-dark {
     width: 100%;
@@ -188,6 +203,15 @@ body {
     pointer-events: none;
 }
 
+.profile-bg .image-section::after {
+    background: linear-gradient(to right, var(--profile-page-bg) 0%, transparent 30%);
+}
+
+.profile-image-section img {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 25%);
+    mask-image: linear-gradient(to right, transparent 0%, black 25%);
+}
+
 .register-bg .image-section::after {
     background: linear-gradient(to right, var(--register-page-bg) 0%, transparent 20%);
 }
@@ -197,9 +221,9 @@ body {
    ========================================= */
 @media (max-width: 768px) {
     /* --- Image & Gradient Adjustments --- */
-    .image-section {
-        width: 100%;
-        transform: translateX(0); /* Fills the whole screen behind the form */
+    .profile-image-section img {
+        -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%);
+        mask-image: linear-gradient(to right, transparent 0%, black 35%);
     }
 
     .responsive-bg-img {
