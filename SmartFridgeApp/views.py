@@ -100,6 +100,9 @@ def areas(request):
         {"id": 4, "name": "Attic", "created_at": "08.03.2026", "is_shared": False},
         {"id": 5, "name": "Room fridge", "created_at": "20.04.2026", "is_shared": False},
         {"id": 6, "name": "Kitchen cabinet", "created_at": "23.04.2026", "is_shared": False},
+        # {"id": 7, "name": "Kitchen cabinet", "created_at": "23.04.2026", "is_shared": False},
+        # {"id": 8, "name": "Kitchen cabinet", "created_at": "23.04.2026", "is_shared": False},
+        # {"id": 9, "name": "Kitchen cabinet", "created_at": "23.04.2026", "is_shared": False},
     ]
 
     context = {

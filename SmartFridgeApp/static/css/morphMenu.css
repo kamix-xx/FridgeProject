@@ -1,0 +1,225 @@
+:root {
+     /* -----------------------------------------
+       Quick-add "+" -> menu morph
+       ----------------------------------------- */
+    --morph-open-dur: 350ms;
+    --morph-close-dur: 250ms;
+
+    --morph-ease: cubic-bezier(0.34, 1.25, 0.64, 1);
+
+    --morph-close-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    --morph-r-closed: 50%;
+    --morph-r-open: 18px;
+
+    --morph-fade-dur: 200ms;
+    --morph-slide: 24px;
+    --morph-blur: 2px;
+
+}
+
+
+/* =========================================
+   Quick-add "+" -> menu morph
+   ========================================= */
+
+.t-morph {
+    position: absolute;
+
+    top: 0;
+    right: 0;
+
+    width: 48px;
+    height: 48px;
+
+    border-radius: var(--morph-r-closed);
+
+    background-color: #e25327;
+
+    box-shadow: 0 6px 16px rgba(226, 83, 39, 0.35);
+
+    overflow: hidden;
+
+    z-index: 20;
+
+    transition: width var(--morph-close-dur) var(--morph-close-ease),
+    height var(--morph-close-dur) var(--morph-close-ease),
+    border-radius var(--morph-close-dur) var(--morph-close-ease),
+    background-color 0.3s ease;
+}
+
+
+.t-morph[data-open="true"] {
+    width: 220px;
+
+    height: 140px;
+
+    border-radius: var(--morph-r-open);
+
+    background-color: #ffffff;
+
+    transition: width var(--morph-open-dur) var(--morph-ease),
+    height var(--morph-open-dur) var(--morph-ease),
+    border-radius var(--morph-open-dur) var(--morph-ease),
+    background-color 0.3s ease;
+}
+
+
+[data-bs-theme="dark"] .t-morph[data-open="true"] {
+    background-color: #2a221c;
+}
+
+
+.t-morph-plus {
+    position: absolute;
+
+    top: 0;
+    right: 0;
+    left: auto;
+
+    width: 48px;
+    height: 48px;
+
+    display: grid;
+    place-items: center;
+
+    border: 0;
+    background: transparent;
+    color: #ffffff;
+
+    cursor: pointer;
+
+    transition:
+        opacity var(--morph-fade-dur) var(--morph-close-ease),
+        transform var(--morph-open-dur) var(--morph-close-ease),
+        filter var(--morph-fade-dur) var(--morph-close-ease);
+
+    z-index: 3;
+}
+
+.t-morph-plus svg {
+    transition: transform var(--morph-open-dur) var(--morph-close-ease);
+}
+
+.t-morph[data-open="true"] .t-morph-plus {
+    opacity: 0;
+    transform: scale(0.85);
+    filter: blur(var(--morph-blur));
+    pointer-events: none;
+}
+
+.t-morph[data-open="true"] .t-morph-plus svg {
+    transform: rotate(45deg);
+}
+
+
+/* morphMenu.css */
+.t-morph-menu {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    gap: 0.2rem;
+    opacity: 0;
+    visibility: hidden;               /* NEW */
+    transform: translateX(var(--morph-slide)) scale(0.97);
+    filter: blur(var(--morph-blur));
+    pointer-events: none;
+    transition: opacity var(--morph-fade-dur) var(--morph-close-ease),
+    transform var(--morph-open-dur) var(--morph-close-ease),
+    filter var(--morph-fade-dur) var(--morph-close-ease),
+    visibility 0s linear var(--morph-fade-dur);   /* NEW: delay hiding until fade-out finishes */
+}
+
+.t-morph[data-open="true"] .t-morph-menu {
+    opacity: 1;
+    visibility: visible;              /* NEW, no delay — shows immediately */
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+    pointer-events: auto;
+}
+
+.t-morph-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+
+    padding: 0.5rem 0.75rem;
+    min-height: 36px;
+
+    border: 0;
+    border-radius: 10px;
+
+    background: transparent;
+    color: var(--title-color);
+
+    font: inherit;
+    font-size: 0.92rem;
+    text-align: left;
+    text-decoration: none;
+
+    white-space: nowrap;
+    cursor: pointer;
+
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+
+.t-morph-menu-item:hover {
+    background-color: rgba(226, 83, 39, 0.1);
+
+    color: var(--title-color);
+}
+
+
+.t-morph-menu-item i {
+    color: #e25327;
+
+    font-size: 1rem;
+}
+
+.areas-morph-anchor {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+}
+
+
+/* =========================================
+   Reduced Motion
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .t-morph,
+    .t-morph-plus,
+    .t-morph-plus svg,
+    .t-morph-menu,
+    .t-clear-mirror,
+    .t-clear-placeholder {
+        transition: none !important;
+    }
+
+    .area-carousel {
+        transition: none !important;
+    }
+
+    .t-clear-glow {
+        opacity: 0 !important;
+    }
+}
+
+
+/* =========================================
+   Firefox performance mode
+   ========================================= */
+
+@-moz-document url-prefix() {
+    /* Remove any remaining expensive filter effects from the morph */
+    .t-morph-plus,
+    .t-morph-menu {
+        filter: none !important;
+    }
+}
