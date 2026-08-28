@@ -147,6 +147,7 @@ body {
     color: #cc441b;
 }
 
+
 /* =========================================
    Free-floating Background Container
    ========================================= */
@@ -160,11 +161,6 @@ body {
     right: 0;
     z-index: 0;
     /*transform: translateX(-80px);*/
-}
-
-.image-section {
-    width: 100%;
-    transform: translateX(0); /* Fills the whole screen behind the form */
 }
 
 /* Make <picture> tags behave like block elements */
@@ -204,9 +200,9 @@ body {
    ========================================= */
 @media (max-width: 768px) {
     /* --- Image & Gradient Adjustments --- */
-    .profile-image-section img {
-        -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%);
-        mask-image: linear-gradient(to right, transparent 0%, black 35%);
+    .image-section {
+        width: 100%;
+        transform: translateX(0); /* Fills the whole screen behind the form */
     }
 
     .responsive-bg-img {
@@ -1012,20 +1008,27 @@ body.side-menu-open .side-menu-theme-controls {
    FIREFOX-ONLY EXCEPTIONS (Performance Fix)
    ========================================= */
 @supports (-moz-appearance: none) {
-    /* 2. Kill the navbar blur */
+    /* Kill the navbar blur */
     .custom-navbar {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
-
-        /* Make the navbar slightly more opaque since it no longer blurs the background */
         background-color: rgba(184, 157, 126, 0.98) !important;
     }
 
-    /* 3. Dark mode opaque fallback for Firefox navbar */
     [data-bs-theme="dark"] .custom-navbar {
         background-color: rgba(0, 0, 0, 0.96) !important;
     }
 
+    /* NEW: Kill the glass card blur for Expense Tracker */
+    .glass-card {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background-color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+    [data-bs-theme="dark"] .glass-card {
+        background-color: rgba(30, 30, 30, 0.95) !important;
+    }
 }
 
 .max-w-280 {
@@ -1285,9 +1288,11 @@ EXPENSE TRACKER MOJA CZĘŚĆ
 
 
 /*
-FIXME wszyscy kochamy ładne glassmorphismy tylko mozzila firefox nie, proponuję dodać exception dla mozzili bo ta strona (expenses) laguje na firefoxie
+wszyscy kochamy ładne glassmorphismy tylko mozzila firefox nie, proponuję dodać exception dla mozzili bo ta strona (expenses) laguje na firefoxie
 albo możemy mieć w dupie mozzile to też opcja XD
 (ogólnie to mozzila używa silnika do renderowania stron który zleca zadania graficzne takie jak blury na CPU, tak ci debile używają cpu do zadań graficznych)
 
 also edytowałem style gdy przyszedł wasz update, sprawdźcie czy macie wszystko na stronach
+
+FIXME strona z expenses nadal laguje na mozilli nie mam pojęcia czemu
 */
