@@ -31,6 +31,7 @@
 
 .areas-glass-card {
     border: 1px solid rgba(179, 90, 70, 0.4) !important;
+    margin-top: 40px;
     margin-bottom: 40px;
     width: min(1180px, calc(100% - 2rem));
     min-height: 50vh; /* NEW — keeps the card from looking sparse with just 1-2 areas */
