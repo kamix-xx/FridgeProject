@@ -8,6 +8,14 @@
     padding-bottom: 20px;
 }
 
+/* Match the dashboard's fridge-panel-title look (uppercase, wider tracking)
+   without touching the shared .expense-title class used elsewhere. */
+.panel-header .expense-title {
+    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+}
+
 .areas-page-wrapper {
     background-image: url('https://i.imgur.com/2SjgpvQ.jpeg');
     background-size: cover;
@@ -23,22 +31,50 @@
     z-index: 1;
 }
 
+/* Dark theme: same background photo + tint the dashboard uses for its
+   dark mode (.page-bg-dark in dashboard.css), instead of the old
+   near-opaque black wash. */
+[data-bs-theme="dark"] .areas-page-wrapper {
+    background-image: url('https://imgur.com/RZ0e0CP.jpeg');
+}
+
 [data-bs-theme="dark"] .areas-page-wrapper::before {
-    background: rgba(9, 10, 12, 0.85);
+    background: rgba(0, 0, 0, 0.50);
 }
 
 /* ---- Glass card container ---- */
 
 .areas-glass-card {
-    border: 1px solid rgba(179, 90, 70, 0.4) !important;
+    /* Same warm glass treatment as the dashboard's .fridge-panel-body,
+       so the "main panel" feel matches across pages. */
+    background: rgba(255, 222, 191, 0.4);
+    border: 1px solid #8b481c !important;
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
     margin-top: 40px;
     margin-bottom: 40px;
     width: min(1180px, calc(100% - 2rem));
     min-height: 50vh; /* NEW — keeps the card from looking sparse with just 1-2 areas */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 [data-bs-theme="dark"] .areas-glass-card {
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(20, 16, 12, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+/* Firefox: backdrop-filter is expensive there — same fallback pattern
+   dashboard.css uses for .fridge-panel-body. */
+@-moz-document url-prefix() {
+    .areas-glass-card {
+        -moz-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+        background-color: rgba(255, 222, 191, 0.82);
+    }
+
+    [data-bs-theme="dark"] .areas-glass-card {
+        background-color: rgba(20, 16, 12, 0.88);
+    }
 }
 
 /* ---- Scroll container ---- */

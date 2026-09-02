@@ -872,8 +872,7 @@ body {
 }
 
 
-.freshness-critical .freshness-bar-fill,
-.freshness-expired .freshness-bar-fill {
+.freshness-critical .freshness-bar-fill{
     background: linear-gradient(
             90deg,
             var(--fridge-danger) 0%,
@@ -884,6 +883,15 @@ body {
 
 .freshness-expired .freshness-bar-fill {
     width: 100% !important;
+     background: linear-gradient(
+            90deg,
+            rgb(34 3 9 / 0.9) 0%,
+            rgb(11 32 35 / 0.9) 70%,
+            rgb(64 67 67 / 0.9) 73%,
+            rgb(11 32 35 / 0.9) 80%,
+            rgb(11 32 35 / 0.9) 85%,
+            rgb(69 119 119 / 0.9) 100%
+    );
 }
 
 

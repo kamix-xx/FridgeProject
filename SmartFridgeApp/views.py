@@ -3,9 +3,19 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .forms import CustomUserCreationForm
 from django.contrib import messages
-from datetime import date
+from datetime import date, datetime, timedelta
+from types import SimpleNamespace
 
 # Create your views here.
+
+# ---------------------------------------------------------------------------
+# DEV/DESIGN TOGGLE — set to False (or delete this + _fake_dashboard_areas)
+# once you're done eyeballing the carousel/product-list styling. When True,
+# home() shows made-up areas/products instead of the logged-in user's real
+# data, so you can see the carousel with several areas and every freshness
+# state without needing real DB rows.
+# ---------------------------------------------------------------------------
+USE_FAKE_DASHBOARD_DATA = True
 
 def _with_freshness(user_product):
     """
@@ -47,6 +57,61 @@ def _with_freshness(user_product):
 
     return user_product
 
+
+def _fake_dashboard_areas():
+    """
+    TEMPORARY demo data for the dashboard (see USE_FAKE_DASHBOARD_DATA above).
+
+    Builds a handful of fake areas/products — reusing _with_freshness so the
+    freshness bars/colors are computed exactly like production — covering:
+      - every freshness state (fresh, warning, critical, expired, unknown)
+      - an empty area (tests the "No products in this area yet." state)
+      - an area with enough products to test scrolling within an area panel
+      - enough areas to test the carousel's prev/next arrows
+    """
+    today = date.today()
+
+    def fake_product(name, days_left=None, added_days_ago=14):
+        up = SimpleNamespace(
+            product=SimpleNamespace(name=name),
+            expiration_date=(today + timedelta(days=days_left)) if days_left is not None else None,
+            added_date=datetime.combine(today - timedelta(days=added_days_ago), datetime.min.time()),
+        )
+        return _with_freshness(up)
+
+    fridge = SimpleNamespace(
+        name="Fridge",
+        products=[
+            fake_product("Whole Milk", days_left=2, added_days_ago=10),     # critical
+            fake_product("Free-range Eggs", days_left=18, added_days_ago=4),  # fresh
+            fake_product("Leftover Soup", days_left=-1, added_days_ago=6),    # expired
+            fake_product("Greek Yogurt", days_left=9, added_days_ago=6),      # warning
+            fake_product("Mystery Jar", days_left=None),                      # unknown
+        ],
+    )
+
+    freezer = SimpleNamespace(
+        name="Freezer",
+        products=[
+            fake_product("Vanilla Ice Cream", days_left=120, added_days_ago=5),
+            fake_product("Frozen Peas", days_left=5, added_days_ago=25),
+            fake_product("Sourdough Loaf", days_left=45, added_days_ago=3),
+        ],
+    )
+
+    pantry = SimpleNamespace(name="Pantry", products=[])
+
+    garage = SimpleNamespace(
+        name="Garage Shelf",
+        products=[
+            fake_product(f"Canned Beans #{i}", days_left=200 - i * 15, added_days_ago=30)
+            for i in range(1, 9)
+        ],
+    )
+
+    return [fridge, freezer, pantry, garage]
+
+
 def home(request):
 
     if not request.user.is_authenticated:
@@ -56,14 +121,17 @@ def home(request):
     Dashboard / "Fridge" view. Shows a carousel of the areas the current
     user belongs to, each with the products currently stored in it.
     """
-    areas = list(
-        request.user.areas
-        .prefetch_related('userproduct_set__product', 'userproduct_set__unit')
-        .order_by('name')
-    )
+    if USE_FAKE_DASHBOARD_DATA:
+        areas = _fake_dashboard_areas()
+    else:
+        areas = list(
+            request.user.areas
+            .prefetch_related('userproduct_set__product', 'userproduct_set__unit')
+            .order_by('name')
+        )
 
-    for area in areas:
-        area.products = [_with_freshness(up) for up in area.userproduct_set.all()]
+        for area in areas:
+            area.products = [_with_freshness(up) for up in area.userproduct_set.all()]
 
     return render(request, 'dashboard/dashboard.html', {
         'areas': areas,
