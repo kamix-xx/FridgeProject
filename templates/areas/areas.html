@@ -2,15 +2,27 @@
 {% load static %}
 {% block title %}SmartFridge+ — My Areas{% endblock %}
 {% block head %}
-    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
-    <link rel="stylesheet" href="{% static 'css/areas.css' %}?v=5">
+{#    <link rel="stylesheet" href="{% static 'css/profile.css' %}">#}
+    <link rel="stylesheet" href="{% static 'css/areas.css' %}?v=6">
     <link rel="stylesheet" href="{% static 'css/morphMenu.css' %}?v=2">
     <script src="{% static 'js/gooeyMenu.js' %}" defer></script>
     <script src="{% static 'js/menuMorph.js' %}" defer></script>
+    <script src="{% static 'js/areas.js' %}?v=2" defer></script>
 {% endblock %}
 
 {% block content %}
     <main class="areas-page-wrapper position-relative min-vh-100 d-flex align-items-center pt-5 pb-5">
+
+        <!-- Page background: plain full-bleed photo in light mode; a
+             smaller, right-aligned, fading photo (same treatment as the
+             dashboard's dark mode) in dark mode. -->
+        <div class="areas-bg-image" aria-hidden="true">
+            <img src="https://i.imgur.com/2SjgpvQ.jpeg" alt="" class="areas-bg-light">
+
+            <picture class="areas-bg-dark">
+                <img src="https://imgur.com/RZ0e0CP.jpeg" alt="" class="areas-bg-dark-img">
+            </picture>
+        </div>
 
         <!-- SVG Filter for the Gooey Effect -->
         <svg width="0" height="0" class="position-absolute" style="visibility: hidden;">
@@ -75,7 +87,11 @@
                         {% for area in user_areas %}
                             <div class="col-12 col-md-6 col-lg-4">
 
-                                <div class="area-card {% if area.is_shared %}bg-yellow{% else %}bg-orange{% endif %} position-relative">
+                                <div class="area-card {% if area.is_shared %}bg-yellow{% else %}bg-orange{% endif %} position-relative"
+                                     data-area-link="{% url 'home' %}?area={{ area.name|urlencode }}"
+                                     role="link"
+                                     tabindex="0"
+                                     aria-label="Open {{ area.name }} in the dashboard">
                                     <div class="area-card-header">
                                         <h3 class="area-card-title">{{ area.name }}</h3>
                                     </div>
@@ -237,4 +253,5 @@
             </div>
         </div>
     </div>
+
 {% endblock %}

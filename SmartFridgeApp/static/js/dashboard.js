@@ -1,4 +1,3 @@
-
 // =========================================
 // Fridge Dashboard (home.html)
 // =========================================
@@ -547,4 +546,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    var targetArea = new URLSearchParams(window.location.search).get('area');
+    if (!targetArea) return;
+
+    var panels = document.querySelectorAll('#areaCarousel .area-panel');
+    var targetIndex = -1;
+    panels.forEach(function (panel, i) {
+        if (targetIndex === -1 && panel.dataset.areaName === targetArea) {
+            targetIndex = i;
+        }
+    });
+    if (targetIndex <= 0) return;
+
+    var nextBtn = document.getElementById('areaNext');
+    if (!nextBtn) return;
+
+    var clicksLeft = targetIndex;
+    (function clickNext() {
+        if (clicksLeft <= 0 || nextBtn.disabled) return;
+        nextBtn.click();
+        clicksLeft--;
+        setTimeout(clickNext, 500);
+    })();
 });

@@ -109,7 +109,7 @@ def _fake_dashboard_areas():
         ],
     )
 
-    return [fridge, freezer, pantry, garage]
+    return [fridge, pantry, freezer, garage]
 
 
 def home(request):

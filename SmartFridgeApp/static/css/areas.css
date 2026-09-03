@@ -8,19 +8,15 @@
     padding-bottom: 20px;
 }
 
-/* Match the dashboard's fridge-panel-title look (uppercase, wider tracking)
-   without touching the shared .expense-title class used elsewhere. */
+/* Match the dashboard's fridge-panel-title exactly, without touching the
+   shared .expense-title class used elsewhere. */
 .panel-header .expense-title {
-    text-transform: uppercase;
+    color: var(--title-color);
+    font-size: 1.75rem;
     font-weight: 500;
     letter-spacing: 0.15em;
-}
-
-.areas-page-wrapper {
-    background-image: url('https://i.imgur.com/2SjgpvQ.jpeg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    text-transform: uppercase;
+    margin: 0;
 }
 
 .areas-page-wrapper::before {
@@ -31,16 +27,79 @@
     z-index: 1;
 }
 
-/* Dark theme: same background photo + tint the dashboard uses for its
-   dark mode (.page-bg-dark in dashboard.css), instead of the old
-   near-opaque black wash. */
-[data-bs-theme="dark"] .areas-page-wrapper {
-    background-image: url('https://imgur.com/RZ0e0CP.jpeg');
+/* Dark mode neutralizes the wrapper tint above — the dark photo below
+   carries its own tint + fade, same as the dashboard's .page-bg-dark. */
+[data-bs-theme="dark"] .areas-page-wrapper::before {
+    background: transparent;
 }
 
-[data-bs-theme="dark"] .areas-page-wrapper::before {
-    background: rgba(0, 0, 0, 0.50);
+/* ---- Dedicated background photo(s) — mirrors dashboard.css's
+   .page-bg-image pattern. Light mode is a plain full-bleed photo; only
+   dark mode gets the smaller, right-aligned, fading treatment. ---- */
+
+.areas-bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
 }
+
+.areas-bg-light {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.areas-bg-dark {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 58.33%;
+    height: 100%;
+}
+
+.areas-bg-dark-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: right center;
+    position: relative;
+    z-index: 1;
+}
+
+.areas-bg-dark::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.50);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.areas-bg-dark::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to left, transparent 80%, var(--dashboard-page-bg, #121212) 100%);
+    z-index: 3;
+    pointer-events: none;
+}
+
+[data-bs-theme="dark"] .areas-bg-light { display: none; }
+[data-bs-theme="dark"] .areas-bg-dark { display: block; }
+
+[data-bs-theme="light"] .areas-bg-dark { display: none; }
+[data-bs-theme="light"] .areas-bg-light { display: block; }
+
+:root:not([data-bs-theme="dark"]) .areas-bg-dark { display: none; }
+:root:not([data-bs-theme="dark"]) .areas-bg-light { display: block; }
 
 /* ---- Glass card container ---- */
 
@@ -49,6 +108,7 @@
        so the "main panel" feel matches across pages. */
     background: rgba(255, 222, 191, 0.4);
     border: 1px solid #8b481c !important;
+    border-radius: 12px !important; /* matches .fridge-panel-body's rounding */
     backdrop-filter: blur(32px);
     -webkit-backdrop-filter: blur(32px);
     margin-top: 40px;
@@ -130,6 +190,16 @@
     flex-direction: column;
     height: 100%;
     overflow: visible; /* Required so gooey bits can overflow slightly */
+    cursor: pointer; /* the whole card now links through to the dashboard */
+}
+
+.area-card:focus-visible {
+    outline: 2px solid #2c1e16;
+    outline-offset: 3px;
+}
+
+[data-bs-theme="dark"] .area-card:focus-visible {
+    outline-color: #fdfaf6;
 }
 
 .area-card:hover {
@@ -390,7 +460,9 @@
 @media (max-width: 575px) {
     .areas-glass-card {
         width: calc(100vw - 1rem);
-        min-height: 76vh;
+        /* was a flat 76vh — capped so short/landscape mobile viewports
+           can't be forced taller than the page has room for */
+        min-height: min(76vh, calc(100dvh - 130px));
     }
 
     .areas-glass-card .t-morph[data-open="true"] {
@@ -405,5 +477,19 @@
 
     .areas-page-wrapper {
         padding-top: 4.5rem;
+    }
+
+    .areas-bg-dark {
+        width: 100%;
+        left: 0;
+        right: 0;
+    }
+
+    .areas-bg-dark-img {
+        object-position: center center;
+    }
+
+    .areas-bg-dark::after {
+        background: linear-gradient(to top, var(--dashboard-page-bg, #121212) 0%, var(--dashboard-page-bg, #121212) 10%, transparent 100%);
     }
 }

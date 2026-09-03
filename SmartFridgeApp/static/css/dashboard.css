@@ -711,11 +711,42 @@ body {
 
     height: 60vh;
 
-    min-height: 450px;
+    /* was a flat 450px — capped relative to the viewport so short /
+       landscape mobile screens can't be forced taller than there's room
+       for (matches the same fix on .areas-glass-card in areas.css) */
+    min-height: min(450px, 45dvh);
 
     overflow-y: auto;
 
     padding-right: 0.25rem;
+
+    /* Same thin, theme-matched scrollbar as the areas page's
+       .areas-scroll-container (Firefox handled here, WebKit below) */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(50, 40, 35, 0.6) transparent;
+}
+
+
+[data-bs-theme="dark"] .area-panel {
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+
+.area-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.area-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.area-panel::-webkit-scrollbar-thumb {
+    background-color: rgba(50, 40, 35, 0.6);
+    border-radius: 10px;
+}
+
+[data-bs-theme="dark"] .area-panel::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 
@@ -872,7 +903,7 @@ body {
 }
 
 
-.freshness-critical .freshness-bar-fill{
+.freshness-critical .freshness-bar-fill {
     background: linear-gradient(
             90deg,
             var(--fridge-danger) 0%,
