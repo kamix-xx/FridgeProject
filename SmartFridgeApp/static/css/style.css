@@ -1,5 +1,6 @@
 /* Custom Palette Variables */
 :root, [data-bs-theme="light"] {
+    --bs-scrollbar-width: 15px;
     --page-bg: #e2cbab;
     --dashboard-page-bg: rgb(226 203 171 / 0.34);
     --login-page-bg: #e2cbab;
@@ -32,6 +33,7 @@
 
 [data-bs-theme="dark"] {
     --page-bg: #090a0c;
+    --bs-scrollbar-width: 15px;
     --dashboard-page-bg: #090a0c;
     --login-page-bg: #111214;
     --landing-page-bg: #090a0c;
@@ -1286,6 +1288,10 @@ EXPENSE TRACKER MOJA CZĘŚĆ
     border: 1px solid rgba(255, 215, 0, 0.2);
 }
 
+/* Kompensacja znikającego paska przewijania dla modali Bootstrapa */
+body.modal-open .expense-page-wrapper {
+    padding-right: var(--bs-scrollbar-width, 0px) !important;
+}
 
 /*
 wszyscy kochamy ładne glassmorphismy tylko mozzila firefox nie, proponuję dodać exception dla mozzili bo ta strona (expenses) laguje na firefoxie

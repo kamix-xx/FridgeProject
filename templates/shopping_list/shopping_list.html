@@ -26,7 +26,8 @@
                         <h2 class="expense-title m-0">Shopping list #1</h2>
                     </div>
                     <button class="btn btn-danger rounded-3 d-flex align-items-center justify-content-center shadow-sm"
-                            style="width: 42px; height: 42px;">
+                            style="width: 42px; height: 42px;"
+                            data-bs-toggle="modal" data-bs-target="#deleteShoppingListModal">
                         <i class="bi bi-trash fs-5"></i>
                     </button>
                 </div>
@@ -43,7 +44,8 @@
 
 
                                 <div class="product-info shopping-product-info d-flex flex-row align-items-center flex-grow-1 ms-2">
-                                    <span class="product-name fw-medium" style="font-size: 1.15rem;">{{ item.name }}</span>
+                                    <span class="product-name fw-medium"
+                                          style="font-size: 1.15rem;">{{ item.name }}</span>
                                     <div class="shopping-divider mx-3"></div>
                                     <span class="product-qty text-nowrap">{{ item.quantity }} {{ item.unit }}</span>
                                 </div>
@@ -52,7 +54,9 @@
                                     <a href="#" class="icon-btn fs-5" aria-label="Edit">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
-                                    <a href="#" class="icon-btn icon-btn-danger fs-5" aria-label="Remove">
+
+                                    <a href="#" class="icon-btn icon-btn-danger fs-5" aria-label="Remove"
+                                       data-bs-toggle="modal" data-bs-target="#deleteProductModal">
                                         <i class="bi bi-dash-square"></i>
                                     </a>
 
@@ -87,10 +91,87 @@
             <button class="btn-shopping-nav">
                 <i class="bi bi-arrow-90deg-up me-2"></i> View ALL LISTS
             </button>
-            <button class="btn-shopping-nav">
+            <button class="btn-shopping-nav" data-bs-toggle="modal" data-bs-target="#createShoppingListModal">
                 <i class="bi bi-plus me-1"></i> Create new list
             </button>
         </div>
 
+        <div class="modal fade" id="createShoppingListModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+
+                <div class="modal-content custom-popup position-relative border-0">
+
+                    <button type="button"
+                            class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    <div class="modal-body text-center p-4 p-md-5">
+                        <h3 class="popup-title mb-4 mt-2">Create shopping list</h3>
+
+                        <div class="text-start mb-5">
+                            <label for="newShoppingListName" class="form-label popup-label">Shopping list name</label>
+                            <input type="text" class="form-control popup-input shadow-none" id="newShoppingListName">
+                        </div>
+
+                        <button type="button" class="popup-circular-btn mx-auto">
+                            <i class="bi bi-plus"></i>
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="deleteShoppingListModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+
+                <div class="modal-content custom-popup border-0">
+
+                    <div class="modal-body text-center p-4 p-md-5">
+
+                        <h3 class="popup-title mb-2">Are you sure to delete this list?</h3>
+                        <p class="popup-subtitle-light mb-5">All items there will be lost!</p>
+
+                        <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                                data-bs-dismiss="modal">
+                            Nah, just kidding
+                        </button>
+
+                        <hr class="popup-divider mx-auto mb-4">
+
+                        <!-- W przyszłości owinąć to w <form method="POST"> do Django -->
+                        <button type="button" class="btn btn-link text-decoration-none popup-btn-danger">
+                            Do it!
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    <div class="modal fade" id="deleteProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content custom-popup border-0">
+
+                <div class="modal-body text-center p-4 p-md-5">
+
+                    <h3 class="popup-title mb-5 mt-2">Are you sure to delete this product?</h3>
+
+                    <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4" data-bs-dismiss="modal">
+                        Nah, just kidding
+                    </button>
+
+                    <hr class="popup-divider mx-auto mb-4">
+
+                    <!-- <form method="POST"> do Django -->
+                    <button type="button" class="btn btn-link text-decoration-none popup-btn-danger">
+                        Do it!
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
     </main>
 {% endblock %}

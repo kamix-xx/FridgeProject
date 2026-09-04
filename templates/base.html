@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
     <title>{% block title %} SmartFridge+ {% endblock %}</title>
     <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.png' %}?v=3">
     <link rel="apple-touch-icon" href="{% static 'images/favicon.png' %}?v=2">
@@ -121,7 +122,7 @@
         <nav class="side-menu-nav">
             <a href="{% url 'home' %}" class="side-menu-link">Dashboard</a>
             <a href="{% url 'areas' %}" class="side-menu-link">Areas</a>
-            <a href="#" class="side-menu-link">Shopping lists</a>
+            <a href="{% url 'shopping_list' %}" class="side-menu-link">Shopping lists</a>
             <a href="#" class="side-menu-link">My products</a>
             <a href="{% url 'expenses' %}" class="side-menu-link">My expenses</a>
             <a href="#" class="side-menu-link">My menu</a>
