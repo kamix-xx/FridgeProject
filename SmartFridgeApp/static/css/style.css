@@ -1011,9 +1011,8 @@ body.side-menu-open .side-menu-theme-controls {
    Areas Dashboard
    ========================================= */
 
-/* Tło dla strony Areas (Mandarynki/Pomarańcze) */
 .areas-page-wrapper {
-    background-image: url('https://i.imgur.com/2SjgpvQ.jpeg');
+    background-image: url('https://i.imgur.com/2SjgpvQ.jpeg ');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -1023,25 +1022,25 @@ body.side-menu-open .side-menu-theme-controls {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(234, 206, 184, 0.45); /* Ciepła nakładka */
+    background: rgba(234, 206, 184, 0.45);
     z-index: 1;
 }
 
 [data-bs-theme="dark"] .areas-page-wrapper::before {
-    background: rgba(9, 10, 12, 0.85); /* Mocniejsze przyciemnienie w dark mode */
+    background: rgba(9, 10, 12, 0.85);
 }
 
-/* Dostosowanie karty szklanej pod layout Areas (cieniutka obwódka z Figmy) */
+
 .areas-glass-card {
-    border: 1px solid rgba(179, 90, 70, 0.4) !important; /* Brązowo-czerwona ramka */
-    margin-bottom: 40px; /* Miejsce na wiszący przycisk */
+    border: 1px solid rgba(179, 90, 70, 0.4) !important;
+    margin-bottom: 40px;
 }
 
 [data-bs-theme="dark"] .areas-glass-card {
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Kontener z własnym paskiem przewijania */
+
 .areas-scroll-container {
     padding-top: 1rem;
     max-height: 55vh;
@@ -1049,7 +1048,7 @@ body.side-menu-open .side-menu-theme-controls {
     overflow-x: hidden;
 }
 
-/* Custom Scrollbar (cieniutki ciemny pasek z Figmy) */
+
 .areas-scroll-container::-webkit-scrollbar {
     width: 6px;
 }
@@ -1064,11 +1063,11 @@ body.side-menu-open .side-menu-theme-controls {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Karty Obszarów */
+
 .area-card {
     border-radius: 16px;
     padding: 1.25rem 1.5rem;
-    color: #2c1e16 !important; /* Wymuszony ciemny tekst dla czytelności na obu motywach */
+    color: #2c1e16 !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     display: flex;
     flex-direction: column;
@@ -1088,7 +1087,7 @@ body.side-menu-open .side-menu-theme-controls {
     background-color: #ffd275;
 }
 
-/* Wnętrze kart */
+
 .area-card-header {
     display: flex;
     justify-content: space-between;
