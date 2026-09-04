@@ -211,6 +211,48 @@ def areas(request):
 
     return render(request, 'areas/areas.html', context)
 
+
+from django.shortcuts import render
+
+
+def shopping_list_view(request):
+    mock_shopping_list = {
+        "id": 1,
+        "name": "Shopping list #1"
+    }
+
+
+    mock_items = [
+        {
+            "id": 1,
+            "name": "Milk",
+            "quantity": 1.0,
+            "unit": "L",
+            "is_done": True
+        },
+        {
+            "id": 2,
+            "name": "Cottage cheese",
+            "quantity": 2.0,
+            "unit": "PCK",
+            "is_done": False
+        },
+        {
+            "id": 3,
+            "name": "Pasta",
+            "quantity": 400.0,
+            "unit": "g",
+            "is_done": False
+        },
+    ]
+
+    context = {
+        'shopping_list': mock_shopping_list,
+        'shopping_items': mock_items
+    }
+
+    return render(request, 'shopping_list/shopping_list.html', context)
+
 def expenses(request):
     return render(request, 'expense-tracker/expense-tracker.html')
 

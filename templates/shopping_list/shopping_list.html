@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/shopping_list.css' %}?v=8">
+{% endblock %}
+
+{% block title %}SmartFridge+ — Shopping List{% endblock %}
+
+{% block content %}
+    <main class="expense-page-wrapper position-relative min-vh-100 d-flex flex-column align-items-center justify-content-center py-5">
+
+
+        <div class="container-fluid position-relative z-2 d-flex align-items-center justify-content-between px-2 px-md-5 w-100">
+
+            <button class="btn btn-link text-decoration-none shadow-none text-dark fs-1 carousel-arrow d-none d-md-block"
+                    aria-label="Previous list">
+                <i class="bi bi-arrow-left"></i>
+            </button>
+
+
+            <div class="glass-card mx-auto p-4 p-md-5 mt-5 position-relative flex-grow-1" style="max-width: 900px;">
+
+                <div class="d-flex justify-content-between align-items-center mb-5 pb-2 border-bottom border-dark border-opacity-25">
+                    <div class="flex-grow-1 text-center">
+                        <h2 class="expense-title m-0">Shopping list #1</h2>
+                    </div>
+                    <button class="btn btn-danger rounded-3 d-flex align-items-center justify-content-center shadow-sm"
+                            style="width: 42px; height: 42px;">
+                        <i class="bi bi-trash fs-5"></i>
+                    </button>
+                </div>
+
+                <div class="areas-scroll-container pe-2 pe-md-4" style="max-height: 45vh;">
+                    <ul class="product-list">
+
+                        {% for item in shopping_items %}
+                            <li class="product-row">
+
+                                <span class="product-icon" aria-hidden="true">
+                                    <i class="bi bi-basket2-fill"></i>
+                                </span>
+
+
+                                <div class="product-info shopping-product-info d-flex flex-row align-items-center flex-grow-1 ms-2">
+                                    <span class="product-name fw-medium" style="font-size: 1.15rem;">{{ item.name }}</span>
+                                    <div class="shopping-divider mx-3"></div>
+                                    <span class="product-qty text-nowrap">{{ item.quantity }} {{ item.unit }}</span>
+                                </div>
+
+                                <div class="product-row-actions d-flex flex-row flex-nowrap align-items-center ms-auto gap-2 gap-md-3">
+                                    <a href="#" class="icon-btn fs-5" aria-label="Edit">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <a href="#" class="icon-btn icon-btn-danger fs-5" aria-label="Remove">
+                                        <i class="bi bi-dash-square"></i>
+                                    </a>
+
+                                    <label class="shopping-checkbox-wrapper mb-0 ms-2 ms-md-3">
+                                        <input type="checkbox" class="shopping-checkbox"
+                                               {% if item.is_bought %}checked{% endif %}>
+                                        <span class="shopping-checkmark"></span>
+                                    </label>
+                                </div>
+                            </li>
+                        {% endfor %}
+
+                    </ul>
+                </div>
+
+                <div class="d-flex justify-content-center mt-4 pt-3">
+                    <button class="btn-add-area shopping-add-btn" aria-label="Add new item">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </div>
+
+            </div>
+
+            <button class="btn btn-link text-decoration-none shadow-none text-dark fs-1 carousel-arrow d-none d-md-block"
+                    aria-label="Next list">
+                <i class="bi bi-arrow-right"></i>
+            </button>
+        </div>
+
+        <div class="container position-relative z-2 d-flex justify-content-between align-items-center mt-5"
+             style="max-width: 900px;">
+            <button class="btn-shopping-nav">
+                <i class="bi bi-arrow-90deg-up me-2"></i> View ALL LISTS
+            </button>
+            <button class="btn-shopping-nav">
+                <i class="bi bi-plus me-1"></i> Create new list
+            </button>
+        </div>
+
+    </main>
+{% endblock %}
