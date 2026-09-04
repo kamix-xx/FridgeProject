@@ -546,6 +546,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    // dashboardAreaJump
+//
+// If the dashboard was opened with a ?area=<name> query param (set by
+// areaCardLink.js on the Areas page), step the carousel forward to that
+// area's panel on load. Deliberately drives the real #areaNext button
+// instead of touching dashboard.js internal state directly, so it rides
+// whatever animation/locking logic dashboard.js already implements.
+
+
     var targetArea = new URLSearchParams(window.location.search).get('area');
     if (!targetArea) return;
 
@@ -561,6 +570,8 @@ document.addEventListener('DOMContentLoaded', () => {
     var nextBtn = document.getElementById('areaNext');
     if (!nextBtn) return;
 
+    // Step forward using the carousel's own "next" control, spaced out to
+    // let each transition finish before the next click fires.
     var clicksLeft = targetIndex;
     (function clickNext() {
         if (clicksLeft <= 0 || nextBtn.disabled) return;
@@ -568,4 +579,6 @@ document.addEventListener('DOMContentLoaded', () => {
         clicksLeft--;
         setTimeout(clickNext, 500);
     })();
+
+
 });

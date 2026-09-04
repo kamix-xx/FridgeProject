@@ -1,4 +1,3 @@
-
 /* =========================================
    FRIDGE DASHBOARD
    ========================================= */
@@ -60,7 +59,7 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    width: 58.33%;
+    width: 100%;
     height: 100%;
     display: block;
     z-index: 1;
@@ -70,7 +69,7 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: left center;
+    object-position: center center;
     position: relative;
     z-index: 1;
 }
@@ -80,20 +79,20 @@ body {
     content: "";
     position: absolute;
     inset: 0;
-    background: rgb(241 220 195 / 0.37);
+    background: rgb(241 220 195 / 0.42);
     z-index: 2;
     pointer-events: none;
 }
 
-/* Light background fading gradient mask */
-.page-bg-light::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to right, transparent 80%, var(--dashboard-page-bg, #ffffff) 100%);
-    z-index: 3;
-    pointer-events: none;
-}
+/*!* Light background fading gradient mask *!*/
+/*.page-bg-light::after {*/
+/*    content: '';*/
+/*    position: absolute;*/
+/*    inset: 0;*/
+/*    background: linear-gradient(to right, transparent 80%, var(--dashboard-page-bg, #ffffff) 100%);*/
+/*    z-index: 3;*/
+/*    pointer-events: none;*/
+/*}*/
 
 /* Dark image section: positioned on the right with dark overlay and fade to the left */
 .page-bg-dark {
@@ -549,7 +548,9 @@ body {
 .area-edit-btn {
     position: absolute;
 
+    top: 50%;
     right: 64px;
+    transform: translateY(-50%);
 
     display: flex;
 
@@ -577,7 +578,7 @@ body {
 .area-edit-btn:hover {
     background: rgba(255, 255, 255, 0.6);
 
-    transform: scale(1.05);
+    transform: translateY(-50%) scale(1.05);
 
     color: var(--title-color);
 }
@@ -667,6 +668,16 @@ body {
     padding-right: 120px;
 
     transition: color 0.3s ease;
+
+    /* Keep the header a single, predictable line no matter how long the
+       area name is. Without this, a long name wraps to two lines, which
+       grows the header, shoves the edit button out of place, and pushes
+       the dashboard-actions buttons below the viewport. */
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 
@@ -709,12 +720,13 @@ body {
 
     min-width: 0;
 
-    height: 60vh;
-
-    /* was a flat 450px — capped relative to the viewport so short /
-       landscape mobile screens can't be forced taller than there's room
-       for (matches the same fix on .areas-glass-card in areas.css) */
-    min-height: min(450px, 45dvh);
+    /* was a flat "height: 60vh; min-height: 450px" — the min-height never
+       actually bound anything (60vh > 45dvh always), so short/mobile
+       viewports still got pushed past the bottom. This caps the real
+       height against the viewport instead, with a small floor so it can
+       never collapse to nothing. */
+    height: min(60dvh, calc(100dvh - 450px));
+    min-height: 220px;
 
     overflow-y: auto;
 
@@ -914,7 +926,7 @@ body {
 
 .freshness-expired .freshness-bar-fill {
     width: 100% !important;
-     background: linear-gradient(
+    background: linear-gradient(
             90deg,
             rgb(34 3 9 / 0.9) 0%,
             rgb(11 32 35 / 0.9) 70%,
@@ -1092,10 +1104,21 @@ body {
 
         flex-basis: 100%;
     }
+
+    .area-panel {
+        /* the wrapped carousel-arrow row above eats extra vertical space
+           at this breakpoint, so the panel needs a tighter cap here */
+        height: min(50dvh, calc(100dvh - 520px));
+    }
 }
 
 
 @media (max-width: 480px) {
+
+    .fridge-panel-title {
+        font-size: 1.3rem;
+    }
+
 
     .dashboard-inner {
         padding: 0 1rem;

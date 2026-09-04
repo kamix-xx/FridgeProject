@@ -1,7 +1,7 @@
 /* Custom Palette Variables */
 :root, [data-bs-theme="light"] {
     --page-bg: #e2cbab;
-    --dashboard-page-bg: #e2cbab;
+    --dashboard-page-bg: rgb(226 203 171 / 0.34);
     --login-page-bg: #e2cbab;
     --landing-page-bg: #f4e5d0;
     --register-page-bg: #dbceca;

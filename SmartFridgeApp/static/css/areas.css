@@ -5,7 +5,8 @@
 /* ---- Page background ---- */
 
 .panel-header {
-    padding-bottom: 20px;
+    padding-bottom: 8px;
+    padding-top: 4px;
 }
 
 /* Match the dashboard's fridge-panel-title exactly, without touching the
@@ -462,7 +463,7 @@
         width: calc(100vw - 1rem);
         /* was a flat 76vh — capped so short/landscape mobile viewports
            can't be forced taller than the page has room for */
-        min-height: min(76vh, calc(100dvh - 130px));
+        min-height: min(76vh, calc(100dvh - 160px));
     }
 
     .areas-glass-card .t-morph[data-open="true"] {
@@ -472,7 +473,7 @@
 
 @media (max-width: 767px) {
     .areas-scroll-container {
-        max-height: calc(100dvh - 210px); /* was 250px — a bit taller */
+        max-height: calc(100dvh - 280px); /* more headroom for the header + card padding above it, so it stops overflowing past the bottom */
     }
 
     .areas-page-wrapper {
