@@ -1,4 +1,3 @@
-
 // =========================================
 // Fridge Dashboard (home.html)
 // =========================================
@@ -547,67 +546,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // =========================================
-    // Quick-add "+" -> menu morph
-    // =========================================
-
-    function closeAllMorphs() {
-        document
-            .querySelectorAll('.t-morph[data-open="true"]')
-            .forEach((morph) => {
-
-                morph.setAttribute('data-open', 'false');
-
-                const trigger = morph.querySelector('.t-morph-plus');
-
-                if (trigger) {
-                    trigger.setAttribute('aria-expanded', 'false');
-                }
-            });
-    }
+    // dashboardAreaJump
+//
+// If the dashboard was opened with a ?area=<name> query param (set by
+// areaCardLink.js on the Areas page), step the carousel forward to that
+// area's panel on load. Deliberately drives the real #areaNext button
+// instead of touching dashboard.js internal state directly, so it rides
+// whatever animation/locking logic dashboard.js already implements.
 
 
-    document
-        .querySelectorAll('.t-morph')
-        .forEach((morph) => {
+    var targetArea = new URLSearchParams(window.location.search).get('area');
+    if (!targetArea) return;
 
-            const trigger = morph.querySelector('.t-morph-plus');
-
-            if (!trigger) {
-                return;
-            }
-
-            trigger.addEventListener('click', (event) => {
-
-                event.stopPropagation();
-
-                const isOpen = morph.getAttribute('data-open') === 'true';
-
-                closeAllMorphs();
-
-                if (!isOpen) {
-                    morph.setAttribute('data-open', 'true');
-
-                    trigger.setAttribute('aria-expanded', 'true');
-                }
-            });
-
-
-            /*
-             * Clicking inside the open menu should not
-             * bubble to document and close it.
-             */
-            morph.addEventListener('click', (event) => {
-                event.stopPropagation();
-            });
-        });
-
-
-    document.addEventListener('click', closeAllMorphs);
-
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            closeAllMorphs();
+    var panels = document.querySelectorAll('#areaCarousel .area-panel');
+    var targetIndex = -1;
+    panels.forEach(function (panel, i) {
+        if (targetIndex === -1 && panel.dataset.areaName === targetArea) {
+            targetIndex = i;
         }
     });
+    if (targetIndex <= 0) return;
+
+    var nextBtn = document.getElementById('areaNext');
+    if (!nextBtn) return;
+
+    // Step forward using the carousel's own "next" control, spaced out to
+    // let each transition finish before the next click fires.
+    var clicksLeft = targetIndex;
+    (function clickNext() {
+        if (clicksLeft <= 0 || nextBtn.disabled) return;
+        nextBtn.click();
+        clicksLeft--;
+        setTimeout(clickNext, 500);
+    })();
+
+
 });

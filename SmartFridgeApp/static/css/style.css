@@ -1,7 +1,7 @@
 /* Custom Palette Variables */
 :root, [data-bs-theme="light"] {
     --page-bg: #e2cbab;
-    --dashboard-page-bg: #e2cbab;
+    --dashboard-page-bg: rgb(226 203 171 / 0.34);
     --login-page-bg: #e2cbab;
     --landing-page-bg: #f4e5d0;
     --register-page-bg: #dbceca;
@@ -147,6 +147,7 @@ body {
     color: #cc441b;
 }
 
+
 /* =========================================
    Free-floating Background Container
    ========================================= */
@@ -160,11 +161,6 @@ body {
     right: 0;
     z-index: 0;
     /*transform: translateX(-80px);*/
-}
-
-.image-section {
-    width: 100%;
-    transform: translateX(0); /* Fills the whole screen behind the form */
 }
 
 /* Make <picture> tags behave like block elements */
@@ -204,9 +200,9 @@ body {
    ========================================= */
 @media (max-width: 768px) {
     /* --- Image & Gradient Adjustments --- */
-    .profile-image-section img {
-        -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%);
-        mask-image: linear-gradient(to right, transparent 0%, black 35%);
+    .image-section {
+        width: 100%;
+        transform: translateX(0); /* Fills the whole screen behind the form */
     }
 
     .responsive-bg-img {
@@ -830,6 +826,18 @@ body.side-menu-open .side-menu,
     padding-left: 0.2rem;
 }
 
+.side-menu-user {
+    color: inherit;
+    text-decoration: none;
+}
+
+.side-menu-user:visited,
+.side-menu-user:hover,
+.side-menu-user:active {
+    color: inherit;
+    text-decoration: none;
+}
+
 /* =========================================
    Responsive Side Menu
    ========================================= */
@@ -944,6 +952,19 @@ body.side-menu-open .side-menu-theme-controls {
 }
 
 
+.side-menu-user {
+    color: inherit;
+    text-decoration: none;
+}
+
+.side-menu-user:visited,
+.side-menu-user:hover,
+.side-menu-user:active {
+    color: inherit;
+    text-decoration: none;
+}
+
+
 /* =========================================
    Mobile Overrides
    ========================================= */
@@ -987,380 +1008,31 @@ body.side-menu-open .side-menu-theme-controls {
    FIREFOX-ONLY EXCEPTIONS (Performance Fix)
    ========================================= */
 @supports (-moz-appearance: none) {
-    /* 2. Kill the navbar blur */
+    /* Kill the navbar blur */
     .custom-navbar {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
-
-        /* Make the navbar slightly more opaque since it no longer blurs the background */
         background-color: rgba(184, 157, 126, 0.98) !important;
     }
 
-    /* 3. Dark mode opaque fallback for Firefox navbar */
     [data-bs-theme="dark"] .custom-navbar {
         background-color: rgba(0, 0, 0, 0.96) !important;
     }
 
+    /* NEW: Kill the glass card blur for Expense Tracker */
+    .glass-card {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        background-color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+    [data-bs-theme="dark"] .glass-card {
+        background-color: rgba(30, 30, 30, 0.95) !important;
+    }
 }
 
 .max-w-280 {
     max-width: 280px;
-}
-
-/* =========================================
-   Areas Dashboard
-   ========================================= */
-
-.areas-page-wrapper {
-    background-image: url('https://i.imgur.com/2SjgpvQ.jpeg ');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-}
-
-.areas-page-wrapper::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(234, 206, 184, 0.45);
-    z-index: 1;
-}
-
-[data-bs-theme="dark"] .areas-page-wrapper::before {
-    background: rgba(9, 10, 12, 0.85);
-}
-
-
-.areas-glass-card {
-    border: 1px solid rgba(179, 90, 70, 0.4) !important;
-    margin-bottom: 40px;
-}
-
-[data-bs-theme="dark"] .areas-glass-card {
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-
-.areas-scroll-container {
-    padding-top: 1rem;
-    max-height: 55vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-
-.areas-scroll-container::-webkit-scrollbar {
-    width: 6px;
-}
-.areas-scroll-container::-webkit-scrollbar-track {
-    background: transparent;
-}
-.areas-scroll-container::-webkit-scrollbar-thumb {
-    background-color: rgba(50, 40, 35, 0.6);
-    border-radius: 10px;
-}
-[data-bs-theme="dark"] .areas-scroll-container::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.3);
-}
-
-
-.area-card {
-    border-radius: 16px;
-    padding: 1.25rem 1.5rem;
-    color: #2c1e16 !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.area-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
-}
-
-.bg-orange {
-    background-color: #ff9166;
-}
-
-.bg-yellow {
-    background-color: #ffd275;
-}
-
-
-.area-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1.5px solid #2c1e16;
-    padding-bottom: 0.5rem;
-    margin-bottom: 0.75rem;
-}
-
-.area-card-title {
-    font-size: 1.3rem;
-    font-weight: 500;
-    margin: 0;
-}
-
-.area-card-body p {
-    margin: 0;
-    font-size: 0.9rem;
-    font-weight: 500;
-}
-
-.area-card-body u {
-    text-decoration-thickness: 1px;
-    text-underline-offset: 3px;
-}
-
-.area-card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 1.5rem;
-}
-
-.area-icon-btn {
-    background: none;
-    border: none;
-    padding: 0;
-    color: #2c1e16;
-    font-size: 1.35rem;
-    transition: opacity 0.2s;
-    cursor: pointer;
-}
-
-.area-icon-btn:hover {
-    opacity: 0.6;
-}
-
-.shared-with-text {
-    font-size: 0.7rem;
-    line-height: 1.2;
-    font-weight: 500;
-}
-
-.btn-add-area {
-
-
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    margin-top: 30px;
-
-
-    appearance: none;
-    -webkit-appearance: none;
-    outline: none;
-    padding: 0;
-
-
-    border: 6px solid #ff9166;
-    background-color: rgba(255, 255, 255, 0.9);
-    background-clip: padding-box;
-
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    color: #2c1e16;
-
-
-
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-.btn-add-area:hover {
-    background-color: #ffffff;
-    transform: scale(1.08);
-}
-
-
-[data-bs-theme="dark"] .btn-add-area {
-    background-color: rgba(30, 30, 30, 0.9);
-    color: #ffffff;
-}
-
-.modal-backdrop.show {
-    opacity: 0.55;
-    background-color: #140e0a;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-}
-
-
-.custom-popup {
-    background-color: #fdfaf6;
-    border: none;
-    border-radius: 20px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-    color: var(--title-color);
-}
-
-[data-bs-theme="dark"] .custom-popup {
-    background-color: #1e1e1e;
-    color: #e2cbab;
-}
-
-
-.popup-title {
-    font-size: 1.6rem;
-    font-weight: 500;
-    line-height: 1.4;
-}
-
-
-.popup-btn-text {
-    color: var(--title-color);
-    font-size: 1.15rem;
-    font-weight: 400;
-    padding: 0;
-}
-
-.popup-btn-text:hover {
-    color: var(--title-color);
-    opacity: 0.7;
-}
-
-.popup-btn-danger {
-    color: #dc3545;
-    font-size: 1.15rem;
-    font-weight: 400;
-    padding: 0;
-}
-
-.popup-btn-danger:hover {
-    color: #a71d2a;
-}
-
-
-.popup-divider {
-    border-color: rgba(81, 67, 54, 0.4);
-    width: 80%;
-    margin-top: 0;
-    opacity: 1;
-}
-
-[data-bs-theme="dark"] .popup-divider {
-    border-color: rgba(255, 255, 255, 0.2);
-}
-
-
-.popup-label {
-    font-size: 0.85rem;
-    margin-bottom: 0.2rem;
-    font-weight: 500;
-}
-
-.popup-input {
-    background-color: transparent;
-    border: 1px solid rgba(81, 67, 54, 0.5);
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    color: inherit;
-}
-
-.popup-input:focus {
-    background-color: transparent;
-    border-color: #ff9166;
-    color: inherit;
-}
-
-[data-bs-theme="dark"] .popup-input {
-    border-color: rgba(255, 255, 255, 0.3);
-}
-[data-bs-theme="dark"] .popup-input:focus {
-    border-color: #ff9166;
-}
-
-
-.popup-circular-btn {
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    background-color: #ff9166;
-    border: none;
-    color: #2c1e16;
-    font-size: 2.2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-.popup-circular-btn:hover {
-    transform: scale(1.08);
-    background-color: #ffa17c;
-}
-
-
-.popup-back-btn {
-    color: var(--title-color) !important;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.popup-back-btn:hover {
-    opacity: 0.7;
-    transform: translateX(-4px);
-}
-
-.popup-share-group {
-    border: 1px solid rgba(81, 67, 54, 0.5);
-    border-radius: 10px;
-    overflow: hidden; ]
-    max-width: 320px;
-}
-
-.popup-share-group .input-group-text {
-    background-color: transparent;
-    border: none;
-    color: var(--title-color);
-    font-size: 1.3rem;
-    padding-right: 0.5rem;
-}
-
-.popup-share-group .form-control {
-    background-color: transparent;
-    border: none;
-    color: var(--title-color);
-    font-size: 0.95rem;
-    padding-left: 0.2rem;
-}
-
-.popup-share-group .btn-copy {
-    background-color: transparent;
-    border: none;
-    color: var(--title-color);
-    font-size: 1.3rem;
-    transition: opacity 0.2s ease, transform 0.1s ease;
-}
-
-.popup-share-group .btn-copy:hover {
-    opacity: 0.6;
-}
-
-.popup-share-group .btn-copy:active {
-    transform: scale(0.9);
-}
-
-[data-bs-theme="dark"] .popup-share-group {
-    border-color: rgba(255, 255, 255, 0.3);
-}
-
-
-.share-social-icon {
-    font-size: 1.8rem;
-    color: var(--title-color) !important;
-    transition: transform 0.2s ease, opacity 0.2s ease;
-}
-
-.share-social-icon:hover {
-    transform: translateY(-4px);
-    opacity: 0.7;
 }
 
 /*
@@ -1616,9 +1288,11 @@ EXPENSE TRACKER MOJA CZĘŚĆ
 
 
 /*
-FIXME wszyscy kochamy ładne glassmorphismy tylko mozzila firefox nie, proponuję dodać exception dla mozzili bo ta strona (expenses) laguje na firefoxie
+wszyscy kochamy ładne glassmorphismy tylko mozzila firefox nie, proponuję dodać exception dla mozzili bo ta strona (expenses) laguje na firefoxie
 albo możemy mieć w dupie mozzile to też opcja XD
 (ogólnie to mozzila używa silnika do renderowania stron który zleca zadania graficzne takie jak blury na CPU, tak ci debile używają cpu do zadań graficznych)
 
 also edytowałem style gdy przyszedł wasz update, sprawdźcie czy macie wszystko na stronach
+
+FIXME strona z expenses nadal laguje na mozilli nie mam pojęcia czemu
 */

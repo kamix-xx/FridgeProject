@@ -1,129 +1,191 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}SmartFridge+ — My Areas{% endblock %}
-{% block css %}
-    <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=8"> {% endblock %}
+{% block head %}
+{#    <link rel="stylesheet" href="{% static 'css/profile.css' %}">#}
+    <link rel="stylesheet" href="{% static 'css/areas.css' %}?v=7">
+    <link rel="stylesheet" href="{% static 'css/morphMenu.css' %}?v=2">
+    <script src="{% static 'js/gooeyMenu.js' %}" defer></script>
+    <script src="{% static 'js/menuMorph.js' %}" defer></script>
+    <script src="{% static 'js/areas.js' %}?v=3" defer></script>
+{% endblock %}
 
 {% block content %}
     <main class="areas-page-wrapper position-relative min-vh-100 d-flex align-items-center pt-5 pb-5">
 
+        <!-- Page background: plain full-bleed photo in light mode; a
+             smaller, right-aligned, fading photo (same treatment as the
+             dashboard's dark mode) in dark mode. -->
+        <div class="areas-bg-image" aria-hidden="true">
+            <img src="https://i.imgur.com/2SjgpvQ.jpeg" alt="" class="areas-bg-light">
+
+            <picture class="areas-bg-dark">
+                <img src="https://imgur.com/RZ0e0CP.jpeg" alt="" class="areas-bg-dark-img">
+            </picture>
+        </div>
+
+        <!-- SVG Filter for the Gooey Effect -->
+        <svg width="0" height="0" class="position-absolute" style="visibility: hidden;">
+            <defs>
+                <filter id="goo">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"
+                                   result="goo"/>
+                    <feBlend in="SourceGraphic" in2="goo"/>
+                </filter>
+            </defs>
+        </svg>
+
         <div class="container position-relative z-2">
-
-
             <div class="glass-card areas-glass-card mx-auto p-4 p-md-5 position-relative">
 
-                <h2 class="text-center mb-4 expense-title" style="letter-spacing: 0.1em;">Areas</h2>
+                <!-- NEW HEADER: Title Left, Expandable Plus Button Right -->
+                <header class="d-flex justify-content-between align-items-center mb-4 panel-header">
+                    <h2 class="expense-title mb-0">
+                        Areas
+                    </h2>
 
+                    <div class="areas-morph-anchor">
+                        <div class="t-morph" data-open="false">
+                            <button type="button"
+                                    class="t-morph-plus"
+                                    aria-expanded="false"
+                                    aria-label="Add Area actions">
+                                <svg width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none" aria-hidden="true">
+                                    <path d="M12 5v14M5 12h14"
+                                          stroke="currentColor"
+                                          stroke-width="2.5"
+                                          stroke-linecap="round"/>
+                                </svg>
+                            </button>
+
+                            <nav class="t-morph-menu">
+                                <button type="button"
+                                        class="t-morph-menu-item"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#addAreaModal">
+                                    <i class="bi bi-folder-plus"></i>
+                                    <span>Add new area</span>
+                                </button>
+
+                                <button type="button"
+                                        class="t-morph-menu-item"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#addSharedAreaModal">
+                                    <i class="bi bi-key"></i>
+                                    <span>Add shared area with code</span>
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+                </header>
 
                 <div class="areas-scroll-container pe-2 pe-md-4">
                     <div class="row g-4">
 
-
                         {% for area in user_areas %}
                             <div class="col-12 col-md-6 col-lg-4">
 
-
-                                <div class="area-card {% if area.is_shared %}bg-yellow{% else %}bg-orange{% endif %}">
+                                <div class="area-card {% if area.is_shared %}bg-yellow{% else %}bg-orange{% endif %} position-relative"
+                                     data-area-link="{% url 'home' %}?area={{ area.name|urlencode }}"
+                                     role="link"
+                                     tabindex="0"
+                                     aria-label="Open {{ area.name }} in the dashboard">
                                     <div class="area-card-header">
                                         <h3 class="area-card-title">{{ area.name }}</h3>
-                                        <button class="area-icon-btn" aria-label="Share" data-bs-toggle="modal"
-                                                data-bs-target="#shareAreaModal">
-                                            <i class="bi bi-share"></i>
-                                        </button>
                                     </div>
                                     <div class="area-card-body">
                                         <p>created at: <u>{{ area.created_at }}</u></p>
                                     </div>
-                                    <div class="area-card-footer">
-                                        <button class="area-icon-btn" aria-label="Delete" data-bs-toggle="modal"
-                                                data-bs-target="#deleteAreaModal">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-
-
+                                    <div class="area-card-footer position-relative mt-auto">
                                         {% if area.is_shared and area.shared_with %}
-                                            <div class="shared-with-text text-center">
+                                            <div class="shared-with-text text-start">
                                                 shared with:<br>{{ area.shared_with }}
                                             </div>
                                         {% endif %}
-
-                                        <button class="area-icon-btn" aria-label="Edit">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </button>
                                     </div>
+
+                                    <!-- Gooey Menu -->
+                                    <div class="gooey-menu">
+                                        <input type="checkbox" id="gooey-chk-{{ forloop.counter }}"
+                                               class="gooey-chk d-none">
+
+                                        <div class="gooey-container">
+                                            <button class="gooey-item item-share" aria-label="Share"
+                                                    data-bs-toggle="modal" data-bs-target="#shareAreaModal">
+                                                <i class="bi bi-share"></i>
+                                            </button>
+
+                                            <button class="gooey-item item-edit" aria-label="Edit">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </button>
+
+                                            <button class="gooey-item item-delete" aria-label="Delete"
+                                                    data-bs-toggle="modal" data-bs-target="#deleteAreaModal">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+
+                                            <label class="gooey-main-btn" for="gooey-chk-{{ forloop.counter }}">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </label>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
-
                         {% empty %}
                             <div class="col-12 text-center mt-5">
                                 <p class="fs-4 text-muted">You don't have any areas yet.</p>
                             </div>
                         {% endfor %}
-
-                        <div class="col-12 d-flex justify-content-center mt-4 mb-2">
-                            <button class="btn-add-area" aria-label="Add new area" data-bs-toggle="modal"
-                                    data-bs-target="#addAreaModal">
-                                <i class="bi bi-plus"></i>
-                            </button>
-                        </div>
-
                     </div>
-
                 </div>
-
-
             </div>
         </div>
     </main>
 
-
+    <!-- Modals -->
     <div class="modal fade" id="deleteAreaModal" tabindex="-1" aria-hidden="true">
+        <!-- ... (Rest of your exact modal HTML) ... -->
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content custom-popup">
                 <div class="modal-body text-center p-4 p-md-5">
-
                     <h3 class="popup-title mb-5">Are you sure you want to delete the ...?</h3>
-
                     <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
                             data-bs-dismiss="modal">
                         Nah, just kidding
                     </button>
-
                     <hr class="popup-divider mx-auto mb-4">
-
                     <button type="button" class="btn btn-link text-decoration-none popup-btn-danger">
                         Yes, destroy the ...!
                     </button>
-
                 </div>
             </div>
         </div>
     </div>
-
 
     <div class="modal fade" id="addAreaModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content custom-popup">
-
                 <button type="button"
                         class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
                         data-bs-dismiss="modal" aria-label="Close"></button>
-
                 <div class="modal-body text-center p-4 p-md-5">
                     <h3 class="popup-title mb-4">Add Area</h3>
-
                     <div class="text-start mb-2">
                         <label for="newAreaName" class="form-label popup-label">Area Name</label>
                         <input type="text" class="form-control popup-input shadow-none" id="newAreaName">
                     </div>
-
                     <p class="custom-subtext mb-5">
-
                         Add a shared area
-                        <a href="#" class="custom-link" style="color: #ff9166;" data-bs-toggle="modal"
-                           data-bs-target="#addSharedAreaModal">HERE</a>
+                        <button type="button"
+                                class="custom-link custom-link-button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#addSharedAreaModal">
+                            HERE
+                        </button>
                     </p>
-
                     <button type="button" class="popup-circular-btn mx-auto">
                         <i class="bi bi-plus"></i>
                     </button>
@@ -132,39 +194,30 @@
         </div>
     </div>
 
-
     <div class="modal fade" id="addSharedAreaModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content custom-popup position-relative">
-
-
-                <button type="button"
-                        class="btn btn-link popup-back-btn position-absolute top-0 start-0 m-3 shadow-none z-3 p-0 fs-4"
-                        data-bs-toggle="modal" data-bs-target="#addAreaModal" aria-label="Go back">
-                    <i class="bi bi-arrow-left"></i>
-                </button>
-
-
+            <div class="modal-content custom-popup">
                 <button type="button"
                         class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
                         data-bs-dismiss="modal" aria-label="Close"></button>
-
                 <div class="modal-body text-center p-4 p-md-5">
-                    <h3 class="popup-title mb-4">Add Area</h3>
-
+                    <h3 class="popup-title mb-4">Add Shared Area</h3>
                     <div class="text-start mb-2">
-                        <label for="newAreaCode" class="form-label popup-label">Area code</label>
+                        <label for="newAreaCode" class="form-label popup-label">Area Code</label>
                         <input type="text" class="form-control popup-input shadow-none" id="newAreaCode">
                     </div>
-
-                    <p class="custom-subtext mb-5 invisible">
-                        Add a shared area <a href="#" class="custom-link">HERE</a>
+                    <p class="custom-subtext mb-5">
+                        Add a new area
+                        <button type="button"
+                                class="custom-link custom-link-button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#addAreaModal">
+                            HERE
+                        </button>
                     </p>
-
                     <button type="button" class="popup-circular-btn mx-auto">
                         <i class="bi bi-plus"></i>
                     </button>
-
                 </div>
             </div>
         </div>
@@ -173,45 +226,32 @@
     <div class="modal fade" id="shareAreaModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content custom-popup">
-
                 <button type="button"
                         class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
                         data-bs-dismiss="modal" aria-label="Close"></button>
-
                 <div class="modal-body p-4 p-md-5 text-center">
-
-
                     <h3 class="popup-title mb-5 d-flex align-items-center justify-content-center gap-2">
-                        Share the Fridge <i class="bi bi-share fs-4"></i>
+                        <i class="bi bi-share fs-4"></i>Share the Fridge
                     </h3>
-
                     <div class="d-flex flex-column flex-sm-row align-items-center justify-content-center gap-3 mb-5">
                         <span class="popup-label mb-0 fs-6">Your sharing code:</span>
-
                         <div class="input-group popup-share-group">
                             <span class="input-group-text"><i class="bi bi-key"></i></span>
-
                             <input type="text" class="form-control shadow-none" value="this_is_the_sharing_code"
                                    id="shareCodeInput" readonly>
-
                             <button class="btn btn-copy" type="button" aria-label="Copy code">
                                 <i class="bi bi-copy"></i>
                             </button>
                         </div>
                     </div>
-
-
                     <div class="d-flex justify-content-center gap-4">
                         <a href="#" class="share-social-icon"><i class="bi bi-messenger"></i></a>
                         <a href="#" class="share-social-icon"><i class="bi bi-chat-dots-fill"></i></a>
                         <a href="#" class="share-social-icon"><i class="bi bi-send"></i></a>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
-
-
 
 {% endblock %}

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %} SmartFridge+ {% endblock %}</title>
-    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.png'%}?v=3">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.png' %}?v=3">
     <link rel="apple-touch-icon" href="{% static 'images/favicon.png' %}?v=2">
     <script>
         (function () {
@@ -24,8 +24,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=8">
-    {% block css %} {% endblock %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=10">
     <script src="{% static 'js/main.js' %}?v=2" defer></script>
     {% block head %}{% endblock %}
 </head>
@@ -100,27 +99,28 @@
             <span class="side-menu-header-spacer" aria-hidden="true"></span>
         </div>
 
-        <div class="side-menu-user">
+        <a href="{% url 'profile' %}" class="side-menu-user">
             <div class="side-menu-avatar">
                 {% if user.avatar %}
                     <img src="{{ user.avatar.url }}" alt="{{ user.username }}">
                 {% else %}
                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"
                          aria-hidden="true">
-                        <rect width="40" height="40" rx="20" fill="white"></rect>
+                        <rect width="40" height="40" rx="20" fill="white"/>
                         <path fill-rule="evenodd" clip-rule="evenodd"
                               d="M26.0002 16C26.0002 19.3137 23.314 22 20.0002 22C16.6865 22 14.0002 19.3137 14.0002 16C14.0002 12.6863 16.6865 10 20.0002 10C23.314 10 26.0002 12.6863 26.0002 16ZM24.0002 16C24.0002 18.2091 22.2094 20 20.0002 20C17.7911 20 16.0002 18.2091 16.0002 16C16.0002 13.7909 17.7911 12 20.0002 12C22.2094 12 24.0002 13.7909 24.0002 16Z"
-                              fill="black"></path>
+                              fill="black"/>
                         <path d="M20.0002 25C13.5259 25 8.00952 28.8284 5.9082 34.192C6.4201 34.7004 6.95934 35.1812 7.52353 35.6321C9.08827 30.7077 13.997 27 20.0002 27C26.0035 27 30.9122 30.7077 32.477 35.6321C33.0412 35.1812 33.5804 34.7004 34.0923 34.1921C31.991 28.8284 26.4746 25 20.0002 25Z"
-                              fill="black"></path>
+                              fill="black"/>
                     </svg>
                 {% endif %}
             </div>
             <span class="side-menu-username">{{ user.username }}</span>
-        </div>
+        </a>
 
         <nav class="side-menu-nav">
-            <a href="{%  url 'areas' %}" class="side-menu-link">Areas</a>
+            <a href="{% url 'home' %}" class="side-menu-link">Dashboard</a>
+            <a href="{% url 'areas' %}" class="side-menu-link">Areas</a>
             <a href="#" class="side-menu-link">Shopping lists</a>
             <a href="#" class="side-menu-link">My products</a>
             <a href="{% url 'expenses' %}" class="side-menu-link">My expenses</a>

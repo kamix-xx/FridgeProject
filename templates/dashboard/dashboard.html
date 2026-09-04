@@ -2,8 +2,10 @@
 
 {% load static %}
 {% block head %}
-    <script src="{% static 'js/dashboard.js' %}" defer></script>
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <script src="{% static 'js/dashboard.js' %}?v=4" defer></script>
+    <script src="{% static 'js/menuMorph.js' %}?v=3" defer></script>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=4">
+    <link rel="stylesheet" href="{% static 'css/morphMenu.css' %}">
 {% endblock %}
 
 {% block title %}SmartFridge+ | Dashboard{% endblock %}
@@ -13,7 +15,7 @@
         <div class="page-bg-image" aria-hidden="true">
             <picture class="page-bg-light">
                 <img
-                        src="https://imgur.com/0pcTzYh.jpeg"
+                        src="https://i.imgur.com/2SjgpvQ.jpeg"
                         alt=""
                         class="page-bg-img"
                 >
@@ -138,9 +140,10 @@
                 </section>
 
                 <div class="dashboard-actions">
-                    <a href="#" class="btn-fridge-outline">View all areas</a>
+                    <a href="{%  url 'areas' %}" class="btn-fridge-outline">View all areas</a>
                     <a href="#" class="btn-fridge-outline"><i class="bi bi-plus"></i> Add new area</a>
                 </div>
             </div>
         </main>
+
 {% endblock %}
