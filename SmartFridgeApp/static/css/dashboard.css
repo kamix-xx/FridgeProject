@@ -1,3 +1,4 @@
+
 /* =========================================
    FRIDGE DASHBOARD
    ========================================= */
@@ -612,6 +613,8 @@ body {
 
     min-width: 0;
 
+    position: relative;
+
     background: rgba(255, 222, 191, 0.4);
 
     border: 1px solid #8b481c;
@@ -687,6 +690,7 @@ body {
 
 .carousel-arrow {
     flex-shrink: 0;
+    border-radius: 10%;
 }
 
 
@@ -793,6 +797,8 @@ body {
 
     padding: 0.9rem 1.1rem;
 
+    cursor: pointer;
+
     transition: background-color 0.3s ease,
     transform 0.15s ease;
 }
@@ -800,6 +806,12 @@ body {
 
 .product-row:hover {
     transform: translateY(-1px);
+}
+
+
+.product-row:focus-visible {
+    outline: 2px solid #e25327;
+    outline-offset: 2px;
 }
 
 
@@ -941,11 +953,136 @@ body {
 .product-row-actions {
     flex-shrink: 0;
 
+    position: relative;
+
+    width: 34px;
+    height: 34px;
+}
+
+/* =========================================
+   Product row "more actions" — a gooey menu
+   like the areas page's, but subtler (no
+   bright always-visible circular buttons) and
+   horizontal-only, since rows don't have
+   vertical room to spare. Reuses the
+   .gooey-chk/.gooey-menu/.gooey-container/
+   .gooey-main-btn/.gooey-item class names —
+   same mechanism as areas.css (and gets
+   gooeyMenu.js's outside-click-closes for
+   free) — but its own look, scoped under
+   .product-row-actions so it can't affect the
+   areas page's gooey menu.
+   ========================================= */
+
+.product-row-actions.gooey-menu {
+    pointer-events: auto;
+}
+
+.product-row-actions .gooey-container {
+    position: absolute;
+    inset: 0;
+    filter: url('#goo');
+}
+
+.product-row-actions .gooey-main-btn,
+.product-row-actions .gooey-item {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 40%;
     display: flex;
-
     align-items: center;
+    justify-content: center;
+    border: 0;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
 
-    gap: 0.4rem;
+.product-row-actions .gooey-main-btn {
+    color: var(--title-color);
+    opacity: 0.5;
+    background: transparent;
+    z-index: 2;
+    transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.25s ease;
+}
+
+.product-row:hover .product-row-actions .gooey-main-btn,
+.product-row-actions .gooey-main-btn:focus-visible {
+    opacity: 1;
+}
+
+.product-row-actions .gooey-main-btn:hover {
+    background: rgba(0, 0, 0, 0.07);
+}
+
+[data-bs-theme="dark"] .product-row-actions .gooey-main-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.product-row-actions .gooey-chk:checked + .gooey-container .gooey-main-btn {
+    opacity: 1;
+    transform: rotate(90deg);
+    background: rgba(0, 0, 0, 0.08);
+}
+
+[data-bs-theme="dark"] .product-row-actions .gooey-chk:checked + .gooey-container .gooey-main-btn {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.product-row-actions .gooey-item {
+    background: #fdfaf6;
+    color: var(--title-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+    opacity: 0;
+    transform: translateX(0) scale(0.6);
+    pointer-events: none;
+    z-index: 1;
+    transition: transform var(--morph-close-dur) var(--morph-close-ease),
+    opacity var(--morph-close-dur) var(--morph-close-ease);
+}
+
+[data-bs-theme="dark"] .product-row-actions .gooey-item {
+    background: #2a221c;
+    color: #fdfaf6;
+}
+
+.product-row-actions .gooey-chk:checked + .gooey-container .item-edit {
+    opacity: 1;
+    transform: translateX(-38px) scale(1);
+    pointer-events: auto;
+    transition: transform var(--morph-open-dur) var(--morph-ease),
+    opacity var(--morph-open-dur) var(--morph-ease);
+}
+
+.product-row-actions .gooey-chk:checked + .gooey-container .item-remove {
+    opacity: 1;
+    transform: translateX(-76px) scale(1);
+    pointer-events: auto;
+    transition: transform var(--morph-open-dur) var(--morph-ease) 0.03s,
+    opacity var(--morph-open-dur) var(--morph-ease) 0.03s;
+    color: #dc3545;
+}
+
+.product-row-actions .gooey-item:hover {
+    background-color: #2c1e16 !important;
+    color: #fdfaf6 !important;
+}
+
+[data-bs-theme="dark"] .product-row-actions .gooey-item:hover {
+    background-color: #fdfaf6 !important;
+    color: #2c1e16 !important;
+}
+
+.product-row-actions .item-remove {
+    color: #dc3545;
+}
+
+.product-row-actions .gooey-chk:checked + .gooey-container .item-remove:hover {
+    background-color: #dc3545 !important;
+    color: #ffffff !important;
 }
 
 
@@ -958,11 +1095,14 @@ body {
     width: 34px;
     height: 34px;
 
+    border: 0;
+    background: transparent;
+
     border-radius: 8px;
 
     color: var(--title-color);
 
-    background: transparent;
+    cursor: pointer;
 
     transition: background-color 0.2s ease,
     color 0.2s ease;
@@ -1006,6 +1146,72 @@ body {
 }
 
 
+/* =========================================
+   Confirmation modal (mirrors areas.css's
+   .custom-popup pattern, duplicated here so
+   dashboard.html doesn't need to load areas.css
+   just for #deleteProductModal)
+   ========================================= */
+
+.modal-backdrop.show {
+    opacity: 0.55;
+    background-color: #140e0a;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.custom-popup {
+    background-color: #fdfaf6;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    color: var(--title-color);
+}
+
+[data-bs-theme="dark"] .custom-popup {
+    background-color: #1e1e1e;
+    color: #e2cbab;
+}
+
+.popup-title { font-size: 1.6rem; font-weight: 500; line-height: 1.4; }
+.popup-btn-text { color: var(--title-color); font-size: 1.15rem; font-weight: 400; padding: 0; }
+.popup-btn-text:hover { color: var(--title-color); opacity: 0.7; }
+.popup-btn-danger { color: #dc3545; font-size: 1.15rem; font-weight: 400; padding: 0; }
+.popup-btn-danger:hover { color: #a71d2a; }
+
+.popup-divider {
+    border-color: rgba(81, 67, 54, 0.4);
+    width: 80%; margin-top: 0; opacity: 1;
+}
+
+[data-bs-theme="dark"] .popup-divider { border-color: rgba(255, 255, 255, 0.2); }
+
+.popup-label { font-size: 0.85rem; margin-bottom: 0.2rem; font-weight: 500; }
+.popup-input { background-color: transparent; border: 1px solid rgba(81, 67, 54, 0.5); border-radius: 8px; padding: 0.5rem 1rem; color: inherit; }
+.popup-input:focus { background-color: transparent; border-color: #ff9166; color: inherit; }
+
+[data-bs-theme="dark"] .popup-input { border-color: rgba(255, 255, 255, 0.3); }
+[data-bs-theme="dark"] .popup-input:focus { border-color: #ff9166; }
+
+.popup-circular-btn {
+    width: 55px; height: 55px; border-radius: 50%; background-color: #ff9166; border: none; color: #2c1e16; font-size: 2.2rem; display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.popup-circular-btn:hover { transform: scale(1.08); background-color: #ffa17c; }
+
+.custom-link-button {
+    appearance: none;
+    -webkit-appearance: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    font: inherit;
+    line-height: inherit;
+    cursor: pointer;
+    vertical-align: baseline;
+}
+
+
 .dashboard-actions {
     display: flex;
 
@@ -1033,6 +1239,10 @@ body {
     border-radius: 12px;
 
     color: var(--title-color);
+
+    font-family: inherit;
+
+    cursor: pointer;
 
     font-size: 0.9rem;
 
@@ -1077,22 +1287,52 @@ body {
 
 @media (max-width: 900px) {
 
-    .dashboard-search-wrapper {
-        padding: 0;
+    /* Trim the chrome above the panel so it can reach further up the
+       screen — several small savings add up to real room here. */
+    .dashboard-page {
+        padding-top: calc(70px + 1rem);
     }
 
+    .dashboard-search-wrapper {
+        padding: 0;
+        margin-bottom: 1rem;
+    }
+
+    .fridge-panel-header {
+        margin-bottom: 0.85rem;
+    }
+
+    /*
+       The old approach wrapped the prev/next arrows onto their own row
+       above the panel (an entire extra row of height, just for two
+       buttons). Instead, float them as small badges hanging off the
+       panel's own bottom corners — same idea as the areas page's gooey
+       button — so the panel doesn't lose a whole row to them.
+    */
     .fridge-panel {
-        flex-wrap: wrap;
+        display: block;
+        position: relative;
     }
 
     .fridge-panel-body {
-        order: 2;
-
-        flex-basis: 100%;
+        padding-bottom: 3rem; /* room so the floating arrows don't sit over the last row */
     }
 
     .carousel-arrow {
-        order: 1;
+        position: absolute;
+        bottom: -18px;
+        z-index: 6;
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+    }
+
+    #areaPrev {
+        left: 14px;
+    }
+
+    #areaNext {
+        right: 14px;
     }
 
     .product-row {
@@ -1106,19 +1346,26 @@ body {
     }
 
     .area-panel {
-        /* the wrapped carousel-arrow row above eats extra vertical space
-           at this breakpoint, so the panel needs a tighter cap here */
-        height: min(50dvh, calc(100dvh - 520px));
+        /* freed up by dropping the arrow row + trimming the chrome above,
+           so the panel gets noticeably more of the viewport back */
+        height: min(58dvh, calc(100dvh - 400px));
+    }
+
+    .dashboard-actions {
+        justify-content: center;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .btn-fridge-outline {
+        padding: 0.55rem 1.15rem;
+        font-size: 0.8rem;
+        letter-spacing: 0.1em;
     }
 }
 
 
 @media (max-width: 480px) {
-
-    .fridge-panel-title {
-        font-size: 1.3rem;
-    }
-
 
     .dashboard-inner {
         padding: 0 1rem;
@@ -1128,10 +1375,42 @@ body {
         width: auto;
     }
 
+    .fridge-panel-body {
+        padding-bottom: 2.75rem;
+    }
+
+    .carousel-arrow {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+        bottom: -16px;
+    }
+
+    #areaPrev {
+        left: 10px;
+    }
+
+    #areaNext {
+        right: 10px;
+    }
+
+    .dashboard-actions {
+        gap: 0.5rem;
+    }
+
+    .btn-fridge-outline {
+        padding: 0.5rem 0.85rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.06em;
+        gap: 0.3rem;
+    }
+
     .t-morph[data-open="true"] {
         width: 190px;
     }
 }
+
+
 
 
 /* =========================================

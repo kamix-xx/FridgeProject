@@ -3,8 +3,20 @@ Renders a single product row inside an area's product list.
 Expects `up` — a UserProduct instance, annotated by the view with
 `freshness_percent` (0-100 or None) and `freshness_level`
 ('fresh' | 'warning' | 'critical' | 'expired' | 'unknown').
+
+The row itself acts as the "edit" trigger (see productRowActions.js) —
+tap/click/Enter anywhere on it except the actions menu opens edit. The
+actions menu (a subtler variant of the areas page's gooey menu) offers
+the same Edit action plus Remove, which opens the shared
+#deleteProductModal confirmation.
 {% endcomment %}
-<li class="product-row" data-product-name="{{ up.product.name|lower }}">
+
+<li class="product-row"
+    data-product-name="{{ up.product.name|lower }}"
+{#    data-edit-href="#"#}
+{#    role="link"#}
+    tabindex="0"
+    aria-label="Edit {{ up.product.name }}">
 
     {# TODO: swap for a per-product icon once product_dictionary.icon_number maps to real assets #}
     <span class="product-icon" aria-hidden="true">
@@ -31,13 +43,46 @@ Expects `up` — a UserProduct instance, annotated by the view with
         <div class="freshness-bar" aria-hidden="true"></div>
     {% endif %}
 
-    <div class="product-row-actions">
-        {# TODO: wire these up once the edit/remove views exist #}
-        <a href="#" class="icon-btn" title="Edit {{ up.product.name }}" aria-label="Edit {{ up.product.name }}">
-            <i class="bi bi-pencil"></i>
-        </a>
-        <a href="#" class="icon-btn icon-btn-danger" title="Remove {{ up.product.name }}" aria-label="Remove {{ up.product.name }}">
-            <i class="bi bi-trash"></i>
-        </a>
+    <div class="product-row-actions gooey-menu">
+
+        <!-- SVG Filter for the Gooey Effect -->
+        <svg width="0" height="0" class="position-absolute" style="visibility: hidden;">
+            <defs>
+                <filter id="goo">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo"/>
+                    <feBlend in="SourceGraphic" in2="goo"/>
+                </filter>
+            </defs>
+        </svg>
+
+
+        <input type="checkbox"
+               id="gooey-chk-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
+               class="gooey-chk d-none">
+
+        <div class="gooey-container">
+            {# TODO: wire the "Yes, remove it!" button up once the delete view exists #}
+            <button type="button"
+                    class="gooey-item item-remove"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteProductModal"
+                    data-product-display-name="{{ up.product.name }}"
+                    aria-label="Remove {{ up.product.name }}">
+                <i class="bi bi-trash"></i>
+            </button>
+
+            <a href="#" class="gooey-item item-edit" aria-label="Edit {{ up.product.name }}">
+                <i class="bi bi-pencil"></i>
+            </a>
+
+            <label class="gooey-main-btn"
+                   for="gooey-chk-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
+                   aria-label="More actions for {{ up.product.name }}">
+                <i class="bi bi-three-dots"></i>
+            </label>
+        </div>
     </div>
 </li>
+
+

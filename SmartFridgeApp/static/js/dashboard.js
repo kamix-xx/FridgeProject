@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const areaCarousel = document.getElementById('areaCarousel');
 
+    // The real, server-rendered panels — captured before any clones are
+    // added below, so this array always maps 1:1 to `areas` from the view.
     const areaPanels = areaCarousel ? Array.from(areaCarousel.querySelectorAll('.area-panel')) : [];
 
     const areaPrevBtn = document.getElementById('areaPrev');
@@ -18,31 +20,143 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const areaTitleEl = document.getElementById('areaTitle');
 
+    const panelCount = areaPanels.length;
+
+    // True infinite wrap needs at least 2 real panels to clone from.
+    const infiniteEnabled = Boolean(areaCarousel) && panelCount > 1;
+
     let currentAreaIndex = 0;
 
-    function goToArea(index) {
-        if (!areaPanels.length) {
+    // trackPosition is the carousel's raw slide index along the (possibly
+    // clone-padded) track. currentAreaIndex is always the real, 0-based
+    // area index — the only one anything outside this block should care
+    // about.
+    let trackPosition = 0;
+
+    let isAnimating = false;
+
+    if (infiniteEnabled) {
+        /*
+         * Clone the last panel to the front and the first panel to the
+         * back. Wrapping from one end to the other then becomes a single
+         * real slide onto a look-alike clone — not a slide through every
+         * panel in between — and we silently snap back to the real panel
+         * the instant that slide finishes (see the transitionend handler
+         * below), with no visible jump.
+         */
+        const firstClone = areaPanels[0].cloneNode(true);
+        const lastClone = areaPanels[panelCount - 1].cloneNode(true);
+
+        [firstClone, lastClone].forEach((clone) => {
+            clone.setAttribute('aria-hidden', 'true');
+            clone.style.pointerEvents = 'none';
+            clone.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
+            clone.querySelectorAll('[tabindex]').forEach((el) => el.setAttribute('tabindex', '-1'));
+        });
+
+        areaCarousel.appendChild(firstClone);
+        areaCarousel.insertBefore(lastClone, areaPanels[0]);
+
+        trackPosition = 1; // real panel 0 now sits at track position 1
+        areaCarousel.style.transform = `translateX(-${trackPosition * 100}%)`;
+
+        areaCarousel.addEventListener('transitionend', (event) => {
+            if (event.target !== areaCarousel || event.propertyName !== 'transform') {
+                return;
+            }
+
+            isAnimating = false;
+
+            if (trackPosition === 0) {
+                // Slid onto the cloned last panel -> silently snap to the real one.
+                trackPosition = panelCount;
+            } else if (trackPosition === panelCount + 1) {
+                // Slid onto the cloned first panel -> silently snap to the real one.
+                trackPosition = 1;
+            } else {
+                return;
+            }
+
+            areaCarousel.style.transition = 'none';
+            areaCarousel.style.transform = `translateX(-${trackPosition * 100}%)`;
+            void areaCarousel.offsetWidth; // flush, so the transition:none actually applies
+            areaCarousel.style.transition = '';
+        });
+    }
+
+    function setAreaTitle(index) {
+        if (areaTitleEl && areaPanels[index]) {
+            areaTitleEl.textContent = areaPanels[index].dataset.areaName || '';
+        }
+    }
+
+    /*
+     * Jump straight to a given real area index.
+     * options.instant skips the slide animation entirely (used when
+     * landing on the dashboard already pointed at a specific area).
+     */
+    function goToArea(index, options) {
+        if (!panelCount) {
             return;
         }
 
-        currentAreaIndex = (index + areaPanels.length) % areaPanels.length;
+        const instant = Boolean(options && options.instant);
 
-        areaCarousel.style.transform = `translateX(-${currentAreaIndex * 100}%)`;
+        currentAreaIndex = (index + panelCount) % panelCount;
 
-        if (areaTitleEl) {
-            areaTitleEl.textContent = areaPanels[currentAreaIndex].dataset.areaName || '';
+        setAreaTitle(currentAreaIndex);
+
+        if (!infiniteEnabled) {
+            areaCarousel.style.transform = `translateX(-${currentAreaIndex * 100}%)`;
+
+            return;
         }
+
+        trackPosition = currentAreaIndex + 1;
+
+        if (instant) {
+            areaCarousel.style.transition = 'none';
+        }
+
+        areaCarousel.style.transform = `translateX(-${trackPosition * 100}%)`;
+
+        if (instant) {
+            void areaCarousel.offsetWidth; // flush before restoring the transition
+            areaCarousel.style.transition = '';
+        }
+    }
+
+    function stepArea(delta) {
+        if (!panelCount || isAnimating) {
+            return;
+        }
+
+        if (!infiniteEnabled) {
+            goToArea(currentAreaIndex + delta);
+
+            return;
+        }
+
+        isAnimating = true;
+
+        trackPosition += delta;
+
+        currentAreaIndex = ((trackPosition - 1) % panelCount + panelCount) % panelCount;
+
+        setAreaTitle(currentAreaIndex);
+
+        areaCarousel.style.transform = `translateX(-${trackPosition * 100}%)`;
     }
 
     if (areaPrevBtn) {
         areaPrevBtn.addEventListener('click', () => {
-            goToArea(currentAreaIndex - 1);
+            stepArea(-1);
         });
     }
 
     if (areaNextBtn) {
         areaNextBtn.addEventListener('click', () => {
-            goToArea(currentAreaIndex + 1);
+            stepArea(1);
         });
     }
 
@@ -546,39 +660,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // dashboardAreaJump
-//
-// If the dashboard was opened with a ?area=<name> query param (set by
-// areaCardLink.js on the Areas page), step the carousel forward to that
-// area's panel on load. Deliberately drives the real #areaNext button
-// instead of touching dashboard.js internal state directly, so it rides
-// whatever animation/locking logic dashboard.js already implements.
+    // =========================================
+    // Jump to a specific area on load
+    // =========================================
+    // If the dashboard was opened with a ?area=<name> query param (set by
+    // areaCardLink.js on the Areas page), land straight on that area's
+    // panel -- instantly, no slide-through -- instead of stepping the
+    // carousel forward one click at a time.
 
+    const targetArea = new URLSearchParams(window.location.search).get('area');
 
-    var targetArea = new URLSearchParams(window.location.search).get('area');
-    if (!targetArea) return;
+    if (targetArea) {
+        const targetIndex = areaPanels.findIndex((panel) => panel.dataset.areaName === targetArea);
 
-    var panels = document.querySelectorAll('#areaCarousel .area-panel');
-    var targetIndex = -1;
-    panels.forEach(function (panel, i) {
-        if (targetIndex === -1 && panel.dataset.areaName === targetArea) {
-            targetIndex = i;
+        if (targetIndex > 0) {
+            goToArea(targetIndex, { instant: true });
         }
-    });
-    if (targetIndex <= 0) return;
-
-    var nextBtn = document.getElementById('areaNext');
-    if (!nextBtn) return;
-
-    // Step forward using the carousel's own "next" control, spaced out to
-    // let each transition finish before the next click fires.
-    var clicksLeft = targetIndex;
-    (function clickNext() {
-        if (clicksLeft <= 0 || nextBtn.disabled) return;
-        nextBtn.click();
-        clicksLeft--;
-        setTimeout(clickNext, 500);
-    })();
+    }
 
 
 });

@@ -16,6 +16,16 @@
     --morph-slide: 24px;
     --morph-blur: 2px;
 
+    /* -----------------------------------------
+       Transitions.dev — Modal open / close
+       https://transitions.dev/detail.html?t=modal-open-close
+       ----------------------------------------- */
+    --modal-open-dur: 250ms;
+    --modal-close-dur: 150ms;
+    --modal-scale: 0.96;
+    --modal-scale-close: 0.96;
+    --modal-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
 }
 
 
@@ -188,6 +198,58 @@
 
 
 /* =========================================
+   Modal open / close
+   Transitions.dev: https://transitions.dev/detail.html?t=modal-open-close
+
+   Applied the "menu" way — working WITH Bootstrap's own modal lifecycle
+   instead of fighting it: .modal keeps its `fade` class (so Bootstrap
+   still drives show/hide, focus, ESC and backdrop-click dismissal
+   normally), and this just re-times/re-styles that same transition.
+   Bootstrap adds `.hiding` to the .modal while it closes — timing our
+   close animation to finish inside that same window is what avoids the
+   "blink" (Bootstrap ripping the modal away mid fade-out).
+
+   Usage: add class="t-modal" to the modal's .modal-content (the actual
+   visible card) — not .modal-dialog, which Bootstrap uses for centering.
+   ========================================= */
+
+.modal.fade .modal-dialog {
+    /* Bootstrap's own slide-down is replaced entirely by .t-modal below */
+    transition: none;
+    transform: none;
+}
+
+.modal.fade {
+    transition: opacity var(--modal-open-dur) linear;
+}
+
+.modal.fade.hiding {
+    transition: opacity var(--modal-close-dur) linear;
+}
+
+.t-modal {
+    transform-origin: center;
+    transform: scale(var(--modal-scale));
+    opacity: 0;
+    transition: transform var(--modal-open-dur) var(--modal-ease),
+    opacity var(--modal-open-dur) var(--modal-ease);
+    will-change: transform, opacity;
+}
+
+.modal.show .t-modal {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.modal.fade.hiding .t-modal {
+    transform: scale(var(--modal-scale-close));
+    opacity: 0;
+    transition: transform var(--modal-close-dur) var(--modal-ease),
+    opacity var(--modal-close-dur) var(--modal-ease);
+}
+
+
+/* =========================================
    Reduced Motion
    ========================================= */
 
@@ -198,7 +260,8 @@
     .t-morph-plus svg,
     .t-morph-menu,
     .t-clear-mirror,
-    .t-clear-placeholder {
+    .t-clear-placeholder,
+    .t-modal {
         transition: none !important;
     }
 
