@@ -1287,6 +1287,10 @@ body {
 
 @media (max-width: 900px) {
 
+    .fridge-panel-title {
+        font-size: 1.5rem !important;
+    }
+
     /* Trim the chrome above the panel so it can reach further up the
        screen — several small savings add up to real room here. */
     .dashboard-page {
@@ -1366,6 +1370,10 @@ body {
 
 
 @media (max-width: 480px) {
+
+    .fridge-panel-title {
+        font-size: 1.2rem !important;
+    }
 
     .dashboard-inner {
         padding: 0 1rem;
