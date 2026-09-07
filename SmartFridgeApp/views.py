@@ -211,10 +211,6 @@ def areas(request):
 
     return render(request, 'areas/areas.html', context)
 
-
-from django.shortcuts import render
-
-
 def shopping_list_view(request):
     mock_shopping_list = {
         "id": 1,
