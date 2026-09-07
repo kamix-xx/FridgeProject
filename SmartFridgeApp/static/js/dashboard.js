@@ -33,8 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // about.
     let trackPosition = 0;
 
-    let isAnimating = false;
-
     if (infiniteEnabled) {
         /*
          * Clone the last panel to the front and the first panel to the
@@ -64,8 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (event.target !== areaCarousel || event.propertyName !== 'transform') {
                 return;
             }
-
-            isAnimating = false;
 
             if (trackPosition === 0) {
                 // Slid onto the cloned last panel -> silently snap to the real one.
@@ -127,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function stepArea(delta) {
-        if (!panelCount || isAnimating) {
+        if (!panelCount) {
             return;
         }
 
@@ -137,7 +133,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        isAnimating = true;
+        /*
+         * If a previous rapid click already landed us on a clone (its
+         * transitionend snap-back hasn't run yet), resolve that first —
+         * instantly, no visible jump, since a clone looks identical to
+         * the real panel it stands in for — so stepping from here can
+         * never walk past the end of the track no matter how fast you
+         * click.
+         */
+        if (trackPosition <= 0 || trackPosition >= panelCount + 1) {
+            trackPosition = ((trackPosition - 1) % panelCount + panelCount) % panelCount + 1;
+            areaCarousel.style.transition = 'none';
+            areaCarousel.style.transform = `translateX(-${trackPosition * 100}%)`;
+            void areaCarousel.offsetWidth; // flush, so the transition:none actually applies
+            areaCarousel.style.transition = '';
+        }
 
         trackPosition += delta;
 

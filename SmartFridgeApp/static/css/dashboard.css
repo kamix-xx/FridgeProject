@@ -1,4 +1,3 @@
-
 /* =========================================
    FRIDGE DASHBOARD
    ========================================= */
@@ -214,10 +213,11 @@ body {
    ========================================= */
 
 .dashboard-search-wrapper {
-    padding: 0 calc(34px + 1rem);
+    /* Matches .fridge-panel-body's actual inset: the 48px carousel arrow
+       + the 1rem gap next to it (see .fridge-panel / .btn-scroll-down) —
+       so this lines up with the panel exactly, not just approximately. */
+    padding: 0 calc(48px + 1rem);
     margin-bottom: 1.5rem;
-    margin-left: 0.8rem;
-    margin-right: 0.8rem;
 }
 
 
@@ -1291,19 +1291,49 @@ body {
         font-size: 1.5rem !important;
     }
 
-    /* Trim the chrome above the panel so it can reach further up the
-       screen — several small savings add up to real room here. */
+    /*
+       Mobile layout is now a single 100dvh flex column: search bar and
+       action buttons take their natural height, and the fridge panel
+       flex-grows to fill whatever's left. That's what actually
+       guarantees "taller panel, no page scroll" — no more guessing a
+       fixed px budget to subtract from 100dvh.
+    */
     .dashboard-page {
-        padding-top: calc(70px + 1rem);
+        display: flex;
+        flex-direction: column;
+        height: 100dvh;
+        width: 100%;
+        min-width: 0;
+        padding-top: calc(70px + 0.6rem);
+        padding-bottom: 0.6rem;
+        overflow: hidden; /* safety net: clip rather than ever push the page into scrolling */
+    }
+
+    .dashboard-inner {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        min-width: 0;
+        width: 100%;
     }
 
     .dashboard-search-wrapper {
+        flex: 0 0 auto;
+        min-width: 0;
         padding: 0;
-        margin-bottom: 1rem;
+        margin-bottom: 0.6rem;
+    }
+
+    /* A tad shorter — width (horizontal padding) is untouched */
+    .dashboard-search-input {
+        padding-top: 0.6rem;
+        padding-bottom: 0.6rem;
+        font-size: 0.95rem;
     }
 
     .fridge-panel-header {
-        margin-bottom: 0.85rem;
+        margin-bottom: 0.65rem;
     }
 
     /*
@@ -1316,10 +1346,33 @@ body {
     .fridge-panel {
         display: block;
         position: relative;
+        flex: 1;
+        min-height: 0;
+        min-width: 0;
     }
 
     .fridge-panel-body {
-        padding-bottom: 3rem; /* room so the floating arrows don't sit over the last row */
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-width: 0;
+        padding-bottom: 2.25rem; /* room so the floating arrows don't sit over the last row */
+    }
+
+    .fridge-panel-header {
+        flex: 0 0 auto;
+        min-width: 0;
+    }
+
+    .area-carousel-viewport {
+        flex: 1;
+        min-height: 0;
+        min-width: 0;
+    }
+
+    .area-carousel,
+    .area-panel {
+        height: 100%;
     }
 
     .carousel-arrow {
@@ -1349,16 +1402,14 @@ body {
         flex-basis: 100%;
     }
 
-    .area-panel {
-        /* freed up by dropping the arrow row + trimming the chrome above,
-           so the panel gets noticeably more of the viewport back */
-        height: min(58dvh, calc(100dvh - 400px));
-    }
-
     .dashboard-actions {
+        flex: 0 0 auto;
+        min-width: 0;
+        flex-wrap: wrap;
         justify-content: center;
         gap: 0.75rem;
-        margin-top: 1rem;
+        margin-top: 0.6rem;
+        margin-bottom: 0.6rem;
     }
 
     .btn-fridge-outline {
