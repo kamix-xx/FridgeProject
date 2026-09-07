@@ -109,99 +109,103 @@
     </div>
 
     <!-- Modal: Edit Account -->
-<div class="modal fade" id="editAccountModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content edit-modal-container p-4 p-md-5">
+    <div class="modal fade" id="editAccountModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content edit-modal-container p-4 p-md-5">
 
-            <!-- Przycisk zamykania X -->
-            <button type="button" class="btn-close edit-modal-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                <!-- Przycisk zamykania X -->
+                <button type="button" class="btn-close edit-modal-close shadow-none" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
 
-            <div class="modal-body p-0">
-                <h2 class="edit-modal-heading">Edit account</h2>
+                <div class="modal-body p-0">
+                    <h2 class="edit-modal-heading">Edit account</h2>
 
-                <div class="row g-4 align-items-start mt-1">
+                    <div class="row g-4 align-items-start mt-1">
 
-                    <!-- LEWA KOLUMNA -->
-                    <div class="col-md-6 d-flex flex-column gap-4">
+                        <!-- LEWA KOLUMNA -->
+                        <div class="col-md-6 d-flex flex-column gap-4">
 
-                        <!-- Login -->
-                        <div>
-                            <label class="edit-field-label">Login</label>
-                            <div class="edit-input-row">
-                                <input type="text" class="edit-input-raw" value="login">
-                                <i class="bi bi-pencil edit-pencil-icon"></i>
+                            <!-- Login -->
+                            <div>
+                                <label for="login" class="edit-field-label">Login</label>
+                                <div class="edit-input-row">
+                                    <input type="text" class="edit-input-raw" value="{{ user.username }}" id="login">
+                                    <label for="login"> <i class="bi bi-pencil edit-pencil-icon"></i></label>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Email -->
-                        <div>
-                            <label class="edit-field-label">Email</label>
-                            <div class="edit-input-row">
-                                <input type="email" class="edit-input-raw" value="user@email.com">
-                                <i class="bi bi-pencil edit-pencil-icon"></i>
+                            <!-- Email -->
+                            <div>
+                                <label for="email" class="edit-field-label">Email</label>
+                                <div class="edit-input-row">
+                                    <input type="email" class="edit-input-raw" value="{{ user.email }}" id="email">
+                                    <label for="email"><i class="bi bi-pencil edit-pencil-icon"></i></label>
+                                </div>
                             </div>
+
+                            <!-- Password -->
+                            <div class="mt-2">
+                                <label class="edit-field-label d-block mb-3">Password</label>
+                                <button type="button" class="btn edit-btn-password">
+                                    <i class="bi bi-pencil me-2"></i>Change password
+                                </button>
+                            </div>
+
                         </div>
 
-                        <!-- Password -->
-                        <div class="mt-2">
-                            <label class="edit-field-label d-block mb-3">Password</label>
-                            <button type="button" class="btn edit-btn-password">
-                                <i class="bi bi-pencil me-2"></i>Change password
-                            </button>
-                        </div>
+                        <!-- PRAWA KOLUMNA -->
+                        <div class="col-md-6 d-flex flex-column gap-4">
 
-                    </div>
+                            <!-- Box Awatara z ikona Upload w rogu -->
+                            <div class="d-flex justify-content-start justify-content-md-center pe-md-4">
+                                <div class="edit-avatar-frame">
+                                    <!-- Upload Icon (Prawy Górny Róg) -->
+                                    <div class="edit-avatar-upload-icon">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                             stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                                             stroke-linejoin="round">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                        </svg>
+                                    </div>
 
-                    <!-- PRAWA KOLUMNA -->
-                    <div class="col-md-6 d-flex flex-column gap-4">
-
-                        <!-- Box Awatara z ikona Upload w rogu -->
-                        <div class="d-flex justify-content-start justify-content-md-center pe-md-4">
-                            <div class="edit-avatar-frame">
-                                <!-- Upload Icon (Prawy Górny Róg) -->
-                                <div class="edit-avatar-upload-icon">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                        <polyline points="17 8 12 3 7 8"></polyline>
-                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    <!-- Awatar (Głowa + Łuk) -->
+                                    <svg class="edit-avatar-svg" viewBox="0 0 100 100" fill="none" stroke="currentColor"
+                                         stroke-width="3.5" stroke-linecap="round">
+                                        <circle cx="50" cy="36" r="16"></circle>
+                                        <path d="M 20 82 A 30 30 0 0 1 80 82"></path>
                                     </svg>
                                 </div>
-
-                                <!-- Awatar (Głowa + Łuk) -->
-                                <svg class="edit-avatar-svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round">
-                                    <circle cx="50" cy="36" r="16" />
-                                    <path d="M 20 82 A 30 30 0 0 1 80 82" />
-                                </svg>
                             </div>
-                        </div>
 
-                        <!-- Name -->
-                        <div>
-                            <label class="edit-field-label">Name</label>
-                            <div class="edit-input-row">
-                                <input type="text" class="edit-input-raw" value="Username">
-                                <i class="bi bi-pencil edit-pencil-icon"></i>
+                            <!-- Name -->
+                            <div>
+                                <label for="name" class="edit-field-label">Name</label>
+                                <div class="edit-input-row">
+                                    <input type="text" class="edit-input-raw" value="{{ user.first_name }}" id="name">
+                                    <label for="name"><i class="bi bi-pencil edit-pencil-icon"></i></label>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Przyciski Save / Delete -->
-                        <div class="d-flex align-items-center gap-3 mt-2">
-                            <button type="button" class="btn edit-btn-save">
-                                <i class="bi bi-floppy me-2"></i>Save changes
-                            </button>
-                            <button type="button" class="btn edit-btn-delete">
-                                Delete account
-                            </button>
+                            <!-- Przyciski Save / Delete -->
+                            <div class="d-flex align-items-center gap-3 mt-2">
+                                <button type="button" class="btn edit-btn-save">
+                                    <i class="bi bi-floppy me-2"></i>Save changes
+                                </button>
+                                <button type="button" class="btn edit-btn-delete" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                                    Delete account
+                                </button>
+                            </div>
+
                         </div>
 
                     </div>
-
                 </div>
-            </div>
 
+            </div>
         </div>
     </div>
-</div>
 
 
 {% endblock %}
