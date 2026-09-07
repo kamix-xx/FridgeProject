@@ -1,0 +1,280 @@
+/* =========================================
+   UNIVERSAL MODALS & POPUPS
+   ========================================= */
+
+:root {
+    --modal-dur: 200ms;
+    --modal-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Backdrop */
+.modal-backdrop {
+    background-color: #140e0a;
+    opacity: 0 !important;
+    transition: opacity var(--modal-dur) var(--modal-ease) !important;
+    will-change: opacity;
+}
+
+.modal-backdrop.show {
+    opacity: 0.55 !important;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+/* Modal */
+.modal {
+    transition: opacity var(--modal-dur) var(--modal-ease) !important;
+    will-change: opacity;
+}
+
+/* Dialog */
+.modal-dialog {
+    transform: scale(0.97) translateY(-5px) !important;
+    transition: transform var(--modal-dur) var(--modal-ease) !important;
+    will-change: transform;
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1) translateY(0) !important;
+}
+
+/*
+ * Bootstrap handles visibility/display itself.
+ * This only prevents invisible modals from intercepting clicks.
+ */
+.modal:not(.show) {
+    pointer-events: none;
+}
+
+/* =========================================
+   Standard Custom Popup (Areas / Dashboard)
+   ========================================= */
+
+.custom-popup {
+    background-color: #fdfaf6;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    color: var(--title-color);
+    background-clip: padding-box; /* Prevents edge bleeding */
+}
+
+[data-bs-theme="dark"] .custom-popup {
+    background-color: #1e1e1e;
+    color: #e2cbab;
+}
+
+/* Typography & Layout */
+.popup-title {
+    font-size: 1.6rem;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.popup-divider {
+    border-color: rgba(81, 67, 54, 0.4);
+    width: 80%;
+    margin-top: 0;
+    opacity: 1;
+}
+
+[data-bs-theme="dark"] .popup-divider {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Buttons */
+.popup-btn-text {
+    color: var(--title-color);
+    font-size: 1.15rem;
+    font-weight: 400;
+    padding: 0;
+}
+
+.popup-btn-text:hover {
+    color: var(--title-color);
+    opacity: 0.7;
+}
+
+.popup-btn-danger {
+    color: #dc3545;
+    font-size: 1.15rem;
+    font-weight: 400;
+    padding: 0;
+}
+
+.popup-btn-danger:hover {
+    color: #a71d2a;
+}
+
+.popup-circular-btn {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background-color: #ff9166;
+    border: none;
+    color: #2c1e16;
+    font-size: 2.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.popup-circular-btn:hover {
+    transform: scale(1.08);
+    background-color: #ffa17c;
+}
+
+/* Inputs */
+.popup-label {
+    font-size: 0.85rem;
+    margin-bottom: 0.2rem;
+    font-weight: 500;
+}
+
+.popup-input {
+    background-color: transparent;
+    border: 1px solid rgba(81, 67, 54, 0.5);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: inherit;
+}
+
+.popup-input:focus {
+    background-color: transparent;
+    border-color: #ff9166;
+    color: inherit;
+}
+
+[data-bs-theme="dark"] .popup-input {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+[data-bs-theme="dark"] .popup-input:focus {
+    border-color: #ff9166;
+}
+
+.custom-link-button {
+    appearance: none;
+    -webkit-appearance: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    font: inherit;
+    line-height: inherit;
+    cursor: pointer;
+    vertical-align: baseline;
+}
+
+/* Share Code Group */
+.popup-share-group {
+    border: 1px solid rgba(81, 67, 54, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
+    max-width: 320px;
+}
+
+.popup-share-group .input-group-text {
+    background-color: transparent;
+    border: none;
+    color: var(--title-color);
+    font-size: 1.3rem;
+    padding-right: 0.5rem;
+}
+
+.popup-share-group .form-control {
+    background-color: transparent;
+    border: none;
+    color: var(--title-color);
+    font-size: 0.95rem;
+    padding-left: 0.2rem;
+}
+
+.popup-share-group .btn-copy {
+    background-color: transparent;
+    border: none;
+    color: var(--title-color);
+    font-size: 1.3rem;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.popup-share-group .btn-copy:hover {
+    opacity: 0.6;
+}
+
+.popup-share-group .btn-copy:active {
+    transform: scale(0.9);
+}
+
+[data-bs-theme="dark"] .popup-share-group {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.share-social-icon {
+    font-size: 1.8rem;
+    color: var(--title-color) !important;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.share-social-icon:hover {
+    transform: translateY(-4px);
+    opacity: 0.7;
+}
+
+
+/* =========================================
+   Red Delete Profile Modal
+   ========================================= */
+
+.custom-delete-modal-dialog {
+    max-width: 520px;
+}
+
+.custom-delete-modal-content {
+    background: linear-gradient(135deg, rgba(140, 18, 18, 0.92) 0%, rgba(70, 8, 8, 0.95) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    background-clip: padding-box;
+}
+
+.delete-modal-title {
+    font-size: 1.65rem;
+    font-weight: 400;
+    line-height: 1.35;
+    letter-spacing: 0.02em;
+}
+
+.delete-modal-subtitle {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 300;
+}
+
+.delete-modal-divider {
+    width: 65%;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.35);
+}
+
+.btn-delete-action {
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-delete-action:hover {
+    transform: scale(1.08);
+    opacity: 0.85;
+}
+
+.btn-delete-action:active {
+    transform: scale(0.96);
+}
+
+/* Prevent hidden modals from blocking mouse interaction during rapid swaps */
+.modal:not(.show) {
+    pointer-events: none;
+}

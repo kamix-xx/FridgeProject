@@ -238,12 +238,13 @@
     transform: scale(1.08) !important;
 }
 
-.modal-backdrop.show {
-    opacity: 0.55;
-    background-color: #140e0a;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-}
+
+/*.modal-backdrop.show {*/
+/*    opacity: 0.55;*/
+/*    background-color: #140e0a;*/
+/*    backdrop-filter: blur(6px);*/
+/*    -webkit-backdrop-filter: blur(6px);*/
+/*}*/
 
 .custom-popup {
     background-color: #fdfaf6;
