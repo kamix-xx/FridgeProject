@@ -2,6 +2,7 @@
 {% load static %}
 {% block title %}SmartFridge+ — My Areas{% endblock %}
 {% block head %}
+    <link rel="expect" href="#page-transition-panel" blocking="render">
 {#    <link rel="stylesheet" href="{% static 'css/profile.css' %}">#}
     <link rel="stylesheet" href="{% static 'css/areas.css' %}?v=7">
     <link rel="stylesheet" href="{% static 'css/morphMenu.css' %}?v=2">
@@ -39,7 +40,7 @@
         </svg>
 
         <div class="container position-relative z-2">
-            <div class="glass-card areas-glass-card mx-auto p-4 p-md-5 position-relative">
+            <div class="glass-card areas-glass-card mx-auto p-4 p-md-5 position-relative" id="page-transition-panel">
 
                 <!-- NEW HEADER: Title Left, Expandable Plus Button Right -->
                 <header class="d-flex justify-content-between align-items-center mb-4 panel-header">

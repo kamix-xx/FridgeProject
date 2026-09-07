@@ -2,12 +2,13 @@
 
 {% load static %}
 {% block head %}
+    <link rel="expect" href="#page-transition-panel" blocking="render">
     <script src="{% static 'js/dashboard.js' %}?v=3" defer></script>
     <script src="{% static 'js/menuMorph.js' %}?v=2" defer></script>
     <script src="{% static 'js/gooeyMenu.js' %}" defer></script>
     <script src="{% static 'js/modals.js' %}?v=2" defer></script>
     <script src="{% static 'js/productRowActions.js' %}" defer></script>
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=3">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=4">
     <link rel="stylesheet" href="{% static 'css/morphMenu.css' %}">
     <link rel="stylesheet" href="{% static 'css/modals.css' %}">
 {% endblock %}
@@ -82,7 +83,7 @@
                         <i class="bi bi-chevron-left"></i>
                     </button>
 
-                    <div class="fridge-panel-body">
+                    <div class="fridge-panel-body" id="page-transition-panel">
                         <header class="fridge-panel-header">
                             <h2 class="fridge-panel-title" id="areaTitle">
                                 {# Fixed fallback string #}
@@ -145,7 +146,7 @@
                 </section>
 
                 <div class="dashboard-actions">
-                    <a href="{%  url 'areas' %}" class="btn-fridge-outline">View all areas</a>
+                    <a href="{%  url 'areas' %}" class="btn-fridge-outline" data-page-transition>View all areas</a>
                     <button type="button" class="btn-fridge-outline"
                             data-bs-toggle="modal" data-bs-target="#addAreaModal">
                         <i class="bi bi-plus"></i> Add new area</button>
