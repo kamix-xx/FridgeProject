@@ -10,16 +10,20 @@
 {% block content %}
     <main class="expense-page-wrapper position-relative min-vh-100 d-flex flex-column align-items-center justify-content-center py-5">
 
+        <section
+                class="shopping-panel d-flex justify-content-center align-items-center gap-3 w-100 position-relative z-2 px-2 px-md-5"
+                style="max-width: 1400px;">
 
-        <div class="container-fluid position-relative z-2 d-flex align-items-center justify-content-between px-2 px-md-5 w-100">
-
-            <button class="btn btn-link text-decoration-none shadow-none text-dark fs-1 carousel-arrow d-none d-md-block"
+            <!-- Lewa strzałka (nowe klasy btn-scroll-down) -->
+            <button type="button"
+                    class="btn-scroll-down carousel-arrow shopping-arrow-prev d-none d-md-flex align-items-center justify-content-center"
                     aria-label="Previous list">
-                <i class="bi bi-arrow-left"></i>
+                <i class="bi bi-chevron-left"></i>
             </button>
 
 
-            <div class="glass-card mx-auto p-4 p-md-5 mt-5 position-relative flex-grow-1" style="max-width: 900px;">
+            <div class="glass-card p-4 p-md-5 mt-4 position-relative flex-grow-1 w-100"
+                 style="max-width: 900px;">
 
                 <div class="d-flex justify-content-between align-items-center mb-5 pb-2 border-bottom border-dark border-opacity-25">
                     <div class="flex-grow-1 text-center">
@@ -51,7 +55,9 @@
                                 </div>
 
                                 <div class="product-row-actions d-flex flex-row flex-nowrap align-items-center ms-auto gap-2 gap-md-3">
-                                    <a href="#" class="icon-btn fs-5" aria-label="Edit">
+                                    <!-- W przyszłości tu trzeba przekazywać id produktu na backend -->
+                                    <a href="#" class="icon-btn fs-5" aria-label="Edit" data-bs-toggle="modal"
+                                       data-bs-target="#editProductModal">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
 
@@ -81,13 +87,15 @@
 
             </div>
 
-            <button class="btn btn-link text-decoration-none shadow-none text-dark fs-1 carousel-arrow d-none d-md-block"
+            <button type="button"
+                    class="btn-scroll-down carousel-arrow shopping-arrow-next d-none d-md-flex align-items-center justify-content-center"
                     aria-label="Next list">
-                <i class="bi bi-arrow-right"></i>
+                <i class="bi bi-chevron-right"></i>
             </button>
-        </div>
 
-        <div class="container position-relative z-2 d-flex justify-content-between align-items-center mt-5"
+        </section>
+
+        <div class="container position-relative z-2 d-flex justify-content-between align-items-center mt-4"
              style="max-width: 900px;">
             <button class="btn-shopping-nav">
                 <i class="bi bi-arrow-90deg-up me-2"></i> View ALL LISTS
@@ -110,8 +118,10 @@
                         <h3 class="popup-title mb-4 mt-2">Create shopping list</h3>
 
                         <div class="text-start mb-5">
-                            <label for="newShoppingListName" class="form-label popup-label">Shopping list name</label>
-                            <input type="text" class="form-control popup-input shadow-none" id="newShoppingListName">
+                            <label for="newShoppingListName" class="form-label popup-label">Shopping list
+                                name</label>
+                            <input type="text" class="form-control popup-input shadow-none"
+                                   id="newShoppingListName">
                         </div>
 
                         <button type="button" class="popup-circular-btn mx-auto">
@@ -241,6 +251,83 @@
                                             </li>
                                             <li><a class="dropdown-item" href="#"
                                                    onclick="document.getElementById('selectedUnitText').innerText='PCK'; return false;">PCK</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" class="popup-circular-btn mx-auto">
+                            <i class="bi bi-plus"></i>
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- POP-UP: Edit Product in List -->
+        <!-- ========================================== -->
+        <div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+
+                <div class="modal-content custom-popup position-relative border-0">
+
+                    <button type="button"
+                            class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    <div class="modal-body text-center p-4 p-md-5">
+                        <h3 class="popup-title mb-4 mt-2">Edit shopping list item</h3>
+
+                        <div class="text-start mb-4">
+                            <label for="editProductName" class="form-label popup-label">Product name</label>
+                            <input type="text" class="form-control popup-input shadow-none" id="editProductName"
+                                   list="editProductOptions" value="Milk">
+
+                            <datalist id="editProductOptions">
+                                <option value="Milk">
+                                <option value="Cottage cheese">
+                                <option value="Pasta">
+                            </datalist>
+                        </div>
+
+                        <div class="row g-2 mb-5">
+                            <div class="col-6 text-start">
+                                <label for="editProductQty" class="form-label popup-label">Quantity</label>
+                            </div>
+                            <div class="col-6 text-start">
+                                <label for="editProductUnit" class="form-label popup-label">Unit</label>
+                            </div>
+                            <div class="col-12 mt-0">
+                                <div class="fused-input-group d-flex align-items-stretch">
+                                    <input type="number" class="form-control shadow-none w-50" id="editProductQty"
+                                           min="0" step="0.1" value="1">
+
+                                    <div class="fused-input-divider"></div>
+
+                                    <div class="dropdown w-50">
+                                        <button class="btn dropdown-toggle w-100 h-100 text-start d-flex justify-content-between align-items-center shadow-none fused-dropdown-btn"
+                                                type="button"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                            <span id="editSelectedUnitText">L</span>
+                                        </button>
+
+                                        <ul class="dropdown-menu custom-dropdown-menu w-100">
+                                            <li><a class="dropdown-item" href="#"
+                                                   onclick="document.getElementById('editSelectedUnitText').innerText='kg'; return false;">kg</a>
+                                            </li>
+                                            <li><a class="dropdown-item" href="#"
+                                                   onclick="document.getElementById('editSelectedUnitText').innerText='g'; return false;">g</a>
+                                            </li>
+                                            <li><a class="dropdown-item" href="#"
+                                                   onclick="document.getElementById('editSelectedUnitText').innerText='L'; return false;">L</a>
+                                            </li>
+                                            <li><a class="dropdown-item" href="#"
+                                                   onclick="document.getElementById('editSelectedUnitText').innerText='PCK'; return false;">PCK</a>
                                             </li>
                                         </ul>
                                     </div>

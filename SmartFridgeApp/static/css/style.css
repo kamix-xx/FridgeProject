@@ -1148,6 +1148,7 @@ EXPENSE TRACKER MOJA CZĘŚĆ
     background-color: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    border-radius: 10% !important;
     border: 1px solid rgba(255, 255, 255, 0.4);
     color: var(--title-color);
     font-size: 1.5rem;
@@ -1437,6 +1438,57 @@ option {
 [data-bs-theme="dark"] .custom-dropdown-menu .dropdown-item:focus {
     background-color: #ff9166;
     color: #fff;
+}
+
+/* =========================================
+   RESPONSYWNE STRZAŁKI KARUZELI (zapożyczone z dashboard_3.css)
+   ========================================= */
+
+@media (max-width: 900px) {
+    /* Pozbywamy się flexboxa wyrównującego na boki na rzecz pozycjonowania na rogu karty */
+    .shopping-panel {
+        display: block !important;
+    }
+
+    /* Odsłaniamy strzałki na małych ekranach (override d-none z HTML) */
+    .shopping-arrow-prev,
+    .shopping-arrow-next {
+        display: flex !important;
+        border-radius: 10% !important;
+        position: absolute;
+        bottom: -18px;
+        z-index: 6;
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+    }
+
+    .shopping-arrow-prev {
+        left: 30px; /* Wcięcie zależne od paddingu sekcji */
+    }
+
+    .shopping-arrow-next {
+        right: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Jeszcze mniejsze strzałki dla telefonów */
+    .shopping-arrow-prev,
+    .shopping-arrow-next {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+        bottom: -16px;
+    }
+
+    .shopping-arrow-prev {
+        left: 20px;
+    }
+
+    .shopping-arrow-next {
+        right: 20px;
+    }
 }
 
 
