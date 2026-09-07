@@ -169,3 +169,154 @@
     transform: scale(0.96);
 }
 
+/* =========================================
+   EDIT ACCOUNT MODAL (EXACT MATCH)
+   ========================================= */
+
+/* Główny kontener modalu - jasny beż z makiety */
+.edit-modal-container {
+    background-color: #FAF5EE !important;
+    border: none !important;
+    border-radius: 20px !important;
+    color: #211A15 !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2) !important;
+    position: relative;
+}
+
+/* Przycisk X zamykający modal */
+.edit-modal-close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    z-index: 10;
+}
+
+/* Nagłówek Edit account */
+.edit-modal-heading {
+    font-size: 2.1rem;
+    font-weight: 500;
+    color: #211A15 !important;
+    margin-bottom: 1.5rem;
+}
+
+/* Etykiety pól */
+.edit-field-label {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #211A15 !important;
+    margin-bottom: 0.4rem;
+}
+
+/* Linia pod inputem */
+.edit-input-row {
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid #211A15 !important;
+    padding-bottom: 3px;
+    max-width: 270px;
+}
+
+/* Czysty, przezroczysty input tekstowy bez ramek systemowych */
+.edit-input-raw {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    color: #211A15 !important;
+    font-size: 0.98rem;
+    font-weight: 400;
+    width: 100%;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Ikony ołówków */
+.edit-pencil-icon {
+    font-size: 1.1rem;
+    color: #211A15 !important;
+    cursor: pointer;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+/* Przycisk Change password */
+.edit-btn-password {
+    background: transparent !important;
+    border: 1.5px solid #211A15 !important;
+    color: #211A15 !important;
+    border-radius: 8px !important;
+    padding: 7px 18px !important;
+    font-size: 1.05rem !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease;
+}
+
+.edit-btn-password:hover {
+    background: #211A15 !important;
+    color: #FAF5EE !important;
+}
+
+/* Kwadratowy ramkowy box awatara */
+.edit-avatar-frame {
+    width: 160px;
+    height: 160px;
+    border: 2.5px solid #211A15;
+    border-radius: 16px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.edit-avatar-upload-icon {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    color: #211A15;
+}
+
+.edit-avatar-svg {
+    width: 105px;
+    height: 105px;
+    color: #211A15;
+}
+
+/* Przycisk Save changes (pomarańczowy) */
+.edit-btn-save {
+    background-color: #E25B38 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 9px 20px !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+    transition: background-color 0.2s ease;
+}
+
+.edit-btn-save:hover {
+    background-color: #c94b2a !important;
+    color: #ffffff !important;
+}
+
+/* Przycisk Delete account (czerwony) */
+.edit-btn-delete {
+    background-color: #C84343 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 9px 20px !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+    transition: background-color 0.2s ease;
+}
+
+.edit-btn-delete:hover {
+    background-color: #af3535 !important;
+    color: #ffffff !important;
+}
