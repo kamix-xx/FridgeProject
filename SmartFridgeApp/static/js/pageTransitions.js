@@ -43,10 +43,10 @@
             }
         });
 
-        const sideMenu = document.querySelector('.offcanvas.show');
-        if (sideMenu && window.bootstrap && window.bootstrap.Offcanvas) {
-            window.bootstrap.Offcanvas.getOrCreateInstance(sideMenu).hide();
-        }
+        // const sideMenu = document.querySelector('.offcanvas.show');
+        // if (sideMenu && window.bootstrap && window.bootstrap.Offcanvas) {
+        //     window.bootstrap.Offcanvas.getOrCreateInstance(sideMenu).hide();
+        // }
     }
 
     function navigate(url) {
