@@ -801,6 +801,16 @@ body {
 
     transition: background-color 0.3s ease,
     transform 0.15s ease;
+
+    /* Z-fighting fix: give it a base z-index */
+    position: relative;
+    z-index: 1;
+}
+
+/* Z-fighting fix: force the active row to the very front */
+.product-row:hover,
+.product-row:focus-within {
+    z-index: 10;
 }
 
 
@@ -991,7 +1001,7 @@ body {
     right: 0;
     width: 34px;
     height: 34px;
-    border-radius: 40%;
+    border-radius: 12px; /* Changed to squircle */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1005,7 +1015,7 @@ body {
     color: var(--title-color);
     opacity: 0.5;
     background: transparent;
-    z-index: 2;
+    z-index: 3; /* Increased so items don't overlap it during transition */
     transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.25s ease;
 }
 
@@ -1144,7 +1154,6 @@ body {
 
     font-size: 1.05rem;
 }
-
 
 /*!* =========================================*/
 /*   Confirmation modal (mirrors areas.css's*/
@@ -1510,45 +1519,45 @@ body {
    Firefox performance mode
    ========================================= */
 
-@-moz-document url-prefix() {
+/*@-moz-document url-prefix() {*/
 
-    /* Kill expensive backdrop blurs */
-    .dashboard-search-bar,
-    .fridge-panel-body,
-    .btn-fridge-outline {
-        -moz-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-    }
+/*    !* Kill expensive backdrop blurs *!*/
+/*    .dashboard-search-bar,*/
+/*    .fridge-panel-body,*/
+/*    .btn-fridge-outline {*/
+/*        -moz-backdrop-filter: none !important;*/
+/*        backdrop-filter: none !important;*/
+/*    }*/
 
-    /* Replace glass with a solid-ish translucent surface */
-    .dashboard-search-bar {
-        background-color: rgba(207, 181, 154, 0.88);
-    }
+/*    !* Replace glass with a solid-ish translucent surface *!*/
+/*    .dashboard-search-bar {*/
+/*        background-color: rgba(207, 181, 154, 0.88);*/
+/*    }*/
 
-    .fridge-panel-body {
-        background-color: rgba(255, 222, 191, 0.82);
-    }
+/*    .fridge-panel-body {*/
+/*        background-color: rgba(255, 222, 191, 0.82);*/
+/*    }*/
 
-    .btn-fridge-outline {
-        background-color: rgba(241, 227, 212, 0.95);
-    }
+/*    .btn-fridge-outline {*/
+/*        background-color: rgba(241, 227, 212, 0.95);*/
+/*    }*/
 
-    /* Firefox doesn't need to render the dissolve blur either */
-    .t-clear-mirror,
-    .t-clear-placeholder {
-        filter: none !important;
-    }
+/*    !* Firefox doesn't need to render the dissolve blur either *!*/
+/*    .t-clear-mirror,*/
+/*    .t-clear-placeholder {*/
+/*        filter: none !important;*/
+/*    }*/
 
-    /* Dark theme */
-    [data-bs-theme="dark"] .dashboard-search-bar {
-        background-color: rgba(20, 16, 12, 0.82);
-    }
+/*    !* Dark theme *!*/
+/*    [data-bs-theme="dark"] .dashboard-search-bar {*/
+/*        background-color: rgba(20, 16, 12, 0.82);*/
+/*    }*/
 
-    [data-bs-theme="dark"] .fridge-panel-body {
-        background-color: rgba(20, 16, 12, 0.88);
-    }
+/*    [data-bs-theme="dark"] .fridge-panel-body {*/
+/*        background-color: rgba(20, 16, 12, 0.88);*/
+/*    }*/
 
-    [data-bs-theme="dark"] .btn-fridge-outline {
-        background-color: rgba(40, 32, 26, 0.9);
-    }
-}
+/*    [data-bs-theme="dark"] .btn-fridge-outline {*/
+/*        background-color: rgba(40, 32, 26, 0.9);*/
+/*    }*/
+/*}*/

@@ -1,0 +1,21 @@
+<link rel="expect" href="#page-transition-panel" blocking="render">
+
+<style>
+    .page-transition-panel--fallback {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 1px;
+        height: 1px;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+    }
+</style>
+
+<div id="page-transition-panel"
+     class="page-transition-panel--fallback"
+     aria-hidden="true"></div>

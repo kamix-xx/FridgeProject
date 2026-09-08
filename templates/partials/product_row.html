@@ -45,12 +45,14 @@ the same Edit action plus Remove, which opens the shared
 
     <div class="product-row-actions gooey-menu">
 
-        <!-- SVG Filter for the Gooey Effect -->
+         <!-- SVG Filter for the Gooey Effect -->
         <svg width="0" height="0" class="position-absolute" style="visibility: hidden;">
             <defs>
-                <filter id="goo">
+                <!-- Expanded bounds so the sliding buttons don't get clipped -->
+                <filter id="goo" x="-200%" y="-100%" width="400%" height="300%">
                     <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
-                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo"/>
+                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"
+                                   result="goo"/>
                     <feBlend in="SourceGraphic" in2="goo"/>
                 </filter>
             </defs>

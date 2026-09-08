@@ -23,7 +23,10 @@
 .areas-page-wrapper::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: var(--page-photo-tint);
     z-index: 1;
 }
@@ -93,14 +96,29 @@
     pointer-events: none;
 }
 
-[data-bs-theme="dark"] .areas-bg-light { display: none; }
-[data-bs-theme="dark"] .areas-bg-dark { display: block; }
+[data-bs-theme="dark"] .areas-bg-light {
+    display: none;
+}
 
-[data-bs-theme="light"] .areas-bg-dark { display: none; }
-[data-bs-theme="light"] .areas-bg-light { display: block; }
+[data-bs-theme="dark"] .areas-bg-dark {
+    display: block;
+}
 
-:root:not([data-bs-theme="dark"]) .areas-bg-dark { display: none; }
-:root:not([data-bs-theme="dark"]) .areas-bg-light { display: block; }
+[data-bs-theme="light"] .areas-bg-dark {
+    display: none;
+}
+
+[data-bs-theme="light"] .areas-bg-light {
+    display: block;
+}
+
+:root:not([data-bs-theme="dark"]) .areas-bg-dark {
+    display: none;
+}
+
+:root:not([data-bs-theme="dark"]) .areas-bg-light {
+    display: block;
+}
 
 /* ---- Glass card container ---- */
 
@@ -126,17 +144,17 @@
 
 /* Firefox: backdrop-filter is expensive there — same fallback pattern
    dashboard.css uses for .fridge-panel-body. */
-@-moz-document url-prefix() {
-    .areas-glass-card {
-        -moz-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-        background-color: rgba(255, 222, 191, 0.82);
-    }
+/*@-moz-document url-prefix() {*/
+/*    .areas-glass-card {*/
+/*        -moz-backdrop-filter: none !important;*/
+/*        backdrop-filter: none !important;*/
+/*        background-color: rgba(255, 222, 191, 0.82);*/
+/*    }*/
 
-    [data-bs-theme="dark"] .areas-glass-card {
-        background-color: rgba(20, 16, 12, 0.88);
-    }
-}
+/*    [data-bs-theme="dark"] .areas-glass-card {*/
+/*        background-color: rgba(20, 16, 12, 0.88);*/
+/*    }*/
+/*}*/
 
 /* ---- Scroll container ---- */
 
@@ -169,13 +187,16 @@
 .areas-scroll-container::-webkit-scrollbar {
     width: 6px;
 }
+
 .areas-scroll-container::-webkit-scrollbar-track {
     background: transparent;
 }
+
 .areas-scroll-container::-webkit-scrollbar-thumb {
     background-color: rgba(50, 40, 35, 0.6);
     border-radius: 10px;
 }
+
 [data-bs-theme="dark"] .areas-scroll-container::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.3);
 }
@@ -208,8 +229,13 @@
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
 }
 
-.bg-orange { background-color: #ff9166; }
-.bg-yellow { background-color: #ffd275; }
+.bg-orange {
+    background-color: #ff9166;
+}
+
+.bg-yellow {
+    background-color: #ffd275;
+}
 
 .area-card-header {
     display: flex;
@@ -290,7 +316,10 @@
 
 .gooey-container {
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     filter: url('#goo');
     pointer-events: none;
 }
@@ -326,7 +355,7 @@
 .gooey-main-btn {
     z-index: 3;
     font-size: 1.15rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .gooey-item {
