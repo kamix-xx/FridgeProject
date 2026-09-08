@@ -1,0 +1,131 @@
+/* =========================================
+   PAGE-SPECIFIC BACKGROUND
+   Matches login/register structure with overlays, fade masks & pushed to lower z-levels
+   ========================================= */
+
+.page-bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Pushed behind regular content */
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* Shared base properties for the images */
+.page-bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: relative;
+    z-index: 1;
+}
+
+/* =========================================
+   LIGHT MODE (Full-bleed, center focus)
+   ========================================= */
+
+.page-bg-light {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.page-bg-light .page-bg-img {
+    object-position: center;
+}
+
+/* Light background tint overlay */
+.page-bg-light::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--page-photo-tint);
+    z-index: 2;
+}
+
+/* =========================================
+   DARK MODE (Smaller, right-aligned, fade left)
+   ========================================= */
+
+.page-bg-dark {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 58.33%;
+    height: 100%;
+    z-index: 1;
+}
+
+.page-bg-dark .page-bg-img {
+    object-position: right center;
+}
+
+/* Dark background tint overlay */
+.page-bg-dark::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.50);
+    z-index: 2;
+}
+
+/* Dark background fading gradient mask */
+.page-bg-dark::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to left, transparent 80%, var(--dashboard-page-bg, #121212) 100%);
+    z-index: 3;
+}
+
+/* =========================================
+   THEME SWAPPING LOGIC
+   ========================================= */
+
+/* Default = Light Mode */
+.page-bg-dark { display: none; }
+.page-bg-light { display: block; }
+
+/* Explicit Light Mode */
+[data-bs-theme="light"] .page-bg-dark { display: none; }
+[data-bs-theme="light"] .page-bg-light { display: block; }
+
+/* Explicit Dark Mode */
+[data-bs-theme="dark"] .page-bg-light { display: none; }
+[data-bs-theme="dark"] .page-bg-dark { display: block; }
+
+/* =========================================
+   MOBILE VIEW (max-width: 768px)
+   ========================================= */
+
+@media (max-width: 768px) {
+    /* Expand dark mode to full width on mobile */
+    .page-bg-dark {
+        width: 100%;
+    }
+
+    /* Center both images */
+    .page-bg-light .page-bg-img,
+    .page-bg-dark .page-bg-img {
+        object-position: center;
+    }
+
+    /* Switch gradient to fade from bottom-up for light mode */
+    .page-bg-light::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, var(--dashboard-page-bg, #ffffff) 0%, var(--dashboard-page-bg, #ffffff) 10%, transparent 100%);
+        z-index: 3;
+    }
+
+    /* Switch gradient to fade from bottom-up for dark mode */
+    .page-bg-dark::after {
+        background: linear-gradient(to top, var(--dashboard-page-bg, #121212) 0%, var(--dashboard-page-bg, #121212) 10%, transparent 100%);
+    }
+}

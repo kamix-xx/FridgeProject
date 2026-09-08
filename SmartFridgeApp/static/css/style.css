@@ -32,8 +32,8 @@
 }
 
 [data-bs-theme="dark"] {
-    --page-bg: #090a0c;
-    --dashboard-page-bg: #090a0c;
+    --page-bg: #000005;
+    --dashboard-page-bg: #000005;
     --login-page-bg: #111214;
     --landing-page-bg: #090a0c;
     --register-page-bg: #21181d;

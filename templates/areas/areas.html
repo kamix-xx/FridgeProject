@@ -16,16 +16,7 @@
 {% block content %}
     <main class="areas-page-wrapper position-relative min-vh-100 d-flex align-items-center pt-5 pb-5">
 
-        <!-- Page background: plain full-bleed photo in light mode; a
-             smaller, right-aligned, fading photo (same treatment as the
-             dashboard's dark mode) in dark mode. -->
-        <div class="areas-bg-image" aria-hidden="true">
-            <img src="https://i.imgur.com/2SjgpvQ.jpeg" alt="" class="areas-bg-light">
-
-            <picture class="areas-bg-dark">
-                <img src="https://imgur.com/RZ0e0CP.jpeg" alt="" class="areas-bg-dark-img">
-            </picture>
-        </div>
+        {% include "partials/background_images.html" %}
 
         <!-- SVG Filter for the Gooey Effect -->
         <svg width="0" height="0" class="position-absolute" style="visibility: hidden;">
