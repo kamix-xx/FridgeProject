@@ -2,11 +2,15 @@
 
 {% block title %}SmartFridge+ — Expense Details{% endblock %}
 
+{% block head %}
+    <link rel="expect" href="#page-transition-panel" blocking="render">
+{% endblock %}
+
 {% block content %}
     <main class="expense-page-wrapper position-relative min-vh-100 d-flex align-items-center pt-5">
         <div class="container position-relative z-2 my-5">
             
-            <div class="glass-card mx-auto p-4 p-md-5">
+            <div class="glass-card mx-auto p-4 p-md-5" id="page-transition-panel">
                 
 
                 <div class="text-center mb-5">
