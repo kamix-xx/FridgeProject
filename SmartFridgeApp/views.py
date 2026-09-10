@@ -88,6 +88,7 @@ def _fake_dashboard_areas():
 
     fridge = SimpleNamespace(
         name="Fridge",
+        is_shared=False,
         products=[
             fake_product("Whole Milk", days_left=2, added_days_ago=10),       # critical
             fake_product("Free-range Eggs", days_left=18, added_days_ago=4),  # fresh
@@ -98,10 +99,11 @@ def _fake_dashboard_areas():
         ],
     )
 
-    pantry = SimpleNamespace(name="Pantry", products=[])
+    attic = SimpleNamespace(name="Attic", is_shared=False, products=[])
 
     freezer = SimpleNamespace(
         name="Freezer",
+        is_shared=False,
         products=[
             fake_product("Vanilla Ice Cream", days_left=120, added_days_ago=5),
             fake_product("Frozen Peas", days_left=5, added_days_ago=25),
@@ -111,8 +113,9 @@ def _fake_dashboard_areas():
         ],
     )
 
-    attic = SimpleNamespace(
-        name="Attic",
+    pantry = SimpleNamespace(
+        name="Pantry",
+        is_shared=True,
         products=[
             fake_product("Canned Tomatoes", days_left=300, added_days_ago=20),
             fake_product("Homemade Jam", days_left=10, added_days_ago=40),
@@ -124,6 +127,7 @@ def _fake_dashboard_areas():
 
     room_fridge = SimpleNamespace(
         name="Room fridge",
+        is_shared=False,
         products=[
             fake_product("Sparkling Water", days_left=180, added_days_ago=10),
             fake_product("Leftover Pizza", days_left=1, added_days_ago=3),
@@ -135,6 +139,7 @@ def _fake_dashboard_areas():
 
     kitchen_cabinet = SimpleNamespace(
         name="Kitchen cabinet",
+        is_shared=False,
         products=[
             fake_product(f"Canned Beans #{i}", days_left=200 - i * 15, added_days_ago=30)
             for i in range(1, 9)
@@ -158,7 +163,11 @@ def home(request):
     else:
         areas = list(
             request.user.areas
-            .prefetch_related('userproduct_set__product', 'userproduct_set__unit')
+            .prefetch_related(
+                'users',
+                'userproduct_set__product',
+                'userproduct_set__unit',
+            )
             .order_by('name')
         )
 

@@ -39,6 +39,11 @@ class Area(models.Model):
         related_name='areas'
     )
 
+    # no migration needed
+    @property
+    def is_shared(self):
+        return self.users.count() > 1
+
 class Unit(models.Model):
     id = models.AutoField(primary_key=True)
     symbol = models.CharField(max_length=45, unique=True, null=False)

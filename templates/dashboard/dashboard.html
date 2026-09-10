@@ -15,6 +15,9 @@
 
 {% block title %}SmartFridge+ | Dashboard{% endblock %}
 
+{# TODO Toast system with push notifications like "There are [x number of products] that are going to expire soon !!!"  or "[Product] is expiring soon!" etc... #}
+{# The toast should show which products are expired and are expiring soon in sections - that are visible or not as needed  #}
+
 {% block content %}
     {#        <!-- Page-specific Background Image Container -->#}
     {#        <div class="page-bg-image" aria-hidden="true">#}
@@ -39,6 +42,11 @@
 
     <main class="dashboard-page">
         <div class="dashboard-inner">
+
+            {# TODO dynamic island on the main panel, with hover menu that shows: select mode, edit area, share area #}
+            {# which means a select mode is needed to be implemented with ability to drag and drop products (?) #}
+            {# and which changes the main panel buttons into select all, move and delete buttons  #}
+            {# this should also apply to area view panel, but with share/unshare button instead of move button #}
 
             <!-- Search bar wrapped to align with Fridge panel width perfectly -->
             <div class="dashboard-search-wrapper">
@@ -86,6 +94,7 @@
                 </button>
 
                 <div class="fridge-panel-body" id="page-transition-panel">
+{#                TODO add shared icon if area is shared#}
                     <header class="fridge-panel-header">
                         <h2 class="fridge-panel-title" id="areaTitle">
                             {# Fixed fallback string #}
