@@ -81,8 +81,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setAreaTitle(index) {
-        if (areaTitleEl && areaPanels[index]) {
-            areaTitleEl.textContent = areaPanels[index].dataset.areaName || '';
+        if (!areaTitleEl || !areaPanels[index]) {
+            return;
+        }
+
+        const panel = areaPanels[index];
+        const areaName = panel.dataset.areaName || '';
+        const isShared = panel.dataset.isShared === 'true';
+
+        // textContent alone would remove the shared-area icon. Rebuild the
+        // title contents and add the icon back when the active area is shared.
+        areaTitleEl.textContent = areaName;
+
+        if (isShared) {
+            const icon = document.createElement('span');
+            icon.className = 'area-shared-icon';
+            icon.title = 'Shared area';
+            icon.setAttribute('aria-label', 'Shared area');
+
+            const iconGlyph = document.createElement('i');
+            iconGlyph.className = 'bi bi-people-fill';
+            iconGlyph.setAttribute('aria-hidden', 'true');
+
+            icon.appendChild(iconGlyph);
+            areaTitleEl.appendChild(document.createTextNode(' '));
+            areaTitleEl.appendChild(icon);
         }
     }
 
