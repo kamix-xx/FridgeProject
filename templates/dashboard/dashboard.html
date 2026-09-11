@@ -96,14 +96,13 @@
                 <div class="fridge-panel-body" id="page-transition-panel">
                     <header class="fridge-panel-header">
                         <h2 class="fridge-panel-title" id="areaTitle">
-                            {% if areas %}{{ areas.0.name }}{% else %}No areas{% endif %}
-                            {% if areas and areas.0.is_shared %}
-                                <span class="area-shared-icon"
+                            <span class="area-title-text" id="areaTitleText">{% if areas %}{{ areas.0.name }}{% else %}No areas{% endif %}{% if areas and areas.0.is_shared %}
+                                <span class="area-shared-icon area-title-word"
                                       title="Shared area"
                                       aria-label="Shared area">
                                     <i class="bi bi-people-fill" aria-hidden="true"></i>
                                 </span>
-                            {% endif %}
+                            {% endif %}</span>
                         </h2>
 
                         <!-- Moved the edit pencil here -->

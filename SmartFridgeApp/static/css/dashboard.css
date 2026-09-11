@@ -28,6 +28,17 @@
 
 
     /* -----------------------------------------
+       Area title word-swap (area carousel swap)
+       ----------------------------------------- */
+    --title-morph-out-dur: 160ms;
+    --title-morph-in-dur: 260ms;
+    --title-morph-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --title-morph-fly: 8px;
+    --title-morph-scale: 0.94;
+    --title-morph-stagger: 30ms;
+
+
+    /* -----------------------------------------
        Fridge colors
        ----------------------------------------- */
     --fridge-danger: #d9534f;
@@ -507,6 +518,10 @@ body {
 
 
 .fridge-panel-title {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4em;
+
     color: var(--title-color);
 
     font-size: 1.75rem;
@@ -530,8 +545,78 @@ body {
     flex: 1 1 auto;
     min-width: 0;
     white-space: nowrap;
+}
+
+
+/*
+ * Holds the per-word spans that get morphed on area swap. Note this is
+ * where overflow clipping now lives instead of on .fridge-panel-title
+ * directly — text-overflow: ellipsis can't apply once the text is split
+ * into flex children, so long names just clip. Area names are short
+ * enough in practice that this rarely shows.
+ */
+.area-title-text {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    gap: 0.32em;
+
+    min-width: 0;
     overflow: hidden;
-    text-overflow: ellipsis;
+}
+
+
+/*
+ * One word of the area title. Swapping areas fades the current words
+ * out, then swaps in the new ones and fades them in (see morphAreaTitle()
+ * in dashboard.js) — a simple crossfade rather than the whole title just
+ * popping to new text. The nth-child rules below give it a light
+ * word-by-word cascade, similar in spirit to the Torph text-morphing
+ * library, without needing any JS-side stagger math.
+ */
+.area-title-word {
+    display: inline-block;
+    white-space: pre;
+
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+
+    transition:
+        transform var(--title-morph-in-dur) var(--title-morph-ease),
+        opacity var(--title-morph-in-dur) var(--title-morph-ease);
+}
+
+
+.area-title-word.is-entering {
+    transform: translate3d(0, var(--title-morph-fly), 0) scale(var(--title-morph-scale));
+    opacity: 0;
+}
+
+
+.area-title-word.is-exiting {
+    transition-duration: var(--title-morph-out-dur);
+    transform: translate3d(0, calc(-1 * var(--title-morph-fly)), 0) scale(var(--title-morph-scale));
+    opacity: 0;
+}
+
+
+.area-title-word:nth-child(2) {
+    transition-delay: var(--title-morph-stagger);
+}
+
+.area-title-word:nth-child(3) {
+    transition-delay: calc(var(--title-morph-stagger) * 2);
+}
+
+.area-title-word:nth-child(4) {
+    transition-delay: calc(var(--title-morph-stagger) * 3);
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+    .area-title-word {
+        transition: none;
+    }
 }
 
 
