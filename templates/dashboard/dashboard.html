@@ -8,9 +8,12 @@
     <script src="{% static 'js/gooeyMenu.js' %}" defer></script>
     <script src="{% static 'js/modals.js' %}?v=2" defer></script>
     <script src="{% static 'js/productRowActions.js' %}" defer></script>
+    <script src="{% static 'js/productModal.js' %}" defer></script>
+    <script src="{% static 'js/productPickers.js' %}" defer></script>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=4">
     <link rel="stylesheet" href="{% static 'css/morphMenu.css' %}">
     <link rel="stylesheet" href="{% static 'css/modals.css' %}">
+    <link rel="stylesheet" href="{% static 'css/productModal.css' %}">
 {% endblock %}
 
 {% block title %}SmartFridge+ | Dashboard{% endblock %}
@@ -120,9 +123,16 @@
                                 </svg>
                             </button>
                             <nav class="t-morph-menu">
-                                <a href="#" class="t-morph-menu-item"><i class="bi bi-plus-circle"></i> Add product</a>
-                                <a href="#" class="t-morph-menu-item"><i class="bi bi-upc-scan"></i> Scan
-                                    barcode</a>
+                                <a href="#" class="t-morph-menu-item"
+                                   data-bs-toggle="modal" data-bs-target="#addProductModal"
+                                   data-initial-mode="scan">
+                                    <i class="bi bi-upc-scan"></i> Scan product
+                                </a>
+                                <a href="#" class="t-morph-menu-item"
+                                   data-bs-toggle="modal" data-bs-target="#addProductModal"
+                                   data-initial-mode="manual">
+                                    <i class="bi bi-plus-circle"></i> Add product by hand
+                                </a>
                                 <button type="button" class="t-morph-menu-item"
                                         data-bs-toggle="modal" data-bs-target="#addAreaModal">
                                     <i class="bi bi-folder-plus"></i> Add area
@@ -138,7 +148,7 @@
                                     {% if area.products %}
                                         <ul class="product-list">
                                             {% for user_product in area.products %}
-                                                {% include "partials/product_row.html" with up=user_product %}
+                                                {% include "partials/product_row.html" with up=user_product area_name=area.name %}
                                             {% endfor %}
                                         </ul>
                                     {% else %}
@@ -251,6 +261,126 @@
                     <button type="button" class="popup-circular-btn mx-auto">
                         <i class="bi bi-plus"></i>
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product — one modal with two faces: a barcode-scan view (camera
+         preview) and a manual-entry view. Both live in this same Bootstrap
+         modal and morph between each other via a CSS class toggle in
+         productModal.js (#addProductModalContent.is-manual) — no second
+         modal is ever opened for this, so there's no backdrop/fade clash
+         with Bootstrap's own modal transition.
+
+         TODO: nothing here is wired to a real Django form yet, and the
+         product-code → product lookup is a stub (see productModal.js) —
+         entering a code just reveals the manual fields, it doesn't look
+         anything up or pre-fill the name. -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content custom-popup t-modal product-modal" id="addProductModalContent">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div class="modal-body p-4 p-md-5">
+                    <h3 class="popup-title text-center mb-4">Add Product</h3>
+
+                    <!-- Barcode scan preview. Collapses to a thin strip
+                         (the camera badge stays put and re-expands it)
+                         once the manual fields are revealed. -->
+                    <div class="product-scan-preview">
+                        <div class="product-scan-frame">
+                            <span class="product-scan-corner product-scan-corner-tl"></span>
+                            <span class="product-scan-corner product-scan-corner-tr"></span>
+                            <span class="product-scan-corner product-scan-corner-bl"></span>
+                            <span class="product-scan-corner product-scan-corner-br"></span>
+
+                            <video class="product-scan-video" id="addProductScanVideo"
+                                   autoplay playsinline muted></video>
+
+                            <div class="product-scan-fallback" id="addProductScanFallback">
+                                <i class="bi bi-camera-video-off" aria-hidden="true"></i>
+                            </div>
+
+                            <button type="button" class="product-scan-badge" id="addProductScanBadge"
+                                    title="Open camera" aria-label="Open camera">
+                                <i class="bi bi-camera-fill" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Product code + enter-arrow. Always visible —
+                         pressing the arrow (or Enter) reveals the manual
+                         fields below if they're currently collapsed. -->
+                    <div class="mb-2">
+                        <label for="addProductCode" class="form-label popup-label">Product code</label>
+                        <div class="product-code-row">
+                            <input type="text" class="form-control popup-input shadow-none"
+                                   id="addProductCode" placeholder="Scan or type a barcode" autocomplete="off">
+                            <button type="button" class="product-code-enter" id="addProductCodeEnter"
+                                    title="Enter" aria-label="Enter">
+                                <i class="bi bi-arrow-return-left" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <p class="custom-subtext product-scan-manual-link" id="addProductManualLink">
+                        Don't have a code?
+                        <button type="button" class="custom-link custom-link-button">CLICK HERE</button>
+                    </p>
+
+                    <!-- Manual fields — collapsed while the scan preview
+                         is open, revealed once a code is entered or "Add
+                         product by hand" is used. The inner wrapper is
+                         what actually clips during the collapse/expand
+                         animation (see productModal.css); once fully
+                         expanded, productModal.js marks it "settled" so
+                         the area/unit/date picker panels inside can
+                         overflow past it instead of being clipped. -->
+                    <div class="product-extra-fields" id="addProductExtraFields">
+                        <div class="product-extra-fields-inner" id="addProductExtraFieldsInner">
+                            {% include "partials/product_form_fields.html" with id_prefix="add" submit_icon="bi-plus" submit_label="Add product" areas=areas %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Product — same fields as the "Add product by hand" view of
+         the modal above, just pre-fillable, with a save icon instead of a
+         plus and no scan/camera section (editing an existing product
+         doesn't need a barcode capture step). None of the fields are
+         disabled — every one of them should stay editable.
+
+         TODO: nothing opens this yet — call window.openEditProductModal()
+         (see productModal.js) from wherever a product row's edit action
+         ends up living. -->
+    <div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content custom-popup t-modal product-modal" id="editProductModalContent">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div class="modal-body p-4 p-md-5">
+                    <h3 class="popup-title text-center mb-4">Edit Product</h3>
+
+                    <div class="mb-2">
+                        <label for="editProductCode" class="form-label popup-label">Product code</label>
+                        <div class="product-code-row">
+                            <input type="text" class="form-control popup-input shadow-none"
+                                   id="editProductCode" placeholder="Scan or type a barcode" autocomplete="off">
+                            <button type="button" class="product-code-enter" id="editProductCodeEnter"
+                                    title="Enter" aria-label="Enter">
+                                <i class="bi bi-arrow-return-left" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    {% include "partials/product_form_fields.html" with id_prefix="edit" submit_icon="bi-floppy-fill" submit_label="Save changes" areas=areas %}
                 </div>
             </div>
         </div>

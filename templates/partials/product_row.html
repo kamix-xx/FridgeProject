@@ -1,20 +1,31 @@
 {% comment %}
 Renders a single product row inside an area's product list.
-Expects `up` — a UserProduct instance, annotated by the view with
-`freshness_percent` (0-100 or None) and `freshness_level`
-('fresh' | 'warning' | 'critical' | 'expired' | 'unknown').
+Expects:
+  - `up` — a UserProduct instance, annotated by the view with
+    `freshness_percent` (0-100 or None) and `freshness_level`
+    ('fresh' | 'warning' | 'critical' | 'expired' | 'unknown').
+  - `area_name` — the name of the area this row lives in, so the Edit
+    Product modal can default its area picker correctly.
 
 The row itself acts as the "edit" trigger (see productRowActions.js) —
-tap/click/Enter anywhere on it except the actions menu opens edit. The
-actions menu (a subtler variant of the areas page's gooey menu) offers
-the same Edit action plus Remove, which opens the shared
-#deleteProductModal confirmation.
+tap/click/Enter/Space anywhere on it except the actions menu opens the
+Edit Product modal (see window.openEditProductModal() in productModal.js),
+pre-filled from this row's data-edit-* attributes. The actions menu (a
+subtler variant of the areas page's gooey menu) offers the same Edit
+action plus Remove, which opens the shared #deleteProductModal
+confirmation.
 {% endcomment %}
 
 <li class="product-row"
     data-product-name="{{ up.product.name|lower }}"
-{#    data-edit-href="#"#}
-{#    role="link"#}
+    data-edit-code="{{ up.product.barcode|default_if_none:'' }}"
+    data-edit-name="{{ up.product.name|default_if_none:'' }}"
+    data-edit-price="{{ up.price|default_if_none:'' }}"
+    data-edit-quantity="{{ up.quantity|default_if_none:'' }}"
+    data-edit-unit="{{ up.unit.symbol|default_if_none:'' }}"
+    data-edit-expiration="{{ up.expiration_date|date:'Y-m-d' }}"
+    data-edit-area="{{ area_name|default_if_none:'' }}"
+    role="button"
     tabindex="0"
     aria-label="Edit {{ up.product.name }}">
 
@@ -86,5 +97,3 @@ the same Edit action plus Remove, which opens the shared
         </div>
     </div>
 </li>
-
-

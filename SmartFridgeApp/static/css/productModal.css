@@ -1,0 +1,587 @@
+/* =========================================
+   ADD / EDIT PRODUCT MODALS
+   ========================================= */
+
+:root {
+    --product-morph-dur: 320ms;
+    --product-morph-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --product-accent: #ff9166;
+    --product-accent-hover: #ffa17c;
+}
+
+.product-modal .modal-body {
+    padding-top: 1.5rem;
+}
+
+/* -----------------------------------------
+   Scan preview (barcode camera viewfinder)
+   ----------------------------------------- */
+
+.product-scan-preview {
+    max-height: 230px;
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+    transition: max-height var(--product-morph-dur) var(--product-morph-ease);
+}
+
+#addProductModalContent.is-manual .product-scan-preview {
+    max-height: 56px;
+}
+
+.product-scan-frame {
+    position: relative;
+    height: 220px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2c2320, #171310);
+    overflow: hidden;
+    transition: height var(--product-morph-dur) var(--product-morph-ease);
+}
+
+#addProductModalContent.is-manual .product-scan-frame {
+    height: 56px;
+}
+
+.product-scan-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 1;
+    transition: opacity calc(var(--product-morph-dur) * 0.5) var(--product-morph-ease);
+}
+
+#addProductModalContent.is-manual .product-scan-video {
+    opacity: 0;
+}
+
+.product-scan-fallback {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 2rem;
+}
+
+.product-scan-fallback.is-visible {
+    display: flex;
+}
+
+#addProductModalContent.is-manual .product-scan-fallback {
+    display: none;
+}
+
+.product-scan-corner {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border: 3px solid transparent;
+    pointer-events: none;
+    opacity: 0.85;
+    transition: opacity var(--product-morph-dur) var(--product-morph-ease);
+}
+
+#addProductModalContent.is-manual .product-scan-corner {
+    opacity: 0;
+}
+
+.product-scan-corner-tl { top: 10px; left: 10px; border-top-color: #fff; border-left-color: #fff; border-top-left-radius: 6px; }
+.product-scan-corner-tr { top: 10px; right: 10px; border-top-color: #fff; border-right-color: #fff; border-top-right-radius: 6px; }
+.product-scan-corner-bl { bottom: 10px; left: 10px; border-bottom-color: #fff; border-left-color: #fff; border-bottom-left-radius: 6px; }
+.product-scan-corner-br { bottom: 10px; right: 10px; border-bottom-color: #fff; border-right-color: #fff; border-bottom-right-radius: 6px; }
+
+.product-scan-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: var(--product-accent);
+    color: #2c1e16;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 1;
+    transition: background-color 0.2s ease, transform 0.2s ease, opacity var(--product-morph-dur) var(--product-morph-ease);
+}
+
+#addProductModalContent.has-feed:not(.is-manual) .product-scan-badge {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.product-scan-badge:hover {
+    background: var(--product-accent-hover);
+    transform: translate(-50%, -50%) scale(1.06);
+}
+
+/* -----------------------------------------
+   Product code row
+   ----------------------------------------- */
+
+.product-code-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+}
+
+.product-code-row .popup-input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.product-code-enter {
+    flex: 0 0 auto;
+    width: 48px;
+    border: 1px solid rgba(81, 67, 54, 0.5);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--title-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.product-code-enter:hover {
+    background: rgba(255, 145, 102, 0.15);
+    border-color: var(--product-accent);
+}
+
+[data-bs-theme="dark"] .product-code-enter {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #e2cbab;
+}
+
+/* -----------------------------------------
+   "Don't have a code?" fallback link
+   ----------------------------------------- */
+
+.product-scan-manual-link {
+    text-align: center;
+    margin: 0.75rem 0 0;
+    max-height: 40px;
+    overflow: hidden;
+    opacity: 1;
+    transition: opacity var(--product-morph-dur) var(--product-morph-ease), max-height var(--product-morph-dur) var(--product-morph-ease), margin var(--product-morph-dur) var(--product-morph-ease);
+}
+
+#addProductModalContent.is-manual .product-scan-manual-link {
+    max-height: 0;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* -----------------------------------------
+   Manual fields
+   ----------------------------------------- */
+
+.product-extra-fields {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows var(--product-morph-dur) var(--product-morph-ease), opacity var(--product-morph-dur) var(--product-morph-ease);
+}
+
+#addProductModalContent.is-manual .product-extra-fields {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+.product-extra-fields-inner {
+    overflow: hidden;
+    min-height: 0;
+    padding-bottom: 1rem;
+}
+
+.product-extra-fields-inner.is-settled {
+    overflow: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .product-scan-preview, .product-scan-frame, .product-scan-video, .product-scan-corner, .product-scan-badge, .product-scan-manual-link, .product-extra-fields {
+        transition: none;
+    }
+}
+
+/* -----------------------------------------
+   Quantity + Unit joined pill
+   ----------------------------------------- */
+
+.product-qty-unit-group {
+    display: flex;
+    gap: 0;
+}
+
+.product-qty-unit-group .product-qty-input.popup-input {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-right: none !important;
+}
+
+.product-qty-unit-group .product-unit-select.popup-input {
+    flex: 0 0 auto;
+    width: 5.5rem;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
+
+.product-unit-select-wrap {
+    flex: 0 0 auto;
+    width: 5.5rem;
+}
+
+/* -----------------------------------------
+   Area picker + submit row
+   ----------------------------------------- */
+
+.product-area-picker {
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+.product-area-submit-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.product-area-select {
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    border-radius: 50px;
+    background-color: var(--product-accent);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%232c1e16' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    color: #2c1e16;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.6rem 2.25rem 0.6rem 1.25rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.product-area-select:hover,
+.product-area-select:focus {
+    background-color: var(--product-accent-hover);
+    outline: none;
+}
+
+/* =========================================
+   Custom pickers
+   ========================================= */
+
+.picker-select-wrap,
+.picker-date-wrap {
+    position: relative;
+}
+
+.picker-native-hidden {
+    display: none !important;
+}
+
+.picker-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    margin: 0;
+    border: 1px solid rgba(81, 67, 54, 0.5);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--title-color);
+    font: inherit;
+    font-size: 1rem;
+    padding: 0.6rem 0.9rem;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.picker-trigger:hover,
+.picker-select-wrap.is-open .picker-trigger,
+.picker-date-wrap.is-open .picker-trigger {
+    border-color: var(--product-accent);
+    background: rgba(255, 145, 102, 0.1);
+}
+
+[data-bs-theme="dark"] .picker-trigger {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #e2cbab;
+}
+
+[data-bs-theme="dark"] .picker-trigger-pill {
+    color: #2c1e16;
+}
+
+.picker-trigger-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.picker-trigger-label.is-placeholder {
+    opacity: 0.55;
+}
+
+.picker-trigger-chevron {
+    flex: 0 0 auto;
+    color: var(--product-accent);
+    transition: transform var(--morph-open-dur) var(--morph-close-ease);
+}
+
+.picker-select-wrap.is-open .picker-trigger-chevron,
+.picker-date-wrap.is-open .picker-trigger-chevron {
+    transform: rotate(180deg);
+}
+
+.picker-trigger-joined {
+    margin: 0;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    justify-content: center;
+}
+
+.picker-trigger-pill {
+    border: none;
+    border-radius: 50px;
+    background-color: var(--product-accent);
+    color: #2c1e16;
+    font-weight: 500;
+    padding: 0.6rem 1.25rem;
+    justify-content: center;
+    gap: 0.6rem;
+}
+
+.picker-trigger-pill:hover,
+.picker-select-wrap.is-open .picker-trigger-pill {
+    background-color: var(--product-accent-hover);
+}
+
+.picker-trigger-pill .picker-trigger-chevron {
+    color: #2c1e16;
+}
+
+.picker-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 100%;
+    z-index: 40;
+    background: #fdfaf6;
+    border-radius: 14px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    padding: 0.4rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(calc(-1 * var(--morph-slide) / 2)) scale(0.97);
+    filter: blur(var(--morph-blur));
+    pointer-events: none;
+    transition: opacity var(--morph-fade-dur) var(--morph-close-ease), transform var(--morph-open-dur) var(--morph-close-ease), filter var(--morph-fade-dur) var(--morph-close-ease), visibility 0s linear var(--morph-fade-dur);
+}
+
+/* FIXED: Scrollable select panels with subtle scrollbars matching dashboard.css */
+.picker-select-wrap .picker-panel {
+    max-height: 220px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(50, 40, 35, 0.6) transparent;
+}
+
+[data-bs-theme="dark"] .picker-select-wrap .picker-panel {
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.picker-select-wrap .picker-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.picker-select-wrap .picker-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.picker-select-wrap .picker-panel::-webkit-scrollbar-thumb {
+    background-color: rgba(50, 40, 35, 0.6);
+    border-radius: 10px;
+}
+
+[data-bs-theme="dark"] .picker-select-wrap .picker-panel::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.picker-select-wrap.is-open .picker-panel,
+.picker-date-wrap.is-open .picker-panel {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+    pointer-events: auto;
+    transition: opacity var(--morph-fade-dur) var(--morph-close-ease), transform var(--morph-open-dur) var(--morph-ease), filter var(--morph-fade-dur) var(--morph-close-ease);
+}
+
+[data-bs-theme="dark"] .picker-panel {
+    background: #2a221c;
+}
+
+.picker-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--title-color);
+    font: inherit;
+    font-size: 0.92rem;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.picker-option:hover {
+    background-color: rgba(226, 83, 39, 0.1);
+}
+
+.picker-option.is-selected {
+    color: #e25327;
+    font-weight: 600;
+}
+
+/* Calendar */
+
+.picker-calendar-panel {
+    width: 280px;
+    padding: 0.75rem;
+}
+
+.picker-cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.picker-cal-month {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--title-color);
+}
+
+.picker-cal-nav {
+    border: 0;
+    background: transparent;
+    color: var(--product-accent);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.picker-cal-nav:hover {
+    background-color: rgba(226, 83, 39, 0.12);
+}
+
+.picker-cal-weekdays,
+.picker-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+}
+
+.picker-cal-weekdays span {
+    font-size: 0.72rem;
+    color: rgba(81, 67, 54, 0.6);
+    padding-bottom: 0.35rem;
+}
+
+[data-bs-theme="dark"] .picker-cal-weekdays span {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.picker-cal-day {
+    border: 0;
+    background: transparent;
+    color: var(--title-color);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    margin: 2px auto;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.picker-cal-day:hover {
+    background-color: rgba(226, 83, 39, 0.12);
+}
+
+.picker-cal-day.is-today {
+    font-weight: 600;
+    color: #e25327;
+}
+
+.picker-cal-day.is-selected {
+    background-color: #e25327;
+    color: #fff;
+}
+
+.picker-cal-day.is-empty {
+    cursor: default;
+    pointer-events: none;
+}
+
+.picker-cal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.35rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .picker-panel,
+    .picker-trigger-chevron {
+        transition: none;
+    }
+}
+
+/* -----------------------------------------
+   Mobile breathing room
+   ----------------------------------------- */
+
+@media (max-width: 575.98px) {
+    .product-modal .popup-title {
+        margin-bottom: 1.5rem;
+    }
+    .product-modal .form-label.popup-label {
+        margin-bottom: 0.4rem;
+    }
+    .product-modal .row.mb-2 {
+        margin-bottom: 1rem !important;
+    }
+    .product-modal .row.mb-3 {
+        margin-bottom: 1.25rem !important;
+    }
+    .product-code-row {
+        margin-bottom: 0.25rem;
+    }
+    .picker-calendar-panel {
+        width: 250px;
+    }
+}
