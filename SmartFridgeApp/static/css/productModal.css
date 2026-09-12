@@ -393,7 +393,6 @@
     transition: opacity var(--morph-fade-dur) var(--morph-close-ease), transform var(--morph-open-dur) var(--morph-close-ease), filter var(--morph-fade-dur) var(--morph-close-ease), visibility 0s linear var(--morph-fade-dur);
 }
 
-/* FIXED: Scrollable select panels with subtle scrollbars matching dashboard.css */
 .picker-select-wrap .picker-panel {
     max-height: 220px;
     overflow-y: auto;
@@ -583,5 +582,12 @@
     }
     .picker-calendar-panel {
         width: 250px;
+    }
+
+    /* Reverse dropdown direction for select pickers on mobile */
+    .picker-select-wrap .picker-panel {
+        top: auto;
+        bottom: calc(100% + 8px);
+        transform: translateY(calc(var(--morph-slide) / 2)) scale(0.97);
     }
 }
