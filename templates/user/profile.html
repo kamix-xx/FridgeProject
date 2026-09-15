@@ -121,7 +121,10 @@
                 <button type="button" class="btn-close edit-modal-close shadow-none" data-bs-dismiss="modal"
                         aria-label="Close"></button>
 
-                <div class="modal-body p-0">
+                <!-- FORMULARZ EDYCJI -->
+                <form method="post" action="{% url 'edit_profile' %}" enctype="multipart/form-data"
+                      class="modal-body p-0">
+                    {% csrf_token %}
                     <h2 class="edit-modal-heading">Edit account</h2>
 
                     <div class="row g-4 align-items-start mt-1">
@@ -133,7 +136,8 @@
                             <div>
                                 <label for="login" class="edit-field-label">Login</label>
                                 <div class="edit-input-row">
-                                    <input type="text" class="edit-input-raw" value="{{ user.username }}" id="login">
+                                    <input type="text" name="username" class="edit-input-raw"
+                                           value="{{ user.username }}" id="login" required>
                                     <label for="login"> <i class="bi bi-pencil edit-pencil-icon"></i></label>
                                 </div>
                             </div>
@@ -142,7 +146,8 @@
                             <div>
                                 <label for="email" class="edit-field-label">Email</label>
                                 <div class="edit-input-row">
-                                    <input type="email" class="edit-input-raw" value="{{ user.email }}" id="email">
+                                    <input type="email" name="email" class="edit-input-raw" value="{{ user.email }}"
+                                           id="email" required>
                                     <label for="email"><i class="bi bi-pencil edit-pencil-icon"></i></label>
                                 </div>
                             </div>
@@ -150,7 +155,8 @@
                             <!-- Password -->
                             <div class="mt-2">
                                 <label class="edit-field-label d-block mb-3">Password</label>
-                                <button type="button" class="btn edit-btn-password">
+                                <button type="button" class="btn edit-btn-password" data-bs-toggle="modal"
+                                        data-bs-target="#changePasswordModal">
                                     <i class="bi bi-pencil me-2"></i>Change password
                                 </button>
                             </div>
@@ -162,7 +168,12 @@
 
                             <!-- Avatar -->
                             <div class="d-flex justify-content-start justify-content-md-center pe-md-4">
-                                <div class="edit-avatar-frame">
+
+                                <!-- Zmieniono div na label, aby kliknięcie otwierało wybór pliku -->
+                                <label for="avatarUpload" class="edit-avatar-frame m-0" style="cursor: pointer;">
+
+                                    <!-- Ukryty input do pliku -->
+                                    <input type="file" name="avatar" id="avatarUpload" class="d-none" accept="image/*">
 
                                     <!-- Upload Icon -->
                                     <div class="edit-avatar-upload-icon">
@@ -175,30 +186,33 @@
                                         </svg>
                                     </div>
 
-                                    <!-- Avatar  -->
+                                    <!-- Avatar SVG -->
                                     <svg class="edit-avatar-svg" viewBox="0 0 100 100" fill="none" stroke="currentColor"
                                          stroke-width="3.5" stroke-linecap="round">
                                         <circle cx="50" cy="36" r="16"></circle>
                                         <path d="M 20 82 A 30 30 0 0 1 80 82"></path>
                                     </svg>
-                                </div>
+                                </label>
                             </div>
 
                             <!-- Name -->
                             <div>
                                 <label for="name" class="edit-field-label">Name</label>
                                 <div class="edit-input-row">
-                                    <input type="text" class="edit-input-raw" value="{{ user.first_name }}" id="name">
+                                    <input type="text" name="first_name" class="edit-input-raw"
+                                           value="{{ user.first_name }}" id="name" required>
                                     <label for="name"><i class="bi bi-pencil edit-pencil-icon"></i></label>
                                 </div>
                             </div>
 
                             <!-- Save / Delete -->
                             <div class="d-flex align-items-center gap-3 mt-2">
-                                <button type="button" class="btn edit-btn-save">
+                                <!-- Zmieniono typ z "button" na "submit" -->
+                                <button type="submit" class="btn edit-btn-save">
                                     <i class="bi bi-floppy me-2"></i>Save changes
                                 </button>
-                                <button type="button" class="btn edit-btn-delete" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                                <button type="button" class="btn edit-btn-delete" data-bs-toggle="modal"
+                                        data-bs-target="#deleteAccountModal">
                                     Delete account
                                 </button>
                             </div>
@@ -206,7 +220,77 @@
                         </div>
 
                     </div>
-                </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Change Password -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content edit-modal-container p-4 p-md-5">
+
+                <!-- Przycisk zamykania X -->
+                <button type="button" class="btn-close edit-modal-close shadow-none" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+
+                <!-- FORMULARZ ZMIANY HASŁA -->
+                <form method="post" action="{% url 'change_password' %}" class="modal-body p-0">
+                    {% csrf_token %}
+                    <h2 class="edit-modal-heading mb-5">Change Password</h2>
+
+                    <div class="row g-4 mb-5">
+
+                        <!-- Old password -->
+                        <div class="col-md-4">
+                            <label for="old_password" class="edit-field-label">Old Password</label>
+                            <div class="edit-input-row">
+                                <input type="password" name="old_password" id="old_password"
+                                       class="edit-input-raw password-input"
+                                       placeholder="********" required>
+                                <i class="bi bi-eye-slash edit-pencil-icon toggle-password" style="font-size: 1.2rem;"
+                                   onclick="togglePasswordVisibility('old_password', this)"></i>
+                            </div>
+                        </div>
+
+                        <!-- New password -->
+                        <div class="col-md-4">
+                            <label for="new_password" class="edit-field-label">New Password</label>
+                            <div class="edit-input-row">
+                                <input type="password" name="new_password" id="new_password"
+                                       class="edit-input-raw password-input"
+                                       placeholder="********" required>
+                                <i class="bi bi-eye-slash edit-pencil-icon toggle-password" style="font-size: 1.2rem;"
+                                   onclick="togglePasswordVisibility('new_password', this)"></i>
+                            </div>
+                        </div>
+
+                        <!-- Repeat new password -->
+                        <div class="col-md-4">
+                            <label for="repeat_password" class="edit-field-label">Repeat Password</label>
+                            <div class="edit-input-row">
+                                <input type="password" name="repeat_password" id="repeat_password" class="edit-input-raw password-input"
+                                       placeholder="********" required>
+                                <i class="bi bi-eye-slash edit-pencil-icon toggle-password"
+                                   style="font-size: 1.2rem;" onclick="togglePasswordVisibility('repeat_password', this)"></i>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Przyciski Zapisz / Anuluj -->
+                    <div class="d-flex align-items-center justify-content-center gap-3 mt-4">
+                        <!-- Przycisk z samą ikonką dyskietki -->
+                        <button type="submit" class="btn edit-btn-save px-3 py-2">
+                            <i class="bi bi-floppy fs-5"></i>
+                        </button>
+                        <!-- Przycisk Cancel -->
+                        <button type="button" class="btn edit-btn-cancel px-4 py-2" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
 
             </div>
         </div>

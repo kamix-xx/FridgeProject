@@ -56,17 +56,29 @@ body {
    ========================================= */
 
 .dashboard-page {
-    padding-top: calc(70px + 2rem);
-    padding-bottom: 4rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    max-height: 100dvh;
+    min-height: 0;
+    padding-top: calc(70px + 1rem);
+    padding-bottom: 1rem;
+    overflow: hidden;
 }
 
 
 .dashboard-inner {
-    max-width: 1400px;
-
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    width: 100%;             /* Changed from width: min(100%, 1200px) */
+    max-width: 1200px;       /* Changed from 1600px to act as standard desktop max */
+    min-width: 0;
+    min-height: 0;
     margin: 0 auto;
-
     padding: 0 1.5rem;
+    box-sizing: border-box;
 }
 
 
@@ -658,9 +670,8 @@ body {
 .area-panel {
     flex: 0 0 100%;
     min-width: 0;
-
-    height: min(60dvh, calc(100dvh - 450px));
-    min-height: 220px;
+    height: 100%;
+    min-height: 0;
 
     overflow-y: auto;
     padding-right: 0.25rem;
@@ -670,25 +681,88 @@ body {
 }
 
 /* =========================================
-   NAPRAWA DLA KRÓTKICH EKRANÓW (Laptopy ze skalowaniem np. 125%)
+   One-screen desktop / laptop layout
    ========================================= */
-@media (max-height: 860px) and (min-width: 901px) {
-    .dashboard-page {
-        padding-top: calc(70px + 1rem);
-        padding-bottom: 1.5rem;
-    }
-
+@media (min-width: 901px) {
     .dashboard-search-wrapper {
+        flex: 0 0 auto;
         margin-bottom: 1rem;
     }
 
-    .dashboard-actions {
-        margin-top: 1rem;
+    .fridge-panel {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+
+    .fridge-panel-body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
+    }
+
+    .fridge-panel-header {
+        flex: 0 0 auto;
+        min-width: 0;
+    }
+
+    .area-carousel-viewport {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+
+    .area-carousel,
+    .area-panel {
+        height: 100%;
     }
 
     .area-panel {
-        height: calc(100dvh - 320px);
-        min-height: 320px;
+        min-height: 0;
+    }
+
+    .dashboard-actions {
+        flex: 0 0 auto;
+        margin-top: 1rem;
+        margin-bottom: 0;
+    }
+}
+
+/* Common 1080p + 125% display scaling is roughly an 864px CSS viewport.
+   Tighten chrome while keeping the dashboard inside one viewport. */
+@media (min-width: 901px) and (max-height: 900px) {
+    .dashboard-page {
+        padding-top: calc(70px + 0.75rem);
+        padding-bottom: 0.75rem;
+    }
+
+    .dashboard-inner {
+        width: min(100%, 1160px);
+        max-width: 1160px;
+    }
+
+    .dashboard-search-wrapper {
+        margin-bottom: 0.75rem;
+    }
+
+    .fridge-panel-body {
+        padding: 1.25rem;
+    }
+
+    .fridge-panel-header {
+        margin-bottom: 0.75rem;
+    }
+
+    .fridge-panel-title {
+        font-size: 1.5rem;
+    }
+
+    .dashboard-actions {
+        gap: 1rem;
+        margin-top: 0.75rem;
+    }
+
+    .btn-fridge-outline {
+        padding: 0.6rem 1.4rem;
     }
 }
 
@@ -1241,6 +1315,21 @@ body {
 }
 
 /* =========================================
+   Large desktop / 4K breathing room
+   ========================================= */
+@media (min-width: 1600px) and (min-height: 901px) {
+    .dashboard-inner {
+        max-width: 1400px; /* Lowered from 1700px */
+        padding-left: 2.5rem;
+        padding-right: 2.5rem;
+    }
+
+    .dashboard-page {
+        padding-bottom: 6rem;
+    }
+}
+
+/* =========================================
    Responsive
    ========================================= */
 
@@ -1260,14 +1349,14 @@ body {
 .dashboard-page {
         display: flex;
         flex-direction: column;
-        min-height: 100dvh;
-        height: auto;
+        height: 100dvh;
+        max-height: 100dvh;
+        min-height: 0;
         width: 100%;
         min-width: 0;
         padding-top: calc(70px + 0.6rem);
         padding-bottom: 0.6rem;
-        overflow-x: hidden;
-        overflow-y: auto;
+        overflow: hidden;
     }
 
     .dashboard-inner {
@@ -1307,8 +1396,8 @@ body {
 .fridge-panel {
         display: block;
         position: relative;
-        flex: 1;
-        min-height: 400px;
+        flex: 1 1 auto;
+        min-height: 0;
         min-width: 0;
     }
 

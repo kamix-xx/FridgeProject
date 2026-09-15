@@ -34,15 +34,24 @@ class Area(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     key = models.CharField(max_length=255, unique=True)
 
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='owned_areas',
+        null=True,
+    )
+
     users = models.ManyToManyField(
         User,
         related_name='areas'
     )
 
-    # no migration needed
     @property
     def is_shared(self):
         return self.users.count() > 1
+
+    def is_owned_by(self, user):
+        return self.owner_id == user.id
 
 class Unit(models.Model):
     id = models.AutoField(primary_key=True)
