@@ -304,3 +304,10 @@
     background: #211A15 !important;
     color: #FAF5EE !important;
 }
+
+.edit-avatar-frame img.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+}
