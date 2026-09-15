@@ -1,0 +1,194 @@
+/* =========================================
+   RECIPE DETAIL STYLES
+   ========================================= */
+
+.btn-back-glass {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(81, 67, 54, 0.2);
+    border-radius: 8px;
+    color: var(--title-color);
+    font-size: 1.4rem;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-back-glass:hover {
+    transform: translateX(-4px);
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--title-color);
+}
+
+[data-bs-theme="dark"] .btn-back-glass {
+    background: rgba(30, 30, 30, 0.65);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #fdfaf6;
+}
+
+[data-bs-theme="dark"] .btn-back-glass:hover {
+    background: rgba(45, 45, 45, 0.9);
+    color: #fdfaf6;
+}
+
+.recipe-detail-hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    z-index: 1;
+    -webkit-mask-image: linear-gradient(to right, black 40%, transparent 100%);
+    mask-image: linear-gradient(to right, black 40%, transparent 100%);
+}
+
+.recipe-meta-text {
+    font-size: 1rem;
+    font-weight: 500;
+    opacity: 0.85;
+}
+
+.recipe-status-text {
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 0.3rem;
+}
+
+.recipe-section-title {
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.recipe-description-text {
+    font-size: 1.05rem;
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+.recipe-glass-box {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(81, 67, 54, 0.15);
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+[data-bs-theme="dark"] .recipe-glass-box {
+    background: rgba(20, 16, 12, 0.65);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.ingredient-name {
+    font-weight: 400;
+    padding-right: 1rem;
+}
+
+.ingredient-bullet {
+    margin-right: 0.4rem;
+    font-weight: 600;
+}
+
+.ingredient-qty {
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+
+.btn-recipe-verify {
+    background-color: #ff9166;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+    line-height: 1.2;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-recipe-verify:hover {
+    background-color: #e25327;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.btn-recipe-action {
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.5rem 1.2rem;
+    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    color: #ffffff;
+}
+
+.btn-recipe-action:hover {
+    transform: translateY(-2px);
+    background-color: transparent !important;
+}
+
+.btn-recipe-edit {
+    background-color: #ff9166;
+}
+
+.btn-recipe-edit:hover {
+    border-color: #ff9166;
+    color: #ff9166;
+}
+
+.btn-recipe-delete {
+    background-color: #ff4d4d;
+}
+
+.btn-recipe-delete:hover {
+    border-color: #ff4d4d;
+    color: #ff4d4d;
+}
+
+.btn-recipe-edit {
+    background-color: #ff9166;
+}
+
+.btn-recipe-delete {
+    background-color: #ff4d4d;
+}
+
+/* =========================================
+   RESPONSIVE (Mobile Overrides)
+   ========================================= */
+@media (max-width: 991px) {
+    .recipe-detail-hero-bg {
+        width: 100%;
+        height: 350px;
+        -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+        mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+    }
+
+    .recipe-detail-page .glass-card > .z-2 {
+        padding-top: 220px !important;
+    }
+
+    .recipe-description-text {
+        text-align: justify;
+    }
+}
+
+@media (max-width: 575px) {
+    .recipe-detail-page .glass-card > .z-2 {
+        padding-top: 180px !important;
+    }
+    .btn-recipe-verify {
+        width: 100%;
+        margin-top: 1rem;
+    }
+    .recipe-status-text {
+        text-align: center;
+    }
+    .btn-recipe-action {
+        width: 100%;
+        justify-content: center;
+    }
+}

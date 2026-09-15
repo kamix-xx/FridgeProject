@@ -360,7 +360,7 @@ def edit_profile_view(request):
         new_username = request.POST.get('username')
         new_email = request.POST.get('email')
         new_first_name = request.POST.get('first_name')
-        new_avatar = request.FILES.get('avatar')  # Pobieranie pliku (zdjęcia)
+        new_avatar = request.FILES.get('avatar')
 
         if new_username and new_username != user.username:
             if User.objects.filter(username=new_username).exists():
@@ -419,4 +419,10 @@ def change_password_view(request):
 
 
 def recipes(request):
+    # recipes = Recipe.objects.all()
     return render(request, 'recipes/recipes.html')
+
+
+def recipe_detail(request, recipe_id):
+    # recipe = get_object_or_404(Recipe, id=recipe_id)
+    return render(request, 'recipes/recipe_detail.html')
