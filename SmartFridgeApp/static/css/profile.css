@@ -290,3 +290,17 @@
     background-color: #af3535 !important;
     color: #ffffff !important;
 }
+
+.edit-btn-cancel {
+    background: transparent !important;
+    border: 1.5px solid #211A15 !important;
+    color: #211A15 !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease;
+}
+.edit-btn-cancel:hover {
+    background: #211A15 !important;
+    color: #FAF5EE !important;
+}
