@@ -1445,12 +1445,10 @@ option {
    ========================================= */
 
 @media (max-width: 900px) {
-    /* Pozbywamy się flexboxa wyrównującego na boki na rzecz pozycjonowania na rogu karty */
     .shopping-panel {
         display: block !important;
     }
 
-    /* Odsłaniamy strzałki na małych ekranach (override d-none z HTML) */
     .shopping-arrow-prev,
     .shopping-arrow-next {
         display: flex !important;
@@ -1464,7 +1462,7 @@ option {
     }
 
     .shopping-arrow-prev {
-        left: 30px; /* Wcięcie zależne od paddingu sekcji */
+        left: 30px;
     }
 
     .shopping-arrow-next {
@@ -1473,7 +1471,6 @@ option {
 }
 
 @media (max-width: 480px) {
-    /* Jeszcze mniejsze strzałki dla telefonów */
     .shopping-arrow-prev,
     .shopping-arrow-next {
         width: 34px;
