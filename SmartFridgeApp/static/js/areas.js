@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
         editAreaPanels[panel.dataset.panel] = panel;
     });
 
-    var editAreaState = { current: 'main', previous: 'main' };
+    var editAreaState = {current: 'main', previous: 'main'};
 
     function switchEditAreaPanel(name, instant) {
         if (name === editAreaState.current) return;
@@ -175,9 +175,13 @@ document.addEventListener('DOMContentLoaded', function () {
     function buildAvatarEl(tag, user, className) {
         var el = document.createElement(tag);
         el.className = className;
-        if (user.avatar_url) {
+
+        // Accepts either user.avatar or user.avatar_url from your context JSON
+        var avatarSrc = user.avatar || user.avatar_url;
+
+        if (avatarSrc) {
             var img = document.createElement('img');
-            img.src = user.avatar_url;
+            img.src = avatarSrc;
             img.alt = '';
             el.appendChild(img);
         } else {
