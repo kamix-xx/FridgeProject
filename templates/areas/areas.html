@@ -111,7 +111,13 @@
                                                 <i class="bi bi-share"></i>
                                             </button>
 
-                                            <button class="gooey-item item-edit" aria-label="Edit">
+                                            <button class="gooey-item item-edit" aria-label="Edit"
+                                                    data-bs-toggle="modal" data-bs-target="#editAreaModal"
+                                                    data-area-id="{{ area.id }}"
+                                                    data-area-name="{{ area.name }}"
+                                                    data-area-shared="{{ area.is_shared|yesno:'true,false' }}">
+                                                {# data-area-owner dropped for now — see commented-out#}
+                                                {# "Stop sharing" block in the editAreaModal below #}
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
 
@@ -216,6 +222,49 @@
         </div>
     </div>
 
+    <!-- Edit Area — save button copied verbatim from
+         partials/product_form_fields.html's id_prefix == "edit" branch:
+         same .popup-circular-btn as the Add Area / Add Shared Area save
+         buttons above, but with that partial's hardcoded 24x24 save SVG
+         instead of a Bootstrap icon (submit_icon is only used for the
+         "add" branch there, so bi-floppy-fill was never actually right).
+
+         "Stop sharing" (owner-only, shared-areas-only) is commented out
+         below until Area has a real owner field — see areas.js for the
+         matching commented-out toggle logic. -->
+    <div class="modal fade" id="editAreaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup t-modal">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-body text-center p-4 p-md-5">
+                    <h3 class="popup-title mb-5">Edit Area</h3>
+                    <div class="text-start mb-5">
+                        <label for="editAreaName" class="form-label popup-label">Area Name</label>
+                        <input type="text" class="form-control popup-input shadow-none" id="editAreaName">
+                    </div>
+                    <button type="button" class="popup-circular-btn mx-auto">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21V13H7V21M7 3V8H15M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+
+                    {% comment %}
+                    <div class="d-none" id="stopSharingAreaWrap">
+                        <hr class="popup-divider mx-auto mt-5 mb-4">
+                        <button type="button"
+                                class="btn btn-link text-decoration-none popup-btn-danger"
+                                id="stopSharingAreaBtn">
+                            Stop sharing this area
+                        </button>
+                    </div>
+                    {% endcomment %}
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="shareAreaModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content custom-popup t-modal">
@@ -247,6 +296,8 @@
         </div>
     </div>
 
-    {# TODO edit area modal should have unshare option #}
+    {# TODO "Stop sharing" button is commented out in editAreaModal above until
+       Area has a real owner field — see areas.js for the matching commented-out
+       toggle logic, and models.py history for the owner field that got reverted #}
 
 {% endblock %}

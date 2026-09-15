@@ -32,4 +32,29 @@ document.addEventListener('DOMContentLoaded', function () {
             navigateToArea(card.dataset.areaLink);
         });
     });
+
+    // Edit Area modal is one shared modal reused by every card's gooey
+    // "edit" button, so on open we pull the clicked button's data-area-*
+    // attributes to pre-fill the name field.
+    var editAreaModalEl = document.getElementById('editAreaModal');
+    if (editAreaModalEl) {
+        editAreaModalEl.addEventListener('show.bs.modal', function (e) {
+            var trigger = e.relatedTarget;
+            if (!trigger) return;
+
+            editAreaModalEl.dataset.areaId = trigger.dataset.areaId || '';
+
+            var nameInput = document.getElementById('editAreaName');
+            if (nameInput) nameInput.value = trigger.dataset.areaName || '';
+
+            // "Stop sharing" toggle — commented out along with the button
+            // itself in areas.html until Area has a real owner field.
+            // var stopSharingWrap = document.getElementById('stopSharingAreaWrap');
+            // if (stopSharingWrap) {
+            //     var canStopSharing = trigger.dataset.areaShared === 'true'
+            //         && trigger.dataset.areaOwner === 'true';
+            //     stopSharingWrap.classList.toggle('d-none', !canStopSharing);
+            // }
+        });
+    }
 });
