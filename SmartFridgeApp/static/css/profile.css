@@ -1,14 +1,18 @@
+/* =========================================
+   PROFILE PAGE & DELETE MODAL STYLES
+   ========================================= */
+
 :root, [data-bs-theme="light"] {
     --profile-color: #ffffff;
+    --bg-modal-color: #FAF5EE;
+    --modal-color: #514336;
 }
 
 [data-bs-theme="dark"] {
     --profile-color: #ad9477;
+    --bg-modal-color: #1e1e1e;
+    --modal-color: #e2cbab;
 }
-
-/* =========================================
-   PROFILE PAGE & DELETE MODAL STYLES
-   ========================================= */
 
 /* Profil - układ i typografia */
 .profile-title {
@@ -132,15 +136,15 @@
 
 
 /* =========================================
-   EDIT ACCOUNT MODAL (EXACT MATCH)
+   EDIT ACCOUNT MODAL
    ========================================= */
 
 /* Główny kontener modalu - jasny beż z makiety */
 .edit-modal-container {
-    background-color: #FAF5EE !important;
+    background-color: var(--bg-modal-color) !important;
     border: none !important;
     border-radius: 20px !important;
-    color: #211A15 !important;
+    color: var(--modal-color) !important;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2) !important;
     position: relative;
 }
@@ -166,7 +170,7 @@
     display: block;
     font-size: 1.2rem;
     font-weight: 500;
-    color: #211A15 !important;
+    color: var(--modal-color) !important;
     margin-bottom: 0.4rem;
 }
 
@@ -174,7 +178,7 @@
 .edit-input-row {
     display: flex;
     align-items: center;
-    border-bottom: 2px solid #211A15 !important;
+    border-bottom: 2px solid var(--modal-color) !important;
     padding-bottom: 3px;
     max-width: 270px;
 }
@@ -196,7 +200,7 @@
 /* Ikony ołówków */
 .edit-pencil-icon {
     font-size: 1.1rem;
-    color: #211A15 !important;
+    color: var(--modal-color) !important;
     cursor: pointer;
     margin-left: 8px;
     flex-shrink: 0;
@@ -206,7 +210,7 @@
 .edit-btn-password {
     background: transparent !important;
     border: 1.5px solid #211A15 !important;
-    color: #211A15 !important;
+    color: var(--modal-color) !important;
     border-radius: 8px !important;
     padding: 7px 18px !important;
     font-size: 1.05rem !important;
@@ -216,8 +220,8 @@
 }
 
 .edit-btn-password:hover {
-    background: #211A15 !important;
-    color: #FAF5EE !important;
+    background: var(--modal-color) !important;
+    color: var(--bg-modal-color) !important;
 }
 
 /* Kwadratowy ramkowy box awatara */
@@ -238,13 +242,13 @@
     position: absolute;
     top: 10px;
     right: 12px;
-    color: #211A15;
+    color: var(--modal-color);
 }
 
 .edit-avatar-svg {
     width: 105px;
     height: 105px;
-    color: #211A15;
+    color: var(--modal-color);
 }
 
 /* Przycisk Save changes (pomarańczowy) */
