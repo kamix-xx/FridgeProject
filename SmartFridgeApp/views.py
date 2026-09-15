@@ -128,7 +128,7 @@ def _fake_dashboard_areas():
 
     room_fridge = SimpleNamespace(
         name="Room fridge",
-        is_shared=False,
+        is_shared=True,
         products=[
             fake_product("Sparkling Water", days_left=180, added_days_ago=10),
             fake_product("Leftover Pizza", days_left=1, added_days_ago=3),
@@ -140,7 +140,7 @@ def _fake_dashboard_areas():
 
     kitchen_cabinet = SimpleNamespace(
         name="Kitchen cabinet",
-        is_shared=False,
+        is_shared=True,
         products=[
             fake_product(f"Canned Beans #{i}", days_left=200 - i * 15, added_days_ago=30)
             for i in range(1, 9)
