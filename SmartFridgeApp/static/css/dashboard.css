@@ -657,23 +657,15 @@ body {
 
 .area-panel {
     flex: 0 0 100%;
-
     min-width: 0;
 
-    /* was a flat "height: 60vh; min-height: 450px" — the min-height never
-       actually bound anything (60vh > 45dvh always), so short/mobile
-       viewports still got pushed past the bottom. This caps the real
-       height against the viewport instead, with a small floor so it can
-       never collapse to nothing. */
-    height: min(60dvh, calc(100dvh - 450px));
-    min-height: 220px;
-
+    height: min(65vh, calc(100vh - 300px));
+    min-height: 380px;
     overflow-y: auto;
 
     padding-right: 0.25rem;
 
-    /* Same thin, theme-matched scrollbar as the areas page's
-       .areas-scroll-container (Firefox handled here, WebKit below) */
+
     scrollbar-width: thin;
     scrollbar-color: rgba(50, 40, 35, 0.6) transparent;
 }
