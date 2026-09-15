@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}SmartFridge+ — My Recipes{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/recipes.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    {% include "partials/background_images.html" %}
+
+    <main class="recipes-page position-relative min-vh-100 py-5">
+        <div class="container position-relative z-2 mt-4 mt-md-5" style="max-width: 900px;">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="expense-title m-0">My recipes</h2>
+                <button class="btn btn-link text-decoration-none p-0 shadow-none recipe-nav-arrow" aria-label="Go back">
+                    <i class="bi bi-chevron-left fs-4"></i>
+                </button>
+            </div>
+
+            <div class="recipe-card position-relative overflow-hidden mb-4" tabindex="0" role="button">
+                <div class="recipe-img-bg">
+                    <img src="https://i.imgur.com/2SjgpvQ.jpeg" alt="Midnight in Seville Oranges" class="w-100 h-100 object-fit-cover">
+                </div>
+                <div class="recipe-content position-relative z-2">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                        <h3 class="recipe-title mb-0">The "Midnight in Seville" Oranges</h3>
+                        <div class="recipe-meta text-end mt-1 mt-sm-0">
+                            <span class="me-3">est. time: 10 h</span>
+                            <span>Status: Private</span>
+                        </div>
+                    </div>
+                    <p class="recipe-desc mb-0">An elegant recipe for scrumptious oranges with or without leaves.<br>...</p>
+                </div>
+            </div>
+
+            <div class="add-recipe-bar d-flex align-items-center px-4 py-3 mb-5" tabindex="0" role="button">
+                <i class="bi bi-plus fs-2 me-3 fw-bold"></i>
+                <span class="fs-5 fw-medium">Add new recipe</span>
+            </div>
+
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="expense-title m-0">Suggestions</h2>
+                <button class="btn btn-link text-decoration-none p-0 shadow-none recipe-nav-arrow" aria-label="View more">
+                    <i class="bi bi-chevron-left fs-4"></i>
+                </button>
+            </div>
+
+            <div class="recipe-card position-relative overflow-hidden mb-4" tabindex="0" role="button">
+                <div class="recipe-img-bg">
+                    <img src="https://imgur.com/RZ0e0CP.jpeg" alt="Vampire's Orchard Oranges" class="w-100 h-100 object-fit-cover">
+                </div>
+                <div class="recipe-content position-relative z-2">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                        <h3 class="recipe-title mb-0">The "Vampire's Orchard" Oranges</h3>
+                        <div class="recipe-meta text-end mt-1 mt-sm-0">
+                            <span class="me-3">est. time: 30 min</span>
+                            <span>Official recipe</span>
+                        </div>
+                    </div>
+                    <p class="recipe-desc mb-0">A ravenous recipe for dark-tinted oranges, brimming with fortified juice and shadowy decadence.<br>...</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+{% endblock %}

@@ -280,3 +280,6 @@ def delete_account(request):
         return redirect('login')
 
     return redirect('profile')
+
+def recipes(request):
+    return render(request, 'recipes/recipes.html')

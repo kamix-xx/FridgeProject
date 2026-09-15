@@ -21,4 +21,6 @@ urlpatterns = [
     path('expenses/details/', views.expense_details, name='expense_details'),
 
     path('shopping-list/', views.shopping_list_view, name='shopping_list'),
+
+    path('recipes/', views.recipes, name='recipes'),
 ]
