@@ -657,25 +657,39 @@ body {
 
 .area-panel {
     flex: 0 0 100%;
-
     min-width: 0;
 
-    /* was a flat "height: 60vh; min-height: 450px" — the min-height never
-       actually bound anything (60vh > 45dvh always), so short/mobile
-       viewports still got pushed past the bottom. This caps the real
-       height against the viewport instead, with a small floor so it can
-       never collapse to nothing. */
     height: min(60dvh, calc(100dvh - 450px));
     min-height: 220px;
 
     overflow-y: auto;
-
     padding-right: 0.25rem;
 
-    /* Same thin, theme-matched scrollbar as the areas page's
-       .areas-scroll-container (Firefox handled here, WebKit below) */
     scrollbar-width: thin;
     scrollbar-color: rgba(50, 40, 35, 0.6) transparent;
+}
+
+/* =========================================
+   NAPRAWA DLA KRÓTKICH EKRANÓW (Laptopy ze skalowaniem np. 125%)
+   ========================================= */
+@media (max-height: 860px) and (min-width: 901px) {
+    .dashboard-page {
+        padding-top: calc(70px + 1rem);
+        padding-bottom: 1.5rem;
+    }
+
+    .dashboard-search-wrapper {
+        margin-bottom: 1rem;
+    }
+
+    .dashboard-actions {
+        margin-top: 1rem;
+    }
+
+    .area-panel {
+        height: calc(100dvh - 320px);
+        min-height: 320px;
+    }
 }
 
 
@@ -1243,15 +1257,17 @@ body {
        guarantees "taller panel, no page scroll" — no more guessing a
        fixed px budget to subtract from 100dvh.
     */
-    .dashboard-page {
+.dashboard-page {
         display: flex;
         flex-direction: column;
-        height: 100dvh;
+        min-height: 100dvh;
+        height: auto;
         width: 100%;
         min-width: 0;
         padding-top: calc(70px + 0.6rem);
         padding-bottom: 0.6rem;
-        overflow: hidden; /* safety net: clip rather than ever push the page into scrolling */
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 
     .dashboard-inner {
@@ -1288,11 +1304,11 @@ body {
        panel's own bottom corners — same idea as the areas page's gooey
        button — so the panel doesn't lose a whole row to them.
     */
-    .fridge-panel {
+.fridge-panel {
         display: block;
         position: relative;
         flex: 1;
-        min-height: 0;
+        min-height: 400px;
         min-width: 0;
     }
 
