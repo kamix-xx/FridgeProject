@@ -2,6 +2,7 @@
 :root, [data-bs-theme="light"] {
     --page-bg: #e2cbab;
     --dashboard-page-bg: rgb(226 203 171 / 0.34);
+    --page-photo-tint: rgb(241 220 195 / 0.42);
     --login-page-bg: #e2cbab;
     --landing-page-bg: #f4e5d0;
     --register-page-bg: #dbceca;
@@ -31,8 +32,8 @@
 }
 
 [data-bs-theme="dark"] {
-    --page-bg: #090a0c;
-    --dashboard-page-bg: #090a0c;
+    --page-bg: #000005;
+    --dashboard-page-bg: #000005;
     --login-page-bg: #111214;
     --landing-page-bg: #090a0c;
     --register-page-bg: #21181d;
@@ -1007,29 +1008,29 @@ body.side-menu-open .side-menu-theme-controls {
 /* =========================================
    FIREFOX-ONLY EXCEPTIONS (Performance Fix)
    ========================================= */
-@supports (-moz-appearance: none) {
-    /* Kill the navbar blur */
-    .custom-navbar {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        background-color: rgba(184, 157, 126, 0.98) !important;
-    }
+/*@supports (-moz-appearance: none) {*/
+/*    !* Kill the navbar blur *!*/
+/*    .custom-navbar {*/
+/*        backdrop-filter: none !important;*/
+/*        -webkit-backdrop-filter: none !important;*/
+/*        background-color: rgba(184, 157, 126, 0.98) !important;*/
+/*    }*/
 
-    [data-bs-theme="dark"] .custom-navbar {
-        background-color: rgba(0, 0, 0, 0.96) !important;
-    }
+/*    [data-bs-theme="dark"] .custom-navbar {*/
+/*        background-color: rgba(0, 0, 0, 0.96) !important;*/
+/*    }*/
 
-    /* NEW: Kill the glass card blur for Expense Tracker */
-    .glass-card {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        background-color: rgba(255, 255, 255, 0.9) !important;
-    }
+/*    !* NEW: Kill the glass card blur for Expense Tracker *!*/
+/*    .glass-card {*/
+/*        backdrop-filter: none !important;*/
+/*        -webkit-backdrop-filter: none !important;*/
+/*        background-color: rgba(255, 255, 255, 0.9) !important;*/
+/*    }*/
 
-    [data-bs-theme="dark"] .glass-card {
-        background-color: rgba(30, 30, 30, 0.95) !important;
-    }
-}
+/*    [data-bs-theme="dark"] .glass-card {*/
+/*        background-color: rgba(30, 30, 30, 0.95) !important;*/
+/*    }*/
+/*}*/
 
 .max-w-280 {
     max-width: 280px;
@@ -1652,5 +1653,4 @@ albo możemy mieć w dupie mozzile to też opcja XD
 
 also edytowałem style gdy przyszedł wasz update, sprawdźcie czy macie wszystko na stronach
 
-FIXME strona z expenses nadal laguje na mozilli nie mam pojęcia czemu
 */

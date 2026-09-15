@@ -275,14 +275,14 @@
 }
 
 
-/* =========================================
-   Firefox performance mode
-   ========================================= */
+/*!* =========================================*/
+/*   Firefox performance mode*/
+/*   ========================================= *!*/
 
-@-moz-document url-prefix() {
-    /* Remove any remaining expensive filter effects from the morph */
-    .t-morph-plus,
-    .t-morph-menu {
-        filter: none !important;
-    }
-}
+/*@-moz-document url-prefix() {*/
+/*    !* Remove any remaining expensive filter effects from the morph *!*/
+/*    .t-morph-plus,*/
+/*    .t-morph-menu {*/
+/*        filter: none !important;*/
+/*    }*/
+/*}*/

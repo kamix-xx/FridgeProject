@@ -1,0 +1,120 @@
+/*
+   Dashboard <-> Areas navigation
+   --------------------------------
+*/
+
+#page-transition-panel {
+    view-transition-name: fridge-main-panel;
+}
+
+
+/* =========================================================
+   SIDE MENU
+   ========================================================= */
+
+/*
+   Keep the side menu in the outgoing snapshot.
+
+   Do NOT put this on .show only. The element needs to have
+   the same transition identity on both documents.
+*/
+.offcanvas.side-menu {
+    view-transition-name: fridge-side-menu;
+}
+
+
+/*
+   Side-menu backdrop.
+
+   Bootstrap creates this dynamically when the offcanvas opens.
+*/
+.offcanvas-backdrop.show {
+    view-transition-name: fridge-side-menu-backdrop;
+}
+
+
+/*
+   The theme buttons sit outside the offcanvas itself, so they
+   need their own transition identity.
+*/
+.side-menu-theme-controls {
+    view-transition-name: fridge-side-menu-controls;
+}
+
+
+/* =========================================================
+   PREPARATION
+   ========================================================= */
+
+/*
+   These transient menus should disappear before the outgoing
+   snapshot.
+*/
+html.page-transition-preparing .gooey-item,
+html.page-transition-preparing .t-morph-menu {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: none !important;
+    transition: none !important;
+}
+
+html.page-transition-preparing .t-morph {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    transition: none !important;
+}
+
+
+/*
+   IMPORTANT:
+
+   There are deliberately NO rules here hiding:
+
+       .offcanvas.show
+       .offcanvas-backdrop.show
+       .side-menu-theme-controls
+
+   They must remain visible when the browser creates the
+   outgoing View Transition snapshot.
+*/
+
+
+/* =========================================================
+   SIDE MENU ANIMATION
+   ========================================================= */
+
+@media (prefers-reduced-motion: no-preference) {
+
+    ::view-transition-old(fridge-side-menu),
+    ::view-transition-old(fridge-side-menu-controls) {
+        animation: side-menu-out 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    ::view-transition-old(fridge-side-menu-backdrop) {
+        animation: backdrop-out 420ms ease both;
+    }
+}
+
+@keyframes side-menu-out {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes backdrop-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}

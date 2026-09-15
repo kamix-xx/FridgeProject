@@ -4,6 +4,18 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // -----------------------------------------
+    // Shared helpers
+    // -----------------------------------------
+
+    function getCssNumber(property, fallback, scope) {
+        const value = parseFloat(getComputedStyle(scope || document.documentElement)
+            .getPropertyValue(property));
+
+        return Number.isFinite(value) ? value : fallback;
+    }
+
+
     // =========================================
     // Area carousel
     // =========================================
@@ -18,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const areaNextBtn = document.getElementById('areaNext');
 
-    const areaTitleEl = document.getElementById('areaTitle');
+    const areaTitleTextEl = document.getElementById('areaTitleText');
 
     const panelCount = areaPanels.length;
 
@@ -32,8 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // area index — the only one anything outside this block should care
     // about.
     let trackPosition = 0;
-
-    let isAnimating = false;
 
     if (infiniteEnabled) {
         /*
@@ -65,8 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            isAnimating = false;
-
             if (trackPosition === 0) {
                 // Slid onto the cloned last panel -> silently snap to the real one.
                 trackPosition = panelCount;
@@ -84,9 +92,129 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function setAreaTitle(index) {
-        if (areaTitleEl && areaPanels[index]) {
-            areaTitleEl.textContent = areaPanels[index].dataset.areaName || '';
+    // -----------------------------------------
+    // Title word-swap animation
+    // -----------------------------------------
+    //
+    // Splits the title into words (the CSS nth-child rules on
+    // .area-title-word give them a light cascade) and crossfades the old
+    // set out before swapping in the new one.
+    //
+    // Rapid clicking is handled by redirecting rather than stacking: if a
+    // swap is already fading the old words out, a new call just updates
+    // titleMorphTarget instead of starting a second animation on top of
+    // it — so no matter how fast you click, only one exit/enter cycle is
+    // ever running, and it always lands on whichever area you actually
+    // stopped on.
+
+    function makeTitleWordSpan(text) {
+        const span = document.createElement('span');
+        span.className = 'area-title-word';
+        span.textContent = text;
+
+        return span;
+    }
+
+    function buildSharedIcon() {
+        const icon = document.createElement('span');
+        icon.className = 'area-shared-icon area-title-word';
+        icon.title = 'Shared area';
+        icon.setAttribute('aria-label', 'Shared area');
+
+        const iconGlyph = document.createElement('i');
+        iconGlyph.className = 'bi bi-people-fill';
+        iconGlyph.setAttribute('aria-hidden', 'true');
+
+        icon.appendChild(iconGlyph);
+
+        return icon;
+    }
+
+    // The icon shares the .area-title-word class, so it rides along in
+    // the same flex row and picks up the same fade/scale transition and
+    // nth-child stagger as the last word — no separate animation needed.
+    function renderTitleWords(container, text, isShared) {
+        container.innerHTML = '';
+
+        text
+            .split(/\s+/)
+            .filter(Boolean)
+            .forEach((word) => {
+                container.appendChild(makeTitleWordSpan(word));
+            });
+
+        if (isShared) {
+            container.appendChild(buildSharedIcon());
+        }
+    }
+
+    let titleMorphTimer = null;
+    let titleMorphTarget = null;
+    let titleMorphTargetShared = false;
+
+    function morphAreaTitle(container, newText, isShared) {
+        const reduceMotion = window.matchMedia
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (reduceMotion) {
+            clearTimeout(titleMorphTimer);
+            titleMorphTimer = null;
+            renderTitleWords(container, newText, isShared);
+
+            return;
+        }
+
+        titleMorphTarget = newText;
+        titleMorphTargetShared = isShared;
+
+        // Already exiting toward some target — just redirect it.
+        if (titleMorphTimer) {
+            return;
+        }
+
+        Array.from(container.children).forEach((el) => el.classList.add('is-exiting'));
+
+        const outDuration = getCssNumber('--title-morph-out-dur', 160);
+
+        titleMorphTimer = window.setTimeout(() => {
+            renderTitleWords(container, titleMorphTarget, titleMorphTargetShared);
+
+            const enteringWords = Array.from(container.children);
+            enteringWords.forEach((el) => el.classList.add('is-entering'));
+
+            void container.offsetWidth; // flush, so the "from" state above actually paints
+
+            requestAnimationFrame(() => {
+                enteringWords.forEach((el) => el.classList.remove('is-entering'));
+            });
+
+            titleMorphTimer = null;
+        }, outDuration);
+    }
+
+    if (areaTitleTextEl) {
+        const initialShared = Boolean(areaTitleTextEl.querySelector('.area-shared-icon'));
+
+        renderTitleWords(areaTitleTextEl, areaTitleTextEl.textContent.trim(), initialShared);
+    }
+
+    function setAreaTitle(index, options) {
+        if (!areaTitleTextEl || !areaPanels[index]) {
+            return;
+        }
+
+        const instant = Boolean(options && options.instant);
+
+        const panel = areaPanels[index];
+        const areaName = panel.dataset.areaName || '';
+        const isShared = panel.dataset.isShared === 'true';
+
+        if (instant) {
+            clearTimeout(titleMorphTimer);
+            titleMorphTimer = null;
+            renderTitleWords(areaTitleTextEl, areaName, isShared);
+        } else {
+            morphAreaTitle(areaTitleTextEl, areaName, isShared);
         }
     }
 
@@ -104,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentAreaIndex = (index + panelCount) % panelCount;
 
-        setAreaTitle(currentAreaIndex);
+        setAreaTitle(currentAreaIndex, options);
 
         if (!infiniteEnabled) {
             areaCarousel.style.transform = `translateX(-${currentAreaIndex * 100}%)`;
@@ -127,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function stepArea(delta) {
-        if (!panelCount || isAnimating) {
+        if (!panelCount) {
             return;
         }
 
@@ -137,7 +265,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        isAnimating = true;
+        /*
+         * If a previous rapid click already landed us on a clone (its
+         * transitionend snap-back hasn't run yet), resolve that first —
+         * instantly, no visible jump, since a clone looks identical to
+         * the real panel it stands in for — so stepping from here can
+         * never walk past the end of the track no matter how fast you
+         * click.
+         */
+        if (trackPosition <= 0 || trackPosition >= panelCount + 1) {
+            trackPosition = ((trackPosition - 1) % panelCount + panelCount) % panelCount + 1;
+            areaCarousel.style.transition = 'none';
+            areaCarousel.style.transform = `translateX(-${trackPosition * 100}%)`;
+            void areaCarousel.offsetWidth; // flush, so the transition:none actually applies
+            areaCarousel.style.transition = '';
+        }
 
         trackPosition += delta;
 
@@ -225,14 +367,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // -----------------------------------------
             // Helpers
             // -----------------------------------------
-
-            function getCssNumber(property, fallback) {
-                const value = parseFloat(getComputedStyle(root)
-                    .getPropertyValue(property));
-
-                return Number.isFinite(value) ? value : fallback;
-            }
-
 
             /*
              * Convert cubic-bezier(x1,y1,x2,y2) to

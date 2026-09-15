@@ -1,4 +1,3 @@
-
 /* =========================================
    FRIDGE DASHBOARD
    ========================================= */
@@ -29,6 +28,17 @@
 
 
     /* -----------------------------------------
+       Area title word-swap (area carousel swap)
+       ----------------------------------------- */
+    --title-morph-out-dur: 160ms;
+    --title-morph-in-dur: 260ms;
+    --title-morph-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --title-morph-fly: 8px;
+    --title-morph-scale: 0.94;
+    --title-morph-stagger: 30ms;
+
+
+    /* -----------------------------------------
        Fridge colors
        ----------------------------------------- */
     --fridge-danger: #d9534f;
@@ -39,156 +49,7 @@ body {
     background-color: var(--dashboard-page-bg);
 }
 
-/* =========================================
-   PAGE-SPECIFIC BACKGROUND
-   Matches login/register structure with overlays, fade masks & pushed to lower z-levels
-   ========================================= */
 
-.page-bg-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1; /* Pushed behind regular content */
-    pointer-events: none;
-    overflow: hidden;
-}
-
-/* Light image section: positioned on the left with tint overlay and fade to the right */
-.page-bg-light {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-    z-index: 1;
-}
-
-.page-bg-light .page-bg-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center center;
-    position: relative;
-    z-index: 1;
-}
-
-/* Light background tint overlay */
-.page-bg-light::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgb(241 220 195 / 0.42);
-    z-index: 2;
-    pointer-events: none;
-}
-
-/*!* Light background fading gradient mask *!*/
-/*.page-bg-light::after {*/
-/*    content: '';*/
-/*    position: absolute;*/
-/*    inset: 0;*/
-/*    background: linear-gradient(to right, transparent 80%, var(--dashboard-page-bg, #ffffff) 100%);*/
-/*    z-index: 3;*/
-/*    pointer-events: none;*/
-/*}*/
-
-/* Dark image section: positioned on the right with dark overlay and fade to the left */
-.page-bg-dark {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 58.33%;
-    height: 100%;
-    display: block;
-    z-index: 1;
-}
-
-.page-bg-dark .page-bg-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: right center;
-    position: relative;
-    z-index: 1;
-}
-
-/* Dark background tint overlay */
-.page-bg-dark::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.50);
-    z-index: 2;
-    pointer-events: none;
-}
-
-/* Dark background fading gradient mask */
-.page-bg-dark::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to left, transparent 80%, var(--dashboard-page-bg, #121212) 100%);
-    z-index: 3;
-    pointer-events: none;
-}
-
-/* =========================================
-   Theme swapping
-   ========================================= */
-
-/* Dark mode */
-[data-bs-theme="dark"] .page-bg-light {
-    display: none;
-}
-
-[data-bs-theme="dark"] .page-bg-dark {
-    display: block;
-}
-
-/* Light mode */
-[data-bs-theme="light"] .page-bg-dark {
-    display: none;
-}
-
-[data-bs-theme="light"] .page-bg-light {
-    display: block;
-}
-
-/* Default = light */
-:root:not([data-bs-theme="dark"]) .page-bg-dark {
-    display: none;
-}
-
-:root:not([data-bs-theme="dark"]) .page-bg-light {
-    display: block;
-}
-
-/* =========================================
-   Mobile View (max-width: 768px)
-   ========================================= */
-@media (max-width: 768px) {
-    .page-bg-light,
-    .page-bg-dark {
-        width: 100%;
-        left: 0;
-        right: 0;
-    }
-
-    .page-bg-img {
-        object-position: center center;
-    }
-
-    .page-bg-light::after {
-        background: linear-gradient(to top, var(--dashboard-page-bg, #ffffff) 0%, var(--dashboard-page-bg, #ffffff) 10%, transparent 100%);
-    }
-
-    .page-bg-dark::after {
-        background: linear-gradient(to top, var(--dashboard-page-bg, #121212) 0%, var(--dashboard-page-bg, #121212) 10%, transparent 100%);
-    }
-}
 
 /* =========================================
    Dashboard Layout
@@ -214,10 +75,11 @@ body {
    ========================================= */
 
 .dashboard-search-wrapper {
-    padding: 0 calc(34px + 1rem);
+    /* Matches .fridge-panel-body's actual inset: the 48px carousel arrow
+       + the 1rem gap next to it (see .fridge-panel / .btn-scroll-down) —
+       so this lines up with the panel exactly, not just approximately. */
+    padding: 0 calc(48px + 1rem);
     margin-bottom: 1.5rem;
-    margin-left: 0.8rem;
-    margin-right: 0.8rem;
 }
 
 
@@ -656,6 +518,10 @@ body {
 
 
 .fridge-panel-title {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4em;
+
     color: var(--title-color);
 
     font-size: 1.75rem;
@@ -679,8 +545,78 @@ body {
     flex: 1 1 auto;
     min-width: 0;
     white-space: nowrap;
+}
+
+
+/*
+ * Holds the per-word spans that get morphed on area swap. Note this is
+ * where overflow clipping now lives instead of on .fridge-panel-title
+ * directly — text-overflow: ellipsis can't apply once the text is split
+ * into flex children, so long names just clip. Area names are short
+ * enough in practice that this rarely shows.
+ */
+.area-title-text {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    gap: 0.32em;
+
+    min-width: 0;
     overflow: hidden;
-    text-overflow: ellipsis;
+}
+
+
+/*
+ * One word of the area title. Swapping areas fades the current words
+ * out, then swaps in the new ones and fades them in (see morphAreaTitle()
+ * in dashboard.js) — a simple crossfade rather than the whole title just
+ * popping to new text. The nth-child rules below give it a light
+ * word-by-word cascade, similar in spirit to the Torph text-morphing
+ * library, without needing any JS-side stagger math.
+ */
+.area-title-word {
+    display: inline-block;
+    white-space: pre;
+
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+
+    transition:
+        transform var(--title-morph-in-dur) var(--title-morph-ease),
+        opacity var(--title-morph-in-dur) var(--title-morph-ease);
+}
+
+
+.area-title-word.is-entering {
+    transform: translate3d(0, var(--title-morph-fly), 0) scale(var(--title-morph-scale));
+    opacity: 0;
+}
+
+
+.area-title-word.is-exiting {
+    transition-duration: var(--title-morph-out-dur);
+    transform: translate3d(0, calc(-1 * var(--title-morph-fly)), 0) scale(var(--title-morph-scale));
+    opacity: 0;
+}
+
+
+.area-title-word:nth-child(2) {
+    transition-delay: var(--title-morph-stagger);
+}
+
+.area-title-word:nth-child(3) {
+    transition-delay: calc(var(--title-morph-stagger) * 2);
+}
+
+.area-title-word:nth-child(4) {
+    transition-delay: calc(var(--title-morph-stagger) * 3);
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+    .area-title-word {
+        transition: none;
+    }
 }
 
 
@@ -801,6 +737,16 @@ body {
 
     transition: background-color 0.3s ease,
     transform 0.15s ease;
+
+    /* Z-fighting fix: give it a base z-index */
+    position: relative;
+    z-index: 1;
+}
+
+/* Z-fighting fix: force the active row to the very front */
+.product-row:hover,
+.product-row:focus-within {
+    z-index: 10;
 }
 
 
@@ -991,7 +937,7 @@ body {
     right: 0;
     width: 34px;
     height: 34px;
-    border-radius: 40%;
+    border-radius: 12px; /* Changed to squircle */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1005,7 +951,7 @@ body {
     color: var(--title-color);
     opacity: 0.5;
     background: transparent;
-    z-index: 2;
+    z-index: 3; /* Increased so items don't overlap it during transition */
     transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.25s ease;
 }
 
@@ -1145,71 +1091,70 @@ body {
     font-size: 1.05rem;
 }
 
+/*!* =========================================*/
+/*   Confirmation modal (mirrors areas.css's*/
+/*   .custom-popup pattern, duplicated here so*/
+/*   dashboard.html doesn't need to load areas.css*/
+/*   just for #deleteProductModal)*/
+/*   ========================================= *!*/
 
-/* =========================================
-   Confirmation modal (mirrors areas.css's
-   .custom-popup pattern, duplicated here so
-   dashboard.html doesn't need to load areas.css
-   just for #deleteProductModal)
-   ========================================= */
+/*.modal-backdrop.show {*/
+/*    opacity: 0.55;*/
+/*    background-color: #140e0a;*/
+/*    backdrop-filter: blur(6px);*/
+/*    -webkit-backdrop-filter: blur(6px);*/
+/*}*/
 
-.modal-backdrop.show {
-    opacity: 0.55;
-    background-color: #140e0a;
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-}
+/*.custom-popup {*/
+/*    background-color: #fdfaf6;*/
+/*    border: none;*/
+/*    border-radius: 20px;*/
+/*    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);*/
+/*    color: var(--title-color);*/
+/*}*/
 
-.custom-popup {
-    background-color: #fdfaf6;
-    border: none;
-    border-radius: 20px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-    color: var(--title-color);
-}
+/*[data-bs-theme="dark"] .custom-popup {*/
+/*    background-color: #1e1e1e;*/
+/*    color: #e2cbab;*/
+/*}*/
 
-[data-bs-theme="dark"] .custom-popup {
-    background-color: #1e1e1e;
-    color: #e2cbab;
-}
+/*.popup-title { font-size: 1.6rem; font-weight: 500; line-height: 1.4; }*/
+/*.popup-btn-text { color: var(--title-color); font-size: 1.15rem; font-weight: 400; padding: 0; }*/
+/*.popup-btn-text:hover { color: var(--title-color); opacity: 0.7; }*/
+/*.popup-btn-danger { color: #dc3545; font-size: 1.15rem; font-weight: 400; padding: 0; }*/
+/*.popup-btn-danger:hover { color: #a71d2a; }*/
 
-.popup-title { font-size: 1.6rem; font-weight: 500; line-height: 1.4; }
-.popup-btn-text { color: var(--title-color); font-size: 1.15rem; font-weight: 400; padding: 0; }
-.popup-btn-text:hover { color: var(--title-color); opacity: 0.7; }
-.popup-btn-danger { color: #dc3545; font-size: 1.15rem; font-weight: 400; padding: 0; }
-.popup-btn-danger:hover { color: #a71d2a; }
+/*.popup-divider {*/
+/*    border-color: rgba(81, 67, 54, 0.4);*/
+/*    width: 80%; margin-top: 0; opacity: 1;*/
+/*}*/
 
-.popup-divider {
-    border-color: rgba(81, 67, 54, 0.4);
-    width: 80%; margin-top: 0; opacity: 1;
-}
+/*[data-bs-theme="dark"] .popup-divider { border-color: rgba(255, 255, 255, 0.2); }*/
 
-[data-bs-theme="dark"] .popup-divider { border-color: rgba(255, 255, 255, 0.2); }
+/*.popup-label { font-size: 0.85rem; margin-bottom: 0.2rem; font-weight: 500; }*/
+/*.popup-input { background-color: transparent; border: 1px solid rgba(81, 67, 54, 0.5); border-radius: 8px; padding: 0.5rem 1rem; color: inherit; }*/
+/*.popup-input:focus { background-color: transparent; border-color: #ff9166; color: inherit; }*/
 
-.popup-label { font-size: 0.85rem; margin-bottom: 0.2rem; font-weight: 500; }
-.popup-input { background-color: transparent; border: 1px solid rgba(81, 67, 54, 0.5); border-radius: 8px; padding: 0.5rem 1rem; color: inherit; }
-.popup-input:focus { background-color: transparent; border-color: #ff9166; color: inherit; }
+/*[data-bs-theme="dark"] .popup-input { border-color: rgba(255, 255, 255, 0.3); }*/
+/*[data-bs-theme="dark"] .popup-input:focus { border-color: #ff9166; }*/
 
-[data-bs-theme="dark"] .popup-input { border-color: rgba(255, 255, 255, 0.3); }
-[data-bs-theme="dark"] .popup-input:focus { border-color: #ff9166; }
+/*.popup-circular-btn {*/
+/*    width: 55px; height: 55px; border-radius: 50%; background-color: #ff9166; border: none; color: #2c1e16; font-size: 2.2rem; display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease, background-color 0.2s ease;*/
+/*}*/
+/*.popup-circular-btn:hover { transform: scale(1.08); background-color: #ffa17c; }*/
 
-.popup-circular-btn {
-    width: 55px; height: 55px; border-radius: 50%; background-color: #ff9166; border: none; color: #2c1e16; font-size: 2.2rem; display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease, background-color 0.2s ease;
-}
-.popup-circular-btn:hover { transform: scale(1.08); background-color: #ffa17c; }
-
-.custom-link-button {
-    appearance: none;
-    -webkit-appearance: none;
-    border: 0;
-    padding: 0;
-    margin: 0;
-    background: transparent;
-    font: inherit;
-    line-height: inherit;
-    cursor: pointer;
-    vertical-align: baseline;
-}
+/*.custom-link-button {*/
+/*    appearance: none;*/
+/*    -webkit-appearance: none;*/
+/*    border: 0;*/
+/*    padding: 0;*/
+/*    margin: 0;*/
+/*    background: transparent;*/
+/*    font: inherit;*/
+/*    line-height: inherit;*/
+/*    cursor: pointer;*/
+/*    vertical-align: baseline;*/
+/*}*/
 
 
 .dashboard-actions {
@@ -1291,19 +1236,49 @@ body {
         font-size: 1.5rem !important;
     }
 
-    /* Trim the chrome above the panel so it can reach further up the
-       screen — several small savings add up to real room here. */
+    /*
+       Mobile layout is now a single 100dvh flex column: search bar and
+       action buttons take their natural height, and the fridge panel
+       flex-grows to fill whatever's left. That's what actually
+       guarantees "taller panel, no page scroll" — no more guessing a
+       fixed px budget to subtract from 100dvh.
+    */
     .dashboard-page {
-        padding-top: calc(70px + 1rem);
+        display: flex;
+        flex-direction: column;
+        height: 100dvh;
+        width: 100%;
+        min-width: 0;
+        padding-top: calc(70px + 0.6rem);
+        padding-bottom: 0.6rem;
+        overflow: hidden; /* safety net: clip rather than ever push the page into scrolling */
+    }
+
+    .dashboard-inner {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        min-width: 0;
+        width: 100%;
     }
 
     .dashboard-search-wrapper {
+        flex: 0 0 auto;
+        min-width: 0;
         padding: 0;
-        margin-bottom: 1rem;
+        margin-bottom: 0.6rem;
+    }
+
+    /* A tad shorter — width (horizontal padding) is untouched */
+    .dashboard-search-input {
+        padding-top: 0.6rem;
+        padding-bottom: 0.6rem;
+        font-size: 0.95rem;
     }
 
     .fridge-panel-header {
-        margin-bottom: 0.85rem;
+        margin-bottom: 0.65rem;
     }
 
     /*
@@ -1316,18 +1291,41 @@ body {
     .fridge-panel {
         display: block;
         position: relative;
+        flex: 1;
+        min-height: 0;
+        min-width: 0;
     }
 
     .fridge-panel-body {
-        padding-bottom: 3rem; /* room so the floating arrows don't sit over the last row */
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-width: 0;
+        padding-bottom: 2.25rem; /* room so the floating arrows don't sit over the last row */
+    }
+
+    .fridge-panel-header {
+        flex: 0 0 auto;
+        min-width: 0;
+    }
+
+    .area-carousel-viewport {
+        flex: 1;
+        min-height: 0;
+        min-width: 0;
+    }
+
+    .area-carousel,
+    .area-panel {
+        height: 100%;
     }
 
     .carousel-arrow {
         position: absolute;
         bottom: -18px;
         z-index: 6;
-        width: 38px;
-        height: 38px;
+        width: 42px;
+        height: 42px;
         font-size: 1.1rem;
     }
 
@@ -1340,25 +1338,57 @@ body {
     }
 
     .product-row {
-        flex-wrap: wrap;
+        /* Keep the action trigger in a dedicated trailing track.  The
+           previous wrapping flex layout could move it onto a new line when
+           the product name was long, leaving the gooey actions clipped or
+           unreachable at the row edge. */
+        display: grid;
+        grid-template-columns: 52px minmax(0, 1fr) 34px;
+        grid-template-areas:
+            "icon info actions"
+            "freshness freshness freshness";
+        column-gap: 1rem;
+        row-gap: 0.75rem;
+        overflow: visible;
+    }
+
+    .product-icon {
+        grid-area: icon;
+    }
+
+    .product-info {
+        grid-area: info;
+        width: auto;
+        min-width: 0;
+    }
+
+    .product-name {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        overflow-wrap: anywhere;
+    }
+
+    .product-row-actions {
+        grid-area: actions;
+        min-width: 34px;
+        justify-self: end;
+        z-index: 2;
     }
 
     .freshness-bar {
-        order: 3;
-
-        flex-basis: 100%;
-    }
-
-    .area-panel {
-        /* freed up by dropping the arrow row + trimming the chrome above,
-           so the panel gets noticeably more of the viewport back */
-        height: min(58dvh, calc(100dvh - 400px));
+        grid-area: freshness;
+        min-width: 0;
     }
 
     .dashboard-actions {
+        flex: 0 0 auto;
+        min-width: 0;
+        flex-wrap: wrap;
         justify-content: center;
         gap: 0.75rem;
-        margin-top: 1rem;
+        margin-top: 0.6rem;
+        margin-bottom: 0.6rem;
     }
 
     .btn-fridge-outline {
@@ -1388,8 +1418,8 @@ body {
     }
 
     .carousel-arrow {
-        width: 34px;
-        height: 34px;
+        width: 40px;
+        height: 40px;
         font-size: 1rem;
         bottom: -16px;
     }
@@ -1425,45 +1455,45 @@ body {
    Firefox performance mode
    ========================================= */
 
-@-moz-document url-prefix() {
+/*@-moz-document url-prefix() {*/
 
-    /* Kill expensive backdrop blurs */
-    .dashboard-search-bar,
-    .fridge-panel-body,
-    .btn-fridge-outline {
-        -moz-backdrop-filter: none !important;
-        backdrop-filter: none !important;
-    }
+/*    !* Kill expensive backdrop blurs *!*/
+/*    .dashboard-search-bar,*/
+/*    .fridge-panel-body,*/
+/*    .btn-fridge-outline {*/
+/*        -moz-backdrop-filter: none !important;*/
+/*        backdrop-filter: none !important;*/
+/*    }*/
 
-    /* Replace glass with a solid-ish translucent surface */
-    .dashboard-search-bar {
-        background-color: rgba(207, 181, 154, 0.88);
-    }
+/*    !* Replace glass with a solid-ish translucent surface *!*/
+/*    .dashboard-search-bar {*/
+/*        background-color: rgba(207, 181, 154, 0.88);*/
+/*    }*/
 
-    .fridge-panel-body {
-        background-color: rgba(255, 222, 191, 0.82);
-    }
+/*    .fridge-panel-body {*/
+/*        background-color: rgba(255, 222, 191, 0.82);*/
+/*    }*/
 
-    .btn-fridge-outline {
-        background-color: rgba(241, 227, 212, 0.95);
-    }
+/*    .btn-fridge-outline {*/
+/*        background-color: rgba(241, 227, 212, 0.95);*/
+/*    }*/
 
-    /* Firefox doesn't need to render the dissolve blur either */
-    .t-clear-mirror,
-    .t-clear-placeholder {
-        filter: none !important;
-    }
+/*    !* Firefox doesn't need to render the dissolve blur either *!*/
+/*    .t-clear-mirror,*/
+/*    .t-clear-placeholder {*/
+/*        filter: none !important;*/
+/*    }*/
 
-    /* Dark theme */
-    [data-bs-theme="dark"] .dashboard-search-bar {
-        background-color: rgba(20, 16, 12, 0.82);
-    }
+/*    !* Dark theme *!*/
+/*    [data-bs-theme="dark"] .dashboard-search-bar {*/
+/*        background-color: rgba(20, 16, 12, 0.82);*/
+/*    }*/
 
-    [data-bs-theme="dark"] .fridge-panel-body {
-        background-color: rgba(20, 16, 12, 0.88);
-    }
+/*    [data-bs-theme="dark"] .fridge-panel-body {*/
+/*        background-color: rgba(20, 16, 12, 0.88);*/
+/*    }*/
 
-    [data-bs-theme="dark"] .btn-fridge-outline {
-        background-color: rgba(40, 32, 26, 0.9);
-    }
-}
+/*    [data-bs-theme="dark"] .btn-fridge-outline {*/
+/*        background-color: rgba(40, 32, 26, 0.9);*/
+/*    }*/
+/*}*/

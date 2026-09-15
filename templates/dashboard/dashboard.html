@@ -2,237 +2,387 @@
 
 {% load static %}
 {% block head %}
-    <script src="{% static 'js/dashboard.js' %}?v=3" defer></script>
+    <link rel="expect" href="#page-transition-panel" blocking="render">
+    <script src="{% static 'js/dashboard.js' %}?v=4" defer></script>
     <script src="{% static 'js/menuMorph.js' %}?v=2" defer></script>
     <script src="{% static 'js/gooeyMenu.js' %}" defer></script>
+    <script src="{% static 'js/modals.js' %}?v=2" defer></script>
     <script src="{% static 'js/productRowActions.js' %}" defer></script>
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=3">
+    <script src="{% static 'js/productModal.js' %}" defer></script>
+    <script src="{% static 'js/productPickers.js' %}" defer></script>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=4">
     <link rel="stylesheet" href="{% static 'css/morphMenu.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modals.css' %}">
+    <link rel="stylesheet" href="{% static 'css/productModal.css' %}">
 {% endblock %}
 
 {% block title %}SmartFridge+ | Dashboard{% endblock %}
 
+{# TODO Toast system with push notifications like "There are [x number of products] that are going to expire soon !!!"  or "[Product] is expiring soon!" etc... #}
+{# The toast should show which products are expired and are expiring soon in sections - that are visible or not as needed  #}
+
 {% block content %}
-        <!-- Page-specific Background Image Container -->
-        <div class="page-bg-image" aria-hidden="true">
-            <picture class="page-bg-light">
-                <img
-                        src="https://i.imgur.com/2SjgpvQ.jpeg"
-                        alt=""
-                        class="page-bg-img"
-                >
-            </picture>
+    {#        <!-- Page-specific Background Image Container -->#}
+    {#        <div class="page-bg-image" aria-hidden="true">#}
+    {#            <picture class="page-bg-light">#}
+    {#                <img#}
+    {#                        src="https://i.imgur.com/2SjgpvQ.jpeg"#}
+    {#                        alt=""#}
+    {#                        class="page-bg-img"#}
+    {#                >#}
+    {#            </picture>#}
+    {##}
+    {#            <picture class="page-bg-dark">#}
+    {#                <img#}
+    {#                        src="https://imgur.com/RZ0e0CP.jpeg"#}
+    {#                        alt=""#}
+    {#                        class="page-bg-img"#}
+    {#                >#}
+    {#            </picture>#}
+    {#        </div>#}
+    {% include "partials/background_images.html" %}
 
-            <picture class="page-bg-dark">
-                <img
-                        src="https://imgur.com/RZ0e0CP.jpeg"
-                        alt=""
-                        class="page-bg-img"
-                >
-            </picture>
-        </div>
 
-        <main class="dashboard-page">
-            <div class="dashboard-inner">
+    <main class="dashboard-page">
+        <div class="dashboard-inner">
 
-                <!-- Search bar wrapped to align with Fridge panel width perfectly -->
-                <div class="dashboard-search-wrapper">
-                    <div class="dashboard-search-bar t-clear" id="searchWrap">
+            {# TODO dynamic island on the main panel, with hover menu that shows: select mode, edit area, share area #}
+            {# which means a select mode is needed to be implemented with ability to drag and drop products (?) #}
+            {# and which changes the main panel buttons into select all, move and delete buttons  #}
+            {# this should also apply to area view panel, but with share/unshare button instead of move button #}
 
-                        <i class="bi bi-search dashboard-search-icon" aria-hidden="true"></i>
+            <!-- Search bar wrapped to align with Fridge panel width perfectly -->
+            <div class="dashboard-search-wrapper">
+                <div class="dashboard-search-bar t-clear" id="searchWrap">
 
-                        <input
-                                type="search"
-                                id="productSearch"
-                                class="dashboard-search-input"
-                                placeholder="Search products…"
-                                aria-label="Search products"
-                                autocomplete="off"
-                        >
+                    <i class="bi bi-search dashboard-search-icon" aria-hidden="true"></i>
 
-                        <!-- Animated copy of the typed text -->
-                        <div class="t-clear-mirror" aria-hidden="true"></div>
+                    <input
+                            type="search"
+                            id="productSearch"
+                            class="dashboard-search-input"
+                            placeholder="Search products…"
+                            aria-label="Search products"
+                            autocomplete="off"
+                    >
 
-                        <!-- Animated replacement for the native placeholder -->
-                        <div class="t-clear-placeholder" aria-hidden="true">
-                            Search products…
-                        </div>
+                    <!-- Animated copy of the typed text -->
+                    <div class="t-clear-mirror" aria-hidden="true"></div>
 
-                        <!-- Per-word dissolve streaks -->
-                        <div class="t-clear-glow" aria-hidden="true"></div>
-
-                        <button
-                                type="button"
-                                class="t-clear-btn"
-                                id="searchClearBtn"
-                                aria-label="Clear Search"
-                        >
-                            <i class="bi bi-x" aria-hidden="true"></i>
-                        </button>
+                    <!-- Animated replacement for the native placeholder -->
+                    <div class="t-clear-placeholder" aria-hidden="true">
+                        Search products…
                     </div>
-                </div>
 
-                <!-- Fridge area carousel -->
-                <section class="fridge-panel">
-                    <button type="button" class="btn-scroll-down carousel-arrow" id="areaPrev"
-                            aria-label="Previous area"
-                            {% if areas|length < 2 %}disabled{% endif %}>
-                        <i class="bi bi-chevron-left"></i>
+                    <!-- Per-word dissolve streaks -->
+                    <div class="t-clear-glow" aria-hidden="true"></div>
+
+                    <button
+                            type="button"
+                            class="t-clear-btn"
+                            id="searchClearBtn"
+                            aria-label="Clear Search"
+                    >
+                        <i class="bi bi-x" aria-hidden="true"></i>
                     </button>
+                </div>
+            </div>
 
-                    <div class="fridge-panel-body">
-                        <header class="fridge-panel-header">
-                            <h2 class="fridge-panel-title" id="areaTitle">
-                                {# Fixed fallback string #}
-                                {% if areas %}{{ areas.0.name }}{% else %}No areas{% endif %}
-                            </h2>
+            <!-- Fridge area carousel -->
+            <section class="fridge-panel">
+                <button type="button" class="btn-scroll-down carousel-arrow" id="areaPrev"
+                        aria-label="Previous area"
+                        {% if areas|length < 2 %}disabled{% endif %}>
+                    <i class="bi bi-chevron-left"></i>
+                </button>
 
-                            <!-- Moved the edit pencil here -->
-                            <a href="#" class="area-edit-btn" title="Edit area" aria-label="Edit area">
-                                <i class="bi bi-pencil"></i>
-                            </a>
+                <div class="fridge-panel-body" id="page-transition-panel">
+                    <header class="fridge-panel-header">
+                        <h2 class="fridge-panel-title" id="areaTitle">
+                            <span class="area-title-text" id="areaTitleText">{% if areas %}{{ areas.0.name }}{% else %}No areas{% endif %}{% if areas and areas.0.is_shared %}
+                                <span class="area-shared-icon area-title-word"
+                                      title="Shared area"
+                                      aria-label="Shared area">
+                                    <i class="bi bi-people-fill" aria-hidden="true"></i>
+                                </span>
+                            {% endif %}</span>
+                        </h2>
 
-                            {# Quick-add popover #}
-                            <div class="t-morph" data-open="false">
-                                <button type="button" class="t-morph-plus" aria-expanded="false"
-                                        aria-label="Quick actions">
-                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                                        <path d="M9 1v16M1 9h16" stroke="currentColor" stroke-width="2"
-                                              stroke-linecap="round"/>
-                                    </svg>
+                        <!-- Moved the edit pencil here -->
+                        <a href="#" class="area-edit-btn" title="Edit area" aria-label="Edit area">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+
+                        {# Quick-add popover #}
+                        <div class="t-morph" data-open="false">
+                            <button type="button" class="t-morph-plus" aria-expanded="false"
+                                    aria-label="Quick actions">
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                                    <path d="M9 1v16M1 9h16" stroke="currentColor" stroke-width="2"
+                                          stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                            <nav class="t-morph-menu">
+                                <a href="#" class="t-morph-menu-item"
+                                   data-bs-toggle="modal" data-bs-target="#addProductModal"
+                                   data-initial-mode="scan">
+                                    <i class="bi bi-upc-scan"></i> Scan product
+                                </a>
+                                <a href="#" class="t-morph-menu-item"
+                                   data-bs-toggle="modal" data-bs-target="#addProductModal"
+                                   data-initial-mode="manual">
+                                    <i class="bi bi-plus-circle"></i> Add product by hand
+                                </a>
+                                <button type="button" class="t-morph-menu-item"
+                                        data-bs-toggle="modal" data-bs-target="#addAreaModal">
+                                    <i class="bi bi-folder-plus"></i> Add area
                                 </button>
-                                <nav class="t-morph-menu">
-                                    <a href="#" class="t-morph-menu-item"><i class="bi bi-plus-circle"></i> Add product</a>
-                                    <a href="#" class="t-morph-menu-item"><i class="bi bi-upc-scan"></i> Scan
-                                        barcode</a>
-                                    <button type="button" class="t-morph-menu-item"
-                                            data-bs-toggle="modal" data-bs-target="#addAreaModal">
-                                        <i class="bi bi-folder-plus"></i> Add area</button>
-                                </nav>
-                            </div>
-                        </header>
+                            </nav>
+                        </div>
+                    </header>
 
-                        <div class="area-carousel-viewport">
-                            <div class="area-carousel" id="areaCarousel">
-                                {% for area in areas %}
-                                    <div class="area-panel" data-area-name="{{ area.name }}">
-                                        {% if area.products %}
-                                            <ul class="product-list">
-                                                {% for user_product in area.products %}
-                                                    {% include "partials/product_row.html" with up=user_product %}
-                                                {% endfor %}
-                                            </ul>
-                                        {% else %}
-                                            <p class="dashboard-empty-state">No products in this area yet.</p>
-                                        {% endif %}
-                                    </div>
-                                {% empty %}
-                                    <div class="area-panel">
-                                        <p class="dashboard-empty-state">
-                                            You don't have any areas yet — add one to get started.
-                                        </p>
-                                    </div>
-                                {% endfor %}
-                            </div>
+                    <div class="area-carousel-viewport">
+                        <div class="area-carousel" id="areaCarousel">
+                            {% for area in areas %}
+                                <div class="area-panel" data-area-name="{{ area.name }}" data-is-shared="{{ area.is_shared|yesno:"true,false" }}">
+                                    {% if area.products %}
+                                        <ul class="product-list">
+                                            {% for user_product in area.products %}
+                                                {% include "partials/product_row.html" with up=user_product area_name=area.name %}
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="dashboard-empty-state">No products in this area yet.</p>
+                                    {% endif %}
+                                </div>
+                            {% empty %}
+                                <div class="area-panel">
+                                    <p class="dashboard-empty-state">
+                                        You don't have any areas yet — add one to get started.
+                                    </p>
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
+                </div>
 
-                    <button type="button" class="btn-scroll-down carousel-arrow" id="areaNext" aria-label="Next area"
-                            {% if areas|length < 2 %}disabled{% endif %}>
-                        <i class="bi bi-chevron-right"></i>
+                <button type="button" class="btn-scroll-down carousel-arrow" id="areaNext" aria-label="Next area"
+                        {% if areas|length < 2 %}disabled{% endif %}>
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </section>
+
+            <div class="dashboard-actions">
+                <a href="{% url 'areas' %}" class="btn-fridge-outline" data-page-transition>View all areas</a>
+                <button type="button" class="btn-fridge-outline"
+                        data-bs-toggle="modal" data-bs-target="#addAreaModal">
+                    <i class="bi bi-plus"></i> Add new area
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Shared delete-confirmation modal for product rows — one instance,
+         its product name filled in by productRowActions.js based on
+         whichever row's delete button was clicked. Same pattern as
+         #deleteAreaModal on the areas page. -->
+    <div class="modal fade" id="deleteProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup t-modal">
+                <div class="modal-body text-center p-4 p-md-5">
+                    <h3 class="popup-title mb-5">
+                        Remove <span id="deleteProductName">this product</span>?
+                    </h3>
+                    <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                            data-bs-dismiss="modal">
+                        Nah, just kidding
                     </button>
-                </section>
-
-                <div class="dashboard-actions">
-                    <a href="{%  url 'areas' %}" class="btn-fridge-outline">View all areas</a>
-                    <button type="button" class="btn-fridge-outline"
-                            data-bs-toggle="modal" data-bs-target="#addAreaModal">
-                        <i class="bi bi-plus"></i> Add new area</button>
-                </div>
-            </div>
-        </main>
-
-        <!-- Shared delete-confirmation modal for product rows — one instance,
-             its product name filled in by productRowActions.js based on
-             whichever row's delete button was clicked. Same pattern as
-             #deleteAreaModal on the areas page. -->
-        <div class="modal fade" id="deleteProductModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content custom-popup t-modal">
-                    <div class="modal-body text-center p-4 p-md-5">
-                        <h3 class="popup-title mb-5">
-                            Remove <span id="deleteProductName">this product</span>?
-                        </h3>
-                        <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
-                                data-bs-dismiss="modal">
-                            Nah, just kidding
-                        </button>
-                        <hr class="popup-divider mx-auto mb-4">
-                        <button type="button" class="btn btn-link text-decoration-none popup-btn-danger">
-                            Yes, remove it!
-                        </button>
-                    </div>
+                    <hr class="popup-divider mx-auto mb-4">
+                    <button type="button" class="btn btn-link text-decoration-none popup-btn-danger">
+                        Yes, remove it!
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Add Area / Add Shared Area — copied from the areas page so
-             "Add new area" works from the dashboard too. -->
-        <div class="modal fade" id="addAreaModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content custom-popup t-modal">
-                    <button type="button"
-                            class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
-                            data-bs-dismiss="modal" aria-label="Close"></button>
-                    <div class="modal-body text-center p-4 p-md-5">
-                        <h3 class="popup-title mb-4">Add Area</h3>
-                        <div class="text-start mb-2">
-                            <label for="newAreaNameDashboard" class="form-label popup-label">Area Name</label>
-                            <input type="text" class="form-control popup-input shadow-none" id="newAreaNameDashboard">
-                        </div>
-                        <p class="custom-subtext mb-5">
-                            Add a shared area
-                            <button type="button"
-                                    class="custom-link custom-link-button"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#addSharedAreaModal">
-                                HERE
+    <!-- Add Area / Add Shared Area — copied from the areas page so
+         "Add new area" works from the dashboard too. -->
+    <div class="modal fade" id="addAreaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup t-modal">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-body text-center p-4 p-md-5">
+                    <h3 class="popup-title mb-4">Add Area</h3>
+                    <div class="text-start mb-2">
+                        <label for="newAreaNameDashboard" class="form-label popup-label">Area Name</label>
+                        <input type="text" class="form-control popup-input shadow-none" id="newAreaNameDashboard">
+                    </div>
+                    <p class="custom-subtext mb-5">
+                        Add a shared area
+                        <button type="button"
+                                class="custom-link custom-link-button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#addSharedAreaModal">
+                            HERE
+                        </button>
+                    </p>
+                    <button type="button" class="popup-circular-btn mx-auto">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addSharedAreaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup t-modal">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-body text-center p-4 p-md-5">
+                    <h3 class="popup-title mb-4">Add Shared Area</h3>
+                    <div class="text-start mb-2">
+                        <label for="newAreaCodeDashboard" class="form-label popup-label">Area Code</label>
+                        <input type="text" class="form-control popup-input shadow-none" id="newAreaCodeDashboard">
+                    </div>
+                    <p class="custom-subtext mb-5">
+                        Add a new area
+                        <button type="button"
+                                class="custom-link custom-link-button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#addAreaModal">
+                            HERE
+                        </button>
+                    </p>
+                    <button type="button" class="popup-circular-btn mx-auto">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product — one modal with two faces: a barcode-scan view (camera
+         preview) and a manual-entry view. Both live in this same Bootstrap
+         modal and morph between each other via a CSS class toggle in
+         productModal.js (#addProductModalContent.is-manual) — no second
+         modal is ever opened for this, so there's no backdrop/fade clash
+         with Bootstrap's own modal transition.
+
+         TODO: nothing here is wired to a real Django form yet, and the
+         product-code → product lookup is a stub (see productModal.js) —
+         entering a code just reveals the manual fields, it doesn't look
+         anything up or pre-fill the name. -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content custom-popup t-modal product-modal" id="addProductModalContent">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div class="modal-body p-4 p-md-5">
+                    <h3 class="popup-title text-center mb-4">Add Product</h3>
+
+                    <!-- Barcode scan preview. Collapses to a thin strip
+                         (the camera badge stays put and re-expands it)
+                         once the manual fields are revealed. -->
+                    <div class="product-scan-preview">
+                        <div class="product-scan-frame">
+                            <span class="product-scan-corner product-scan-corner-tl"></span>
+                            <span class="product-scan-corner product-scan-corner-tr"></span>
+                            <span class="product-scan-corner product-scan-corner-bl"></span>
+                            <span class="product-scan-corner product-scan-corner-br"></span>
+
+                            <video class="product-scan-video" id="addProductScanVideo"
+                                   autoplay playsinline muted></video>
+
+                            <div class="product-scan-fallback" id="addProductScanFallback">
+                                <i class="bi bi-camera-video-off" aria-hidden="true"></i>
+                            </div>
+
+                            <button type="button" class="product-scan-badge" id="addProductScanBadge"
+                                    title="Open camera" aria-label="Open camera">
+                                <i class="bi bi-camera-fill" aria-hidden="true"></i>
                             </button>
-                        </p>
-                        <button type="button" class="popup-circular-btn mx-auto">
-                            <i class="bi bi-plus"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="addSharedAreaModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content custom-popup t-modal">
-                    <button type="button"
-                            class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
-                            data-bs-dismiss="modal" aria-label="Close"></button>
-                    <div class="modal-body text-center p-4 p-md-5">
-                        <h3 class="popup-title mb-4">Add Shared Area</h3>
-                        <div class="text-start mb-2">
-                            <label for="newAreaCodeDashboard" class="form-label popup-label">Area Code</label>
-                            <input type="text" class="form-control popup-input shadow-none" id="newAreaCodeDashboard">
                         </div>
-                        <p class="custom-subtext mb-5">
-                            Add a new area
-                            <button type="button"
-                                    class="custom-link custom-link-button"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#addAreaModal">
-                                HERE
+                    </div>
+
+                    <!-- Product code + enter-arrow. Always visible —
+                         pressing the arrow (or Enter) reveals the manual
+                         fields below if they're currently collapsed. -->
+                    <div class="mb-2">
+                        <label for="addProductCode" class="form-label popup-label">Product code</label>
+                        <div class="product-code-row">
+                            <input type="text" class="form-control popup-input shadow-none"
+                                   id="addProductCode" placeholder="Scan or type a barcode" autocomplete="off">
+                            <button type="button" class="product-code-enter" id="addProductCodeEnter"
+                                    title="Enter" aria-label="Enter">
+                                <i class="bi bi-arrow-return-left" aria-hidden="true"></i>
                             </button>
-                        </p>
-                        <button type="button" class="popup-circular-btn mx-auto">
-                            <i class="bi bi-plus"></i>
-                        </button>
+                        </div>
+                    </div>
+
+                    <p class="custom-subtext product-scan-manual-link" id="addProductManualLink">
+                        Don't have a code?
+                        <button type="button" class="custom-link custom-link-button">CLICK HERE</button>
+                    </p>
+
+                    <!-- Manual fields — collapsed while the scan preview
+                         is open, revealed once a code is entered or "Add
+                         product by hand" is used. The inner wrapper is
+                         what actually clips during the collapse/expand
+                         animation (see productModal.css); once fully
+                         expanded, productModal.js marks it "settled" so
+                         the area/unit/date picker panels inside can
+                         overflow past it instead of being clipped. -->
+                    <div class="product-extra-fields" id="addProductExtraFields">
+                        <div class="product-extra-fields-inner" id="addProductExtraFieldsInner">
+                            {% include "partials/product_form_fields.html" with id_prefix="add" submit_icon="bi-plus" submit_label="Add product" areas=areas %}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Edit Product — same fields as the "Add product by hand" view of
+         the modal above, just pre-fillable, with a save icon instead of a
+         plus and no scan/camera section (editing an existing product
+         doesn't need a barcode capture step). None of the fields are
+         disabled — every one of them should stay editable.
+
+         TODO: nothing opens this yet — call window.openEditProductModal()
+         (see productModal.js) from wherever a product row's edit action
+         ends up living. -->
+    <div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content custom-popup t-modal product-modal" id="editProductModalContent">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div class="modal-body p-4 p-md-5">
+                    <h3 class="popup-title text-center mb-4">Edit Product</h3>
+
+                    <div class="mb-2">
+                        <label for="editProductCode" class="form-label popup-label">Product code</label>
+                        <div class="product-code-row">
+                            <input type="text" class="form-control popup-input shadow-none"
+                                   id="editProductCode" placeholder="Scan or type a barcode" autocomplete="off">
+                            <button type="button" class="product-code-enter" id="editProductCodeEnter"
+                                    title="Enter" aria-label="Enter">
+                                <i class="bi bi-arrow-return-left" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    {% include "partials/product_form_fields.html" with id_prefix="edit" submit_icon="bi-floppy-fill" submit_label="Save changes" areas=areas %}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

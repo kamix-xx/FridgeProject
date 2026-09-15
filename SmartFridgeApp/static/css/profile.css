@@ -122,52 +122,52 @@
     }
 }
 
-/* Czerwony Modal Potwierdzenia Usunięcia Konta */
-.custom-delete-modal-dialog {
-    max-width: 520px;
-}
+/*!* Czerwony Modal Potwierdzenia Usunięcia Konta *!*/
+/*.custom-delete-modal-dialog {*/
+/*    max-width: 520px;*/
+/*}*/
 
-.custom-delete-modal-content {
-    background: linear-gradient(135deg, rgba(140, 18, 18, 0.92) 0%, rgba(70, 8, 8, 0.95) 100%);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
-}
+/*.custom-delete-modal-content {*/
+/*    background: linear-gradient(135deg, rgba(140, 18, 18, 0.92) 0%, rgba(70, 8, 8, 0.95) 100%);*/
+/*    backdrop-filter: blur(12px);*/
+/*    -webkit-backdrop-filter: blur(12px);*/
+/*    border: 1px solid rgba(255, 255, 255, 0.1);*/
+/*    border-radius: 20px;*/
+/*    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);*/
+/*}*/
 
-.delete-modal-title {
-    font-size: 1.65rem;
-    font-weight: 400;
-    line-height: 1.35;
-    letter-spacing: 0.02em;
-}
+/*.delete-modal-title {*/
+/*    font-size: 1.65rem;*/
+/*    font-weight: 400;*/
+/*    line-height: 1.35;*/
+/*    letter-spacing: 0.02em;*/
+/*}*/
 
-.delete-modal-subtitle {
-    font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.75);
-    font-weight: 300;
-}
+/*.delete-modal-subtitle {*/
+/*    font-size: 0.95rem;*/
+/*    color: rgba(255, 255, 255, 0.75);*/
+/*    font-weight: 300;*/
+/*}*/
 
-.delete-modal-divider {
-    width: 65%;
-    height: 1px;
-    background-color: rgba(255, 255, 255, 0.35);
-}
+/*.delete-modal-divider {*/
+/*    width: 65%;*/
+/*    height: 1px;*/
+/*    background-color: rgba(255, 255, 255, 0.35);*/
+/*}*/
 
-.btn-delete-action {
-    transition: transform 0.2s ease, opacity 0.2s ease;
-    cursor: pointer;
-}
+/*.btn-delete-action {*/
+/*    transition: transform 0.2s ease, opacity 0.2s ease;*/
+/*    cursor: pointer;*/
+/*}*/
 
-.btn-delete-action:hover {
-    transform: scale(1.08);
-    opacity: 0.85;
-}
+/*.btn-delete-action:hover {*/
+/*    transform: scale(1.08);*/
+/*    opacity: 0.85;*/
+/*}*/
 
-.btn-delete-action:active {
-    transform: scale(0.96);
-}
+/*.btn-delete-action:active {*/
+/*    transform: scale(0.96);*/
+/*}*/
 
 /* =========================================
    EDIT ACCOUNT MODAL (EXACT MATCH)

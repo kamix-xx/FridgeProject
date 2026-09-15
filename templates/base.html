@@ -5,6 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="same-origin">
+    <style>
+        /* Must be available during the initial document parse. Chromium-based
+           browsers can otherwise miss an external @view-transition opt-in
+           while deciding whether a cross-document navigation may animate. */
+        @media (prefers-reduced-motion: no-preference) {
+            @view-transition { navigation: auto; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            @view-transition { navigation: none; }
+        }
+    </style>
     <title>{% block title %} SmartFridge+ {% endblock %}</title>
     <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.png' %}?v=3">
     <link rel="apple-touch-icon" href="{% static 'images/favicon.png' %}?v=2">
@@ -25,8 +37,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=10">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=11">
+    <link rel="stylesheet" href="{% static 'css/pageTransitions.css' %}?v=3">
     <script src="{% static 'js/main.js' %}?v=2" defer></script>
+    <script src="{% static 'js/pageTransitions.js' %}?v=1" defer></script>
     {% block head %}{% endblock %}
 </head>
 <body>
@@ -120,8 +134,8 @@
         </a>
 
         <nav class="side-menu-nav">
-            <a href="{% url 'home' %}" class="side-menu-link">Dashboard</a>
-            <a href="{% url 'areas' %}" class="side-menu-link">Areas</a>
+            <a href="{% url 'home' %}" class="side-menu-link" data-page-transition>Dashboard</a>
+            <a href="{% url 'areas' %}" class="side-menu-link" data-page-transition>Areas</a>
             <a href="{% url 'shopping_list' %}" class="side-menu-link">Shopping lists</a>
             <a href="#" class="side-menu-link">My products</a>
             <a href="{% url 'expenses' %}" class="side-menu-link">My expenses</a>

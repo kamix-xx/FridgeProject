@@ -1,0 +1,73 @@
+{# Shared Add/Edit product fields.#}
+{#   Context vars expected from the including template:#}
+{#     - id_prefix:    unique prefix for element IDs, e.g. "add" / "edit"#}
+{#     - submit_icon:  Bootstrap Icons class for the submit button, e.g. "bi-plus"#}
+{#     - submit_label: aria-label / title text for the submit button#}
+{#     - areas:        the areas list, for the area picker#}
+{##}
+{#   Nothing here is wired to a real Django form yet — submitting doesn't#}
+{#   do anything. This is just the markup + client-side behavior#}
+{#   scaffolding to build the form logic against later. #}
+
+<div class="row g-3 mb-2">
+    <div class="col-12 col-sm-8">
+        <label for="{{ id_prefix }}ProductName" class="form-label popup-label">Product Name</label>
+        <input type="text" class="form-control popup-input shadow-none"
+               id="{{ id_prefix }}ProductName" autocomplete="off">
+    </div>
+    <div class="col-12 col-sm-4">
+        <label for="{{ id_prefix }}ProductExpiration" class="form-label popup-label">Expiration Date</label>
+        <input type="date" class="form-control popup-input shadow-none"
+               id="{{ id_prefix }}ProductExpiration">
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-12 col-sm-4">
+        <label for="{{ id_prefix }}ProductPrice" class="form-label popup-label">Price</label>
+        <input type="number" class="form-control popup-input shadow-none"
+               id="{{ id_prefix }}ProductPrice" min="0.01" step="0.01" inputmode="decimal">
+    </div>
+    <div class="col-12 col-sm-8">
+        <label for="{{ id_prefix }}ProductQuantity" class="form-label popup-label">Quantity</label>
+        <div class="product-qty-unit-group">
+            <input type="number" class="form-control popup-input shadow-none product-qty-input"
+                   id="{{ id_prefix }}ProductQuantity" min="1" step="1" inputmode="numeric">
+{#             TODO: source these from the Unit model once there's a view for#}
+{#               it — hardcoded to the common ones for now. #}
+            <select class="form-select popup-input shadow-none product-unit-select"
+                    id="{{ id_prefix }}ProductUnit">
+                <option value="pcs">pcs</option>
+                <option value="g">g</option>
+                <option value="kg">kg</option>
+                <option value="ml">ml</option>
+                <option value="l">L</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="product-area-picker">
+    <label for="{{ id_prefix }}ProductArea" class="form-label popup-label">Area</label>
+    <div class="product-area-submit-row">
+{#         TODO: keyed by area name (same as the carousel's own#}
+{#           data-area-name) since the fake dashboard data has no real ids —#}
+{#           switch to area.id once real Area rows/forms are wired up. #}
+        <select class="product-area-select" id="{{ id_prefix }}ProductArea">
+            {% for area in areas %}
+                <option value="{{ area.name }}"{% if forloop.first %} selected{% endif %}>{{ area.name }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="button" class="popup-circular-btn" id="{{ id_prefix }}ProductSubmit"
+                title="{{ submit_label }}" aria-label="{{ submit_label }}">
+            {% if id_prefix == 'edit' %}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17 21V13H7V21M7 3V8H15M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            {% else %}
+                <i class="bi {{ submit_icon }}" aria-hidden="true"></i>
+            {% endif %}
+        </button>
+    </div>
+</div>

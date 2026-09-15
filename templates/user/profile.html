@@ -5,9 +5,13 @@
 
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/profile.css' %}?v=8">
+    <link rel="stylesheet" href="{% static 'css/modals.css' %}">
+    <script src="{% static 'js/modals.js' %}?v=2" defer></script>
 {% endblock %}
 
 {% block content %}
+    {% include "partials/no_page_transition_panel.html" %}
+
     <div class="container-fluid p-0 login-wrapper profile-bg">
         <div class="row g-0 h-100 min-vh-100">
 
