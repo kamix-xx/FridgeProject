@@ -242,36 +242,38 @@
 
                     <div class="row g-4 mb-5">
 
-                        <!-- Stare hasło -->
+                        <!-- Old password -->
                         <div class="col-md-4">
-                            <label class="edit-field-label">Old Password</label>
+                            <label for="old_password" class="edit-field-label">Old Password</label>
                             <div class="edit-input-row">
-                                <input type="password" name="old_password" id="old_password" class="edit-input-raw password-input"
+                                <input type="password" name="old_password" id="old_password"
+                                       class="edit-input-raw password-input"
                                        placeholder="********" required>
-                                <i class="bi bi-eye-slash edit-pencil-icon toggle-password"
-                                   style="font-size: 1.2rem;" onclick="togglePasswordVisibility('old_password', this)"></i>
+                                <i class="bi bi-eye-slash edit-pencil-icon toggle-password" style="font-size: 1.2rem;"
+                                   onclick="togglePasswordVisibility('old_password', this)"></i>
                             </div>
                         </div>
 
-                        <!-- Nowe hasło -->
+                        <!-- New password -->
                         <div class="col-md-4">
-                            <label class="edit-field-label">New Password</label>
+                            <label for="new_password" class="edit-field-label">New Password</label>
                             <div class="edit-input-row">
-                                <input type="password" name="new_password" class="edit-input-raw password-input"
+                                <input type="password" name="new_password" id="new_password"
+                                       class="edit-input-raw password-input"
                                        placeholder="********" required>
-                                <i class="bi bi-eye-slash edit-pencil-icon toggle-password"
-                                   style="font-size: 1.2rem;"></i>
+                                <i class="bi bi-eye-slash edit-pencil-icon toggle-password" style="font-size: 1.2rem;"
+                                   onclick="togglePasswordVisibility('new_password', this)"></i>
                             </div>
                         </div>
 
-                        <!-- Powtórz nowe hasło -->
+                        <!-- Repeat new password -->
                         <div class="col-md-4">
-                            <label class="edit-field-label">Repeat Password</label>
+                            <label for="repeat_password" class="edit-field-label">Repeat Password</label>
                             <div class="edit-input-row">
-                                <input type="password" name="repeat_password" class="edit-input-raw password-input"
+                                <input type="password" name="repeat_password" id="repeat_password" class="edit-input-raw password-input"
                                        placeholder="********" required>
                                 <i class="bi bi-eye-slash edit-pencil-icon toggle-password"
-                                   style="font-size: 1.2rem;"></i>
+                                   style="font-size: 1.2rem;" onclick="togglePasswordVisibility('repeat_password', this)"></i>
                             </div>
                         </div>
 
