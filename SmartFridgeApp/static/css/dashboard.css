@@ -659,15 +659,37 @@ body {
     flex: 0 0 100%;
     min-width: 0;
 
-    height: min(65vh, calc(100vh - 300px));
-    min-height: 380px;
+    height: min(60dvh, calc(100dvh - 450px));
+    min-height: 220px;
+
     overflow-y: auto;
-
     padding-right: 0.25rem;
-
 
     scrollbar-width: thin;
     scrollbar-color: rgba(50, 40, 35, 0.6) transparent;
+}
+
+/* =========================================
+   NAPRAWA DLA KRÓTKICH EKRANÓW (Laptopy ze skalowaniem np. 125%)
+   ========================================= */
+@media (max-height: 860px) and (min-width: 901px) {
+    .dashboard-page {
+        padding-top: calc(70px + 1rem);
+        padding-bottom: 1.5rem;
+    }
+
+    .dashboard-search-wrapper {
+        margin-bottom: 1rem;
+    }
+
+    .dashboard-actions {
+        margin-top: 1rem;
+    }
+
+    .area-panel {
+        height: calc(100dvh - 320px);
+        min-height: 320px;
+    }
 }
 
 
