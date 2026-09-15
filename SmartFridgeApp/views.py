@@ -5,6 +5,7 @@ from .forms import CustomUserCreationForm
 from django.contrib import messages
 from datetime import date, datetime, timedelta
 from types import SimpleNamespace
+from django.utils.html import json_script
 
 # Create your views here.
 
@@ -16,7 +17,6 @@ from types import SimpleNamespace
 # state without needing real DB rows.
 # ---------------------------------------------------------------------------
 USE_FAKE_DASHBOARD_DATA = True
-
 
 def _with_freshness(user_product):
     """
@@ -91,12 +91,12 @@ def _fake_dashboard_areas():
         name="Fridge",
         is_shared=False,
         products=[
-            fake_product("Whole Milk", days_left=2, added_days_ago=10),  # critical
+            fake_product("Whole Milk", days_left=2, added_days_ago=10),       # critical
             fake_product("Free-range Eggs", days_left=18, added_days_ago=4),  # fresh
-            fake_product("Leftover Soup", days_left=-1, added_days_ago=6),  # expired
-            fake_product("Greek Yogurt", days_left=9, added_days_ago=6),  # warning
-            fake_product("Cheddar Block", days_left=25, added_days_ago=5),  # fresh
-            fake_product("Mystery Jar", days_left=None),  # unknown
+            fake_product("Leftover Soup", days_left=-1, added_days_ago=6),    # expired
+            fake_product("Greek Yogurt", days_left=9, added_days_ago=6),      # warning
+            fake_product("Cheddar Block", days_left=25, added_days_ago=5),    # fresh
+            fake_product("Mystery Jar", days_left=None),                      # unknown
         ],
     )
 
@@ -151,6 +151,7 @@ def _fake_dashboard_areas():
 
 
 def home(request):
+
     if not request.user.is_authenticated:
         return redirect('landing')
 
@@ -178,7 +179,6 @@ def home(request):
         'areas': areas,
     })
 
-
 def landing(request):
     return render(request, "landing.html")
 
@@ -203,13 +203,75 @@ def register(request):
 
 def areas(request):
     # mock data
+    #
+    # Shapes an area needs for the templates below:
+    #   is_shared          -> bool
+    #   is_owner           -> bool, only meaningful when is_shared is True.
+    #                         Gates the whole "people it's shared with" /
+    #                         "Stop sharing" section in editAreaModal — a
+    #                         shared member who isn't the owner only gets
+    #                         the plain name+save form.
+    #   owner               -> {"username", "avatar_url"} shown on the card
+    #                         itself ("owner: <name>" + avatar).
+    #   shared_users        -> everyone it's shared with EXCEPT the owner
+    #                         (the owner's already shown separately) — the
+    #                         list editAreaModal's avatar group / "+N" /
+    #                         scrollable list / remove-confirm all work off.
+    #   shared_users_script -> that same list, pre-rendered as a safe
+    #                         <script type="application/json"> tag via
+    #                         json_script() so areas.js can just
+    #                         JSON.parse(...) it — see area-users-<id> in
+    #                         areas.html.
+    #
+    # avatar_url is left None everywhere below: there's no seeded media to
+    # point at, and it's also the more realistic default (most users won't
+    # have uploaded one) — so this is what exercises the fallback-initials
+    # avatar path in areas.html/areas.css, which matters more to get right
+    # than the plain-<img> path.
+    display_name = request.user.username if request.user.is_authenticated else "You"
+
+    def user_stub(username, avatar_url=None):
+        return {"username": username, "avatar_url": avatar_url}
+
+    def shared_block(area_id, owner, members):
+        return {
+            "owner": owner,
+            "is_owner": owner["username"] == display_name,
+            "shared_users": members,
+            "shared_users_script": json_script(members, f"area-users-{area_id}"),
+        }
+
     fake_areas = [
         {"id": 1, "name": "Fridge", "created_at": "01.01.2026", "is_shared": False},
-        {"id": 2, "name": "Pantry", "created_at": "01.01.2026", "is_shared": True, "shared_with": "Gacek and more ..."},
+        {
+            # shared, but owned by someone else — "you" are just a member,
+            # so the edit modal for this one should NOT show the people
+            # section, even though it's shared and you're in the list.
+            "id": 2, "name": "Pantry", "created_at": "01.01.2026", "is_shared": True,
+            **shared_block(2, user_stub("Gacek"), [
+                user_stub("Kasia"), user_stub("Marek"), user_stub(display_name),
+            ]),
+        },
         {"id": 3, "name": "Freezer", "created_at": "12.02.2026", "is_shared": False},
         {"id": 4, "name": "Attic", "created_at": "08.03.2026", "is_shared": False},
-        {"id": 5, "name": "Room fridge", "created_at": "20.04.2026", "is_shared": False},
-        {"id": 6, "name": "Kitchen cabinet", "created_at": "23.04.2026", "is_shared": False},
+        {
+            # shared, you're the owner, few enough members that the avatar
+            # group fits with no "+N" overflow bubble.
+            "id": 5, "name": "Room fridge", "created_at": "20.04.2026", "is_shared": True,
+            **shared_block(5, user_stub(display_name), [
+                user_stub("Kasia"), user_stub("Marek"),
+            ]),
+        },
+        {
+            # shared, you're the owner, enough members to trigger the "+N"
+            # bubble and exercise the scrollable full-list panel.
+            "id": 6, "name": "Kitchen cabinet", "created_at": "23.04.2026", "is_shared": True,
+            **shared_block(6, user_stub(display_name), [
+                user_stub("Kasia"), user_stub("Marek"), user_stub("Ola"),
+                user_stub("Tomek"), user_stub("Zosia"), user_stub("Piotr"),
+                user_stub("Ania"), user_stub("Wiktor"), user_stub("Bartek"),
+            ]),
+        },
         # {"id": 7, "name": "Kitchen cabinet", "created_at": "23.04.2026", "is_shared": False},
         # {"id": 8, "name": "Kitchen cabinet", "created_at": "23.04.2026", "is_shared": False},
         # {"id": 9, "name": "Kitchen cabinet", "created_at": "23.04.2026", "is_shared": False},
@@ -220,7 +282,6 @@ def areas(request):
     }
 
     return render(request, 'areas/areas.html', context)
-
 
 def shopping_list_view(request):
     mock_shopping_list = {
