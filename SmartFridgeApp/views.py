@@ -282,4 +282,10 @@ def delete_account(request):
     return redirect('profile')
 
 def recipes(request):
+    # recipes = Recipe.objects.all()
     return render(request, 'recipes/recipes.html')
+
+
+def recipe_detail(request, recipe_id):
+    # recipe = get_object_or_404(Recipe, id=recipe_id)
+    return render(request, 'recipes/recipe_detail.html')
