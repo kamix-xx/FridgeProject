@@ -1243,15 +1243,17 @@ body {
        guarantees "taller panel, no page scroll" — no more guessing a
        fixed px budget to subtract from 100dvh.
     */
-    .dashboard-page {
+.dashboard-page {
         display: flex;
         flex-direction: column;
-        height: 100dvh;
+        min-height: 100dvh;
+        height: auto;
         width: 100%;
         min-width: 0;
         padding-top: calc(70px + 0.6rem);
         padding-bottom: 0.6rem;
-        overflow: hidden; /* safety net: clip rather than ever push the page into scrolling */
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 
     .dashboard-inner {
@@ -1288,11 +1290,11 @@ body {
        panel's own bottom corners — same idea as the areas page's gooey
        button — so the panel doesn't lose a whole row to them.
     */
-    .fridge-panel {
+.fridge-panel {
         display: block;
         position: relative;
         flex: 1;
-        min-height: 0;
+        min-height: 400px;
         min-width: 0;
     }
 
