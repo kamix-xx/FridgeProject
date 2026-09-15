@@ -12,6 +12,10 @@ urlpatterns = [
 
     path('profile', views.profile, name='profile'),
 
+    path('profile/edit/', views.edit_profile_view, name='edit_profile'),
+
+    path('profile/change-password/', views.change_password_view, name='change_password'),
+
     path('areas', views.areas, name='areas'),
 
     path('profile/delete', views.delete_account, name='delete_account'),
@@ -21,4 +25,6 @@ urlpatterns = [
     path('expenses/details/', views.expense_details, name='expense_details'),
 
     path('shopping-list/', views.shopping_list_view, name='shopping_list'),
+
+    path('recipes/', views.recipes, name='recipes'),
 ]
