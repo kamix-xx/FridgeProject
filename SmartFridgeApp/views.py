@@ -351,7 +351,15 @@ def edit_profile_view(request):
         if new_first_name:
             user.first_name = new_first_name
 
-        if new_avatar:
+        # Pobierz flagę remove_avatar z formularza POST
+        remove_avatar = request.POST.get('remove_avatar') == 'true'
+
+        # Zmiana zdjęcia: Usuwanie lub Wgrywanie
+        if remove_avatar:
+            if user.avatar:
+                user.avatar.delete(save=False)  # Automatycznie usuwa z dysku stary plik
+            user.avatar = None
+        elif new_avatar:
             user.avatar = new_avatar
 
         user.save()
