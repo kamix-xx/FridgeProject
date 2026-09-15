@@ -5,6 +5,10 @@
 
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/recipes.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modals.css' %}">
+    <link rel="stylesheet" href="{% static 'css/recipe_modal.css' %}">
+
+    <script src="{% static 'js/modals.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -21,9 +25,11 @@
                 </button>
             </div>
 
-            <a href="{% url 'recipe_detail' recipe_id=1 %}" class="recipe-card text-decoration-none position-relative overflow-hidden mb-4 d-block">
+            <a href="{% url 'recipe_detail' recipe_id=1 %}"
+               class="recipe-card text-decoration-none position-relative overflow-hidden mb-4 d-block">
                 <div class="recipe-img-bg">
-                    <img src="https://i.imgur.com/2SjgpvQ.jpeg" alt="Midnight in Seville Oranges" class="w-100 h-100 object-fit-cover">
+                    <img src="https://i.imgur.com/2SjgpvQ.jpeg" alt="Midnight in Seville Oranges"
+                         class="w-100 h-100 object-fit-cover">
                 </div>
                 <div class="recipe-content position-relative z-2">
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
@@ -33,11 +39,13 @@
                             <span>Status: Private</span>
                         </div>
                     </div>
-                    <p class="recipe-desc mb-0">An elegant recipe for scrumptious oranges with or without leaves.<br>...</p>
+                    <p class="recipe-desc mb-0">An elegant recipe for scrumptious oranges with or without leaves.<br>...
+                    </p>
                 </div>
             </a>
 
-            <div class="add-recipe-bar d-flex align-items-center px-4 py-3 mb-5" tabindex="0" role="button">
+            <div class="add-recipe-bar d-flex align-items-center px-4 py-3 mb-5" tabindex="0" role="button"
+                 data-bs-toggle="modal" data-bs-target="#createRecipeModal">
                 <i class="bi bi-plus fs-2 me-3 fw-bold"></i>
                 <span class="fs-5 fw-medium">Add new recipe</span>
             </div>
@@ -45,14 +53,16 @@
 
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="expense-title m-0">Suggestions</h2>
-                <button class="btn btn-link text-decoration-none p-0 shadow-none recipe-nav-arrow" aria-label="View more">
+                <button class="btn btn-link text-decoration-none p-0 shadow-none recipe-nav-arrow"
+                        aria-label="View more">
                     <i class="bi bi-chevron-down fs-4"></i>
                 </button>
             </div>
 
             <div class="recipe-card position-relative overflow-hidden mb-4" tabindex="0" role="button">
                 <div class="recipe-img-bg">
-                    <img src="https://imgur.com/RZ0e0CP.jpeg" alt="Vampire's Orchard Oranges" class="w-100 h-100 object-fit-cover">
+                    <img src="https://imgur.com/RZ0e0CP.jpeg" alt="Vampire's Orchard Oranges"
+                         class="w-100 h-100 object-fit-cover">
                 </div>
                 <div class="recipe-content position-relative z-2">
                     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
@@ -62,10 +72,97 @@
                             <span>Official recipe</span>
                         </div>
                     </div>
-                    <p class="recipe-desc mb-0">A ravenous recipe for dark-tinted oranges, brimming with fortified juice and shadowy decadence.<br>...</p>
+                    <p class="recipe-desc mb-0">A ravenous recipe for dark-tinted oranges, brimming with fortified juice
+                        and shadowy decadence.<br>...</p>
                 </div>
             </div>
 
         </div>
     </main>
+
+    <!-- ========================================== -->
+    <!-- POP-UP: Create Recipe -->
+    <!-- ========================================== -->
+    <div class="modal fade" id="createRecipeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+
+            <div class="modal-content custom-popup t-modal border-0">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div class="modal-body p-4">
+                    <h3 class="popup-title text-center mb-3 mt-1">Create recipe</h3>
+                    <div class="row g-3 mb-5">
+                        <div class="col-sm-5">
+                            <label class="form-label popup-label d-none d-sm-block">&nbsp;</label>
+                            <div class="recipe-img-upload" role="button" tabindex="0" aria-label="Upload recipe image">
+                                <i class="bi bi-image upload-main-icon"></i>
+                                <i class="bi bi-box-arrow-up upload-corner-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-sm-7 d-flex flex-column justify-content-between">
+                            <div class="mb-2">
+                                <label for="newRecipeName" class="form-label popup-label">Recipe name</label>
+                                <input type="text" class="form-control popup-input shadow-none w-100"
+                                       id="newRecipeName">
+                            </div>
+                            <div>
+                                <label for="newRecipeTime" class="form-label popup-label">Preparation time</label>
+                                <input type="text" class="form-control popup-input shadow-none w-100" id="newRecipeTime"
+                                       placeholder="e.g., 30 min">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="newRecipeDesc" class="form-label popup-label">Short description:</label>
+                        <textarea class="form-control popup-input shadow-none w-100" id="newRecipeDesc" rows="2"
+                                  style="resize: none;"></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label popup-label mb-2">Ingredients:</label>
+
+                        <div class="recipe-ingredient-grid header-row px-3 mb-1">
+                            <span class="popup-label fw-normal mb-0">Name</span>
+                            <span class="popup-label fw-normal mb-0 text-center">Quantity</span>
+                            <span class="popup-label fw-normal mb-0 text-center">Unit</span>
+                            <span></span>
+                        </div>
+
+                        <div class="recipe-ingredient-grid existing-row align-items-center mb-2">
+                            <div class="ingredient-text">Milk</div>
+                            <div class="ingredient-text text-center">0.4</div>
+                            <div class="ingredient-text text-center">L</div>
+                            <button class="btn btn-recipe-row-action btn-danger shadow-none">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+
+                        <div class="recipe-ingredient-grid input-row mt-2">
+                            <input type="text" class="form-control popup-input shadow-none" placeholder="Name">
+                            <input type="number" class="form-control popup-input shadow-none text-center"
+                                   placeholder="0.0" step="0.1">
+                            <select class="form-select popup-input shadow-none custom-select-style text-center">
+                                <option value="" selected disabled></option>
+                                <option value="kg">kg</option>
+                                <option value="g">g</option>
+                                <option value="L">L</option>
+                                <option value="pcs">pcs</option>
+                            </select>
+                            <button class="btn btn-recipe-row-action btn-add shadow-none">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="button" class="popup-circular-btn mx-auto">
+                        <i class="bi bi-plus"></i>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
