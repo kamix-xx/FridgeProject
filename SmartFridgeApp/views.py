@@ -377,7 +377,7 @@ def change_password_view(request):
 
         # Weryfikacja starego hasła
         if not request.user.check_password(old_password):
-            messages.error(request, 'Incorrect old password.')
+            messages.error(request, 'Incorrect old password.', extra_tags='password_error error')
             return redirect('profile')
 
         # Weryfikacja czy nowe hasła się zgadzają
