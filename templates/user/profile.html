@@ -187,11 +187,17 @@
                                     </div>
 
                                     <!-- Avatar SVG -->
-                                    <svg class="edit-avatar-svg" viewBox="0 0 100 100" fill="none" stroke="currentColor"
-                                         stroke-width="3.5" stroke-linecap="round">
-                                        <circle cx="50" cy="36" r="16"></circle>
-                                        <path d="M 20 82 A 30 30 0 0 1 80 82"></path>
-                                    </svg>
+                                    {% if user.avatar %}
+                                        <img src="{{ user.avatar.url }}" alt="{{ user.username }}"
+                                             class="profile-avatar-img">
+                                    {% else %}
+                                        <svg class="edit-avatar-svg" viewBox="0 0 100 100" fill="none"
+                                             stroke="currentColor"
+                                             stroke-width="3.5" stroke-linecap="round">
+                                            <circle cx="50" cy="36" r="16"></circle>
+                                            <path d="M 20 82 A 30 30 0 0 1 80 82"></path>
+                                        </svg>
+                                    {% endif %}
                                 </label>
                             </div>
 
@@ -270,10 +276,12 @@
                         <div class="col-md-4">
                             <label for="repeat_password" class="edit-field-label">Repeat Password</label>
                             <div class="edit-input-row">
-                                <input type="password" name="repeat_password" id="repeat_password" class="edit-input-raw password-input"
+                                <input type="password" name="repeat_password" id="repeat_password"
+                                       class="edit-input-raw password-input"
                                        placeholder="********" required>
                                 <i class="bi bi-eye-slash edit-pencil-icon toggle-password"
-                                   style="font-size: 1.2rem;" onclick="togglePasswordVisibility('repeat_password', this)"></i>
+                                   style="font-size: 1.2rem;"
+                                   onclick="togglePasswordVisibility('repeat_password', this)"></i>
                             </div>
                         </div>
 
@@ -295,41 +303,41 @@
             </div>
         </div>
     </div>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
 
-        // 1. Resetowanie modala Edycji Konta
-        const editModal = document.getElementById('editAccountModal');
-        if (editModal) {
-            editModal.addEventListener('hidden.bs.modal', function () {
-                const form = editModal.querySelector('form');
-                if (form) form.reset();
-            });
-        }
+            // 1. Resetowanie modala Edycji Konta
+            const editModal = document.getElementById('editAccountModal');
+            if (editModal) {
+                editModal.addEventListener('hidden.bs.modal', function () {
+                    const form = editModal.querySelector('form');
+                    if (form) form.reset();
+                });
+            }
 
-        // 2. Resetowanie modala Zmiany Hasła
-        const passwordModal = document.getElementById('changePasswordModal');
-        if (passwordModal) {
-            passwordModal.addEventListener('hidden.bs.modal', function () {
-                const form = passwordModal.querySelector('form');
-                if (form) {
-                    // Wyczyść wpisane hasła
-                    form.reset();
+            // 2. Resetowanie modala Zmiany Hasła
+            const passwordModal = document.getElementById('changePasswordModal');
+            if (passwordModal) {
+                passwordModal.addEventListener('hidden.bs.modal', function () {
+                    const form = passwordModal.querySelector('form');
+                    if (form) {
+                        // Wyczyść wpisane hasła
+                        form.reset();
 
-                    // Zresetuj ikonki "oka" (przywróć ukrywanie haseł)
-                    const passwordToggles = form.querySelectorAll('.toggle-password');
-                    passwordToggles.forEach(icon => {
-                        icon.classList.remove('bi-eye');
-                        icon.classList.add('bi-eye-slash');
+                        // Zresetuj ikonki "oka" (przywróć ukrywanie haseł)
+                        const passwordToggles = form.querySelectorAll('.toggle-password');
+                        passwordToggles.forEach(icon => {
+                            icon.classList.remove('bi-eye');
+                            icon.classList.add('bi-eye-slash');
 
-                        const input = icon.previousElementSibling;
-                        if (input) input.type = 'password';
-                    });
-                }
-            });
-        }
+                            const input = icon.previousElementSibling;
+                            if (input) input.type = 'password';
+                        });
+                    }
+                });
+            }
 
-    });
-</script>
+        });
+    </script>
 
 {% endblock %}
