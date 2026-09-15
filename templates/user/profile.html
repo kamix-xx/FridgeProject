@@ -295,6 +295,41 @@
             </div>
         </div>
     </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
 
+        // 1. Resetowanie modala Edycji Konta
+        const editModal = document.getElementById('editAccountModal');
+        if (editModal) {
+            editModal.addEventListener('hidden.bs.modal', function () {
+                const form = editModal.querySelector('form');
+                if (form) form.reset();
+            });
+        }
+
+        // 2. Resetowanie modala Zmiany Hasła
+        const passwordModal = document.getElementById('changePasswordModal');
+        if (passwordModal) {
+            passwordModal.addEventListener('hidden.bs.modal', function () {
+                const form = passwordModal.querySelector('form');
+                if (form) {
+                    // Wyczyść wpisane hasła
+                    form.reset();
+
+                    // Zresetuj ikonki "oka" (przywróć ukrywanie haseł)
+                    const passwordToggles = form.querySelectorAll('.toggle-password');
+                    passwordToggles.forEach(icon => {
+                        icon.classList.remove('bi-eye');
+                        icon.classList.add('bi-eye-slash');
+
+                        const input = icon.previousElementSibling;
+                        if (input) input.type = 'password';
+                    });
+                }
+            });
+        }
+
+    });
+</script>
 
 {% endblock %}
