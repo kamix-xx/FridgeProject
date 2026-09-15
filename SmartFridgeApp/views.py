@@ -202,33 +202,14 @@ def register(request):
 
 
 def areas(request):
-    # mock data
-    #
-    # Shapes an area needs for the templates below:
-    #   is_shared          -> bool
-    #   is_owner           -> bool, only meaningful when is_shared is True.
-    #                         Gates the whole "people it's shared with" /
-    #                         "Stop sharing" section in editAreaModal — a
-    #                         shared member who isn't the owner only gets
-    #                         the plain name+save form.
-    #   owner               -> {"username", "avatar_url"} shown on the card
-    #                         itself ("owner: <name>" + avatar).
-    #   shared_users        -> everyone it's shared with EXCEPT the owner
-    #                         (the owner's already shown separately) — the
-    #                         list editAreaModal's avatar group / "+N" /
-    #                         scrollable list / remove-confirm all work off.
-    #   shared_users_script -> that same list, pre-rendered as a safe
-    #                         <script type="application/json"> tag via
-    #                         json_script() so areas.js can just
-    #                         JSON.parse(...) it — see area-users-<id> in
-    #                         areas.html.
-    #
-    # avatar_url is left None everywhere below: there's no seeded media to
-    # point at, and it's also the more realistic default (most users won't
-    # have uploaded one) — so this is what exercises the fallback-initials
-    # avatar path in areas.html/areas.css, which matters more to get right
-    # than the plain-<img> path.
     display_name = request.user.username if request.user.is_authenticated else "You"
+
+    # Fetch the real avatar URL if the user has uploaded one
+    user_avatar = (
+        request.user.avatar.url
+        if request.user.is_authenticated and request.user.avatar
+        else None
+    )
 
     def user_stub(username, avatar_url=None):
         return {"username": username, "avatar_url": avatar_url}
@@ -244,37 +225,30 @@ def areas(request):
     fake_areas = [
         {"id": 1, "name": "Fridge", "created_at": "01.01.2026", "is_shared": False},
         {
-            # shared, but owned by someone else — "you" are just a member,
-            # so the edit modal for this one should NOT show the people
-            # section, even though it's shared and you're in the list.
+            # shared, but owned by someone else
             "id": 2, "name": "Pantry", "created_at": "01.01.2026", "is_shared": True,
             **shared_block(2, user_stub("Gacek"), [
-                user_stub("Kasia"), user_stub("Marek"), user_stub(display_name),
+                user_stub("Kasia"), user_stub("Marek"), user_stub(display_name, user_avatar),
             ]),
         },
         {"id": 3, "name": "Freezer", "created_at": "12.02.2026", "is_shared": False},
         {"id": 4, "name": "Attic", "created_at": "08.03.2026", "is_shared": False},
         {
-            # shared, you're the owner, few enough members that the avatar
-            # group fits with no "+N" overflow bubble.
+            # shared, you're the owner
             "id": 5, "name": "Room fridge", "created_at": "20.04.2026", "is_shared": True,
-            **shared_block(5, user_stub(display_name), [
+            **shared_block(5, user_stub(display_name, user_avatar), [
                 user_stub("Kasia"), user_stub("Marek"),
             ]),
         },
         {
-            # shared, you're the owner, enough members to trigger the "+N"
-            # bubble and exercise the scrollable full-list panel.
+            # shared, you're the owner
             "id": 6, "name": "Kitchen cabinet", "created_at": "23.04.2026", "is_shared": True,
-            **shared_block(6, user_stub(display_name), [
+            **shared_block(6, user_stub(display_name, user_avatar), [
                 user_stub("Kasia"), user_stub("Marek"), user_stub("Ola"),
                 user_stub("Tomek"), user_stub("Zosia"), user_stub("Piotr"),
                 user_stub("Ania"), user_stub("Wiktor"), user_stub("Bartek"),
             ]),
         },
-        # {"id": 7, "name": "Kitchen cabinet", "created_at": "23.04.2026", "is_shared": False},
-        # {"id": 8, "name": "Kitchen cabinet", "created_at": "23.04.2026", "is_shared": False},
-        # {"id": 9, "name": "Kitchen cabinet", "created_at": "23.04.2026", "is_shared": False},
     ]
 
     context = {
