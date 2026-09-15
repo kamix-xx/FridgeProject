@@ -13,6 +13,29 @@
 {% block content %}
     {% include "partials/no_page_transition_panel.html" %}
 
+    <!-- Errors and notifications -->
+    {% if messages %}
+        <div class="toast-container position-fixed top-0 end-0 p-4" style="z-index: 1070; margin-top: 60px;">
+            {% for message in messages %}
+                <div class="toast align-items-center text-bg-{% if message.tags == 'error' %}danger{% else %}success{% endif %} border-0 show shadow-lg"
+                     role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body fs-6 fw-medium">
+                            {{ message }}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                                aria-label="Close"></button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <script>
+            setTimeout(() => {
+                document.querySelectorAll('.toast').forEach(t => t.classList.remove('show'));
+            }, 5000);
+        </script>
+    {% endif %}
+
     <div class="container-fluid p-0 login-wrapper profile-bg">
         <div class="row g-0 h-100 min-vh-100">
 
@@ -253,11 +276,11 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content edit-modal-container p-4 p-md-5">
 
-                <!-- Przycisk zamykania X -->
+                <!-- Close button X -->
                 <button type="button" class="btn-close edit-modal-close shadow-none" data-bs-dismiss="modal"
                         aria-label="Close"></button>
 
-                <!-- FORMULARZ ZMIANY HASŁA -->
+                <!-- CHANGE PASSWORD FORM -->
                 <form method="post" action="{% url 'change_password' %}" class="modal-body p-0">
                     {% csrf_token %}
                     <h2 class="edit-modal-heading mb-5">Change Password</h2>
@@ -281,7 +304,7 @@
                             <label for="new_password" class="edit-field-label">New Password</label>
                             <div class="edit-input-row">
                                 <input type="password" name="new_password" id="new_password"
-                                       class="edit-input-raw password-input"
+                                       class="edit-input-raw password-input" minlength="8"
                                        placeholder="********" required>
                                 <i class="bi bi-eye-slash edit-pencil-icon toggle-password" style="font-size: 1.2rem;"
                                    onclick="togglePasswordVisibility('new_password', this)"></i>
@@ -293,15 +316,17 @@
                             <label for="repeat_password" class="edit-field-label">Repeat Password</label>
                             <div class="edit-input-row">
                                 <input type="password" name="repeat_password" id="repeat_password"
-                                       class="edit-input-raw password-input"
+                                       class="edit-input-raw password-input" minlength="8"
                                        placeholder="********" required>
                                 <i class="bi bi-eye-slash edit-pencil-icon toggle-password"
                                    style="font-size: 1.2rem;"
                                    onclick="togglePasswordVisibility('repeat_password', this)"></i>
                             </div>
                         </div>
-
                     </div>
+
+                    <!-- Errors -->
+                    <div id="passwordErrorMsg" class="text-danger text-center mb-3 d-none fw-medium"></div>
 
                     <!-- Przyciski Zapisz / Anuluj -->
                     <div class="d-flex align-items-center justify-content-center gap-3 mt-4">

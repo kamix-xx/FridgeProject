@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 2. KLIKNIĘCIE "REMOVE AVATAR" (Zmiany tylko w UI, bez zapisu)
     if (removeAvatarBtn) {
-        removeAvatarBtn.addEventListener('click', function() {
+        removeAvatarBtn.addEventListener('click', function () {
             if (removeAvatarFlag) removeAvatarFlag.value = 'true'; // flaga dla backendu
             if (avatarUploadInput) avatarUploadInput.value = '';   // czyścimy upload
 
@@ -108,6 +108,26 @@ document.addEventListener('DOMContentLoaded', function () {
                     const input = icon.previousElementSibling;
                     if (input) input.type = 'password';
                 });
+            }
+        });
+    }
+
+    // Walidacja modala zmiany hasła przed wysłaniem
+    const passwordForm = document.querySelector('#changePasswordModal form');
+    const passwordErrorMsg = document.getElementById('passwordErrorMsg');
+
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', function (event) {
+            const newPass = document.getElementById('new_password').value;
+            const repeatPass = document.getElementById('repeat_password').value;
+
+            // Sprawdź, czy nowe hasła są identyczne
+            if (newPass !== repeatPass) {
+                event.preventDefault(); // Zatrzymaj przeładowanie strony i zamknięcie modala
+                passwordErrorMsg.textContent = "New passwords do not match!";
+                passwordErrorMsg.classList.remove('d-none');
+            } else {
+                passwordErrorMsg.classList.add('d-none');
             }
         });
     }
