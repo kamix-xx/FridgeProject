@@ -17,7 +17,6 @@ from types import SimpleNamespace
 # ---------------------------------------------------------------------------
 USE_FAKE_DASHBOARD_DATA = True
 
-
 def _with_freshness(user_product):
     """
     Attaches two convenience attributes to a UserProduct instance so the
@@ -91,12 +90,12 @@ def _fake_dashboard_areas():
         name="Fridge",
         is_shared=False,
         products=[
-            fake_product("Whole Milk", days_left=2, added_days_ago=10),  # critical
+            fake_product("Whole Milk", days_left=2, added_days_ago=10),       # critical
             fake_product("Free-range Eggs", days_left=18, added_days_ago=4),  # fresh
-            fake_product("Leftover Soup", days_left=-1, added_days_ago=6),  # expired
-            fake_product("Greek Yogurt", days_left=9, added_days_ago=6),  # warning
-            fake_product("Cheddar Block", days_left=25, added_days_ago=5),  # fresh
-            fake_product("Mystery Jar", days_left=None),  # unknown
+            fake_product("Leftover Soup", days_left=-1, added_days_ago=6),    # expired
+            fake_product("Greek Yogurt", days_left=9, added_days_ago=6),      # warning
+            fake_product("Cheddar Block", days_left=25, added_days_ago=5),    # fresh
+            fake_product("Mystery Jar", days_left=None),                      # unknown
         ],
     )
 
@@ -151,6 +150,7 @@ def _fake_dashboard_areas():
 
 
 def home(request):
+
     if not request.user.is_authenticated:
         return redirect('landing')
 
@@ -177,7 +177,6 @@ def home(request):
     return render(request, 'dashboard/dashboard.html', {
         'areas': areas,
     })
-
 
 def landing(request):
     return render(request, "landing.html")
@@ -221,12 +220,12 @@ def areas(request):
 
     return render(request, 'areas/areas.html', context)
 
-
 def shopping_list_view(request):
     mock_shopping_list = {
         "id": 1,
         "name": "Shopping list #1"
     }
+
 
     mock_items = [
         {
@@ -259,14 +258,11 @@ def shopping_list_view(request):
 
     return render(request, 'shopping_list/shopping_list.html', context)
 
-
 def expenses(request):
     return render(request, 'expense-tracker/expense-tracker.html')
 
-
 def expense_details(request):
     return render(request, 'expense-tracker/expense-details.html')
-
 
 @login_required(login_url='login')
 # If a user is logged-in, Django automatically passes 'request.user' object to every template as 'user'
@@ -321,3 +317,7 @@ def edit_profile_view(request):
         messages.success(request, 'Profile successfully updated.')
 
     return redirect('profile')
+
+
+def recipes(request):
+    return render(request, 'recipes/recipes.html')
