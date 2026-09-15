@@ -26,93 +26,92 @@
                     <i class="bi bi-arrow-left"></i>
                 </a>
 
-                <div class="position-relative z-2 p-4 p-md-5">
+                <div class="position-relative z-2 p-3 p-md-4 p-lg-5">
 
-                    <div class="row mb-5">
+                    <!-- ========================================== -->
+                    <!-- NAGŁÓWEK (Tytuł + Akcje) -->
+                    <!-- ========================================== -->
+                    <div class="row mb-4">
                         <div class="col-lg-5 d-none d-lg-block"></div>
 
-                        <div class="col-lg-7 d-flex flex-column gap-3">
+                        <div class="col-lg-7">
+                            <div class="recipe-glass-box p-4 d-flex flex-column gap-3">
 
-                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-start gap-3">
-                                <div>
-                                    <h1 class="expense-title mb-2">The "Midnight in Seville"<br>Oranges</h1>
-                                    <p class="recipe-meta-text mb-0">est. time: 10 h</p>
+                                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-start gap-3">
+                                    <div>
+                                        <h1 class="expense-title mb-2">The "Midnight in Seville"<br>Oranges</h1>
+                                        <p class="recipe-meta-text mb-0">est. time: 10 h</p>
+                                    </div>
+
+                                    <div class="text-sm-end">
+                                        <button class="btn btn-recipe-verify shadow-sm mb-1">
+                                            Send recipe for<br>verification
+                                        </button>
+                                        <div class="recipe-status-text">current status: private</div>
+                                    </div>
                                 </div>
 
-                                <div class="text-sm-end">
-                                    <button class="btn btn-recipe-verify shadow-sm mb-1">
-                                        Send recipe for<br>verification
+                                <div class="d-flex flex-wrap gap-2 gap-sm-3 mt-2">
+                                    <button class="btn btn-recipe-action btn-recipe-edit shadow-sm d-flex align-items-center gap-2">
+                                        <i class="bi bi-pencil"></i> Edit Recipe details
                                     </button>
-                                    <div class="recipe-status-text">current status: private</div>
+                                    <button class="btn btn-recipe-action btn-recipe-delete shadow-sm d-flex align-items-center gap-2">
+                                        <i class="bi bi-trash"></i> Delete recipe
+                                    </button>
                                 </div>
-                            </div>
-
-                            <div class="d-flex flex-wrap gap-3 mt-2">
-                                <button class="btn btn-recipe-action btn-recipe-edit shadow-sm d-flex align-items-center gap-2">
-                                    <i class="bi bi-pencil"></i> Edit Recipe details
-                                </button>
-                                <button class="btn btn-recipe-action btn-recipe-delete shadow-sm d-flex align-items-center gap-2">
-                                    <i class="bi bi-trash"></i> Delete recipe
-                                </button>
                             </div>
                         </div>
                     </div>
 
                     <!-- ========================================== -->
-                    <!-- TREŚĆ (Składniki + Opis - docelowo generowana z przychodzących danych) -->
+                    <!-- TREŚĆ (Docelowo zaciągana z bazy i generowana jakimś .map()) -->
                     <!-- ========================================== -->
-                    <div class="row g-5 mt-2">
+                    <div class="row g-4 mt-1">
 
-                        <!-- Lewa Kolumna: Składniki -->
                         <div class="col-md-5">
-                            <h3 class="recipe-section-title mb-4">Ingredients:</h3>
-                            <ul class="recipe-ingredients-list list-unstyled m-0 p-0">
+                            <div class="recipe-glass-box p-4 h-100">
+                                <h3 class="recipe-section-title mb-4">Ingredients:</h3>
+                                <ul class="recipe-ingredients-list list-unstyled m-0 p-0">
 
-                                <li class="d-flex justify-content-between mb-2">
-                                    <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Sicilian Blood Oranges</span>
-                                    <span class="ingredient-qty text-end">67 pcs.</span>
-                                </li>
-                                <li class="d-flex justify-content-between mb-2">
-                                    <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Oranges with Stems and Leaves</span>
-                                    <span class="ingredient-qty text-end">21 pcs.</span>
-                                </li>
-                                <li class="d-flex justify-content-between mb-2">
-                                    <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Orange Blossom Honey</span>
-                                    <span class="ingredient-qty text-end">37 L</span>
-                                </li>
-                                <li class="d-flex justify-content-between mb-2">
-                                    <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Grand Marnier or Cointreau</span>
-                                    <span class="ingredient-qty text-end">42 L</span>
-                                </li>
-                                <li class="d-flex justify-content-between mb-2">
-                                    <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Rose Water</span>
-                                    <span class="ingredient-qty text-end">2 L</span>
-                                </li>
-                                <li class="d-flex justify-content-between mb-2">
-                                    <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Pistachios (Bright Green)</span>
-                                    <span class="ingredient-qty text-end">300 g</span>
-                                </li>
-                                <li class="d-flex justify-content-between mb-2">
-                                    <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Micro-Basil</span>
-                                    <span class="ingredient-qty text-end">2 pinch</span>
-                                </li>
-                                <li class="d-flex justify-content-between mb-0">
-                                    <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Pomegranate Arils</span>
-                                    <span class="ingredient-qty text-end">30 g</span>
-                                </li>
+                                    <li class="d-flex justify-content-between mb-2">
+                                        <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Sicilian Blood Oranges</span>
+                                        <span class="ingredient-qty text-end">67 pcs.</span>
+                                    </li>
+                                    <li class="d-flex justify-content-between mb-2">
+                                        <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Oranges with Stems and Leaves</span>
+                                        <span class="ingredient-qty text-end">21 pcs.</span>
+                                    </li>
+                                    <li class="d-flex justify-content-between mb-2">
+                                        <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Orange Blossom Honey</span>
+                                        <span class="ingredient-qty text-end">37 L</span>
+                                    </li>
+                                    <li class="d-flex justify-content-between mb-2">
+                                        <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Grand Marnier or Cointreau</span>
+                                        <span class="ingredient-qty text-end">42 L</span>
+                                    </li>
+                                    <li class="d-flex justify-content-between mb-0">
+                                        <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Rose Water</span>
+                                        <span class="ingredient-qty text-end">2 L</span>
+                                    </li>
 
-                            </ul>
+                                </ul>
+                            </div>
                         </div>
 
                         <div class="col-md-7">
-                            <h3 class="recipe-section-title text-center text-md-start mb-4">Description:</h3>
-                            <div class="recipe-description-text">
-                                <p>An elegant recipe for scrumptious oranges with or without leaves.</p>
-                                <p>This isn't just a fruit plate; it's a masterclass in citrus minimalism. By stripping
-                                    away the mundane "peel and pith," you transform a common supermarket staple into a
-                                    glistening, jewel-toned centerpiece. Whether you've managed to find oranges with
-                                    their pristine leaves attached or you're working with "naked" fruit, the secret lies
-                                    in the contrast between the cold, sharp citrus and the warm, aromatic syrup.</p>
+                            <div class="recipe-glass-box p-4 h-100">
+                                <h3 class="recipe-section-title text-center text-md-start mb-4">Description:</h3>
+                                <div class="recipe-description-text">
+                                    <p>An elegant recipe for scrumptious oranges with or without leaves.</p>
+                                    <p>This isn't just a fruit plate; it's a masterclass in citrus minimalism. By
+                                        stripping
+                                        away the mundane "peel and pith," you transform a common supermarket staple into
+                                        a
+                                        glistening, jewel-toned centerpiece. Whether you've managed to find oranges with
+                                        their pristine leaves attached or you're working with "naked" fruit, the secret
+                                        lies
+                                        in the contrast between the cold, sharp citrus and the warm, aromatic syrup.</p>
+                                </div>
                             </div>
                         </div>
 

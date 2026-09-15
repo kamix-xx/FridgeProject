@@ -66,6 +66,22 @@
     font-weight: 400;
 }
 
+.recipe-glass-box {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(81, 67, 54, 0.15);
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+[data-bs-theme="dark"] .recipe-glass-box {
+    background: rgba(20, 16, 12, 0.65);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
 .ingredient-name {
     font-weight: 400;
     padding-right: 1rem;
