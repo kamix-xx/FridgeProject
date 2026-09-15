@@ -292,9 +292,9 @@
 }
 
 .edit-btn-cancel {
-    background: transparent !important;
-    border: 1.5px solid #211A15 !important;
-    color: #211A15 !important;
+    background: var(--bg-avatar-default) !important;
+    border: 1.5px solid var(--profile-second-color) !important;
+    color: var(--profile-second-color) !important;
     border-radius: 8px !important;
     font-size: 1rem !important;
     font-weight: 500 !important;
