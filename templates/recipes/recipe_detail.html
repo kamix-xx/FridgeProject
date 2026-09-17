@@ -5,6 +5,8 @@
 
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/recipe_details.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modals.css' %}">
+    <script src="{% static 'js/modals.js' %}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -55,7 +57,9 @@
                                     <button class="btn btn-recipe-action btn-recipe-edit shadow-sm d-flex align-items-center gap-2">
                                         <i class="bi bi-pencil"></i> Edit Recipe details
                                     </button>
-                                    <button class="btn btn-recipe-action btn-recipe-delete shadow-sm d-flex align-items-center gap-2">
+                                    <button class="btn btn-recipe-action btn-recipe-delete shadow-sm d-flex align-items-center gap-2"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#deleteRecipeModal">
                                         <i class="bi bi-trash"></i> Delete recipe
                                     </button>
                                 </div>
@@ -120,6 +124,78 @@
                 </div>
             </div>
 
+            <div class="container position-relative z-2 mt-5 stepList d-flex flex-column gap-4" style="max-width: 1000px;">
+
+            <div class="glass-card recipe-step-card position-relative overflow-hidden w-100 shadow-sm">
+                <div class="row g-0 h-100">
+
+                    <div class="col-lg-6 position-relative z-2 p-4 p-md-5 step-text-panel">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h3 class="step-number mb-0">Step 1:</h3>
+                            <div class="step-actions d-flex gap-3">
+                                <button class="btn p-0 shadow-none" aria-label="Edit step">
+                                    <i class="bi bi-pencil-square fs-5"></i>
+                                </button>
+                                <button class="btn p-0 shadow-none" aria-label="Delete step">
+                                    <i class="bi bi-trash fs-5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <h4 class="step-title mb-4">The "Orange Surgery"<br>(The Supreme Cut)</h4>
+
+                        <div class="step-text">
+                            <p class="mb-3">Forget peeling; we're performing an extraction. To achieve "scrumptious" status, you must transform the fruit into Supremes - naked, glowing wedges free from all bitter white pith and membranes.</p>
+                            <ol class="ps-3 mb-0">
+                                <li class="mb-2">Behead & Base: Slice off the top and bottom until you see the vibrant flesh.</li>
+                                <li class="mb-2">The Shave: Curve your knife from top to bottom, stripping away the peel and all white pith. You want a bald, glistening sphere.</li>
+                                <li class="mb-2">The Extraction: Slide your knife between the membranes to pop out individual wedges.</li>
+                                <li>Save the Gold: Squeeze the leftover "carcass" over your wedges for a natural bath of juice.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 position-relative step-img-col">
+                        <img src="https://i.imgur.com/2SjgpvQ.jpeg" alt="Step 1 image" class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
+                    </div>
+
+                </div>
+            </div>
+
+            <button class="add-step-btn w-100 d-flex align-items-center gap-3 p-3 px-md-4 mt-2 border-0 shadow-sm">
+                <i class="bi bi-plus-lg fs-3"></i>
+                <span class="fs-5">Add new step</span>
+            </button>
+
+        </div>
+
         </div>
     </main>
+    <!-- ========================================== -->
+    <!-- POP-UP: Delete Recipe Confirmation -->
+    <!-- ========================================== -->
+    <div class="modal fade" id="deleteRecipeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+            <div class="modal-content custom-popup t-modal border-0 text-center p-4 p-md-5">
+
+                <div class="modal-body p-0">
+                    <h3 class="popup-title mb-5">Are you sure to delete this recipe?</h3>
+
+                    <div class="d-flex flex-column align-items-center">
+                        <button type="button" class="btn custom-link-button popup-btn-text mb-4" data-bs-dismiss="modal">
+                            Nah, just kidding
+                        </button>
+
+                        <hr class="popup-divider mx-auto mb-4">
+
+                        <!-- Zamiast button, docelowo może to być <form method="POST">  -->
+                        <button type="button" class="btn custom-link-button popup-btn-danger">
+                            Do it!
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 {% endblock %}

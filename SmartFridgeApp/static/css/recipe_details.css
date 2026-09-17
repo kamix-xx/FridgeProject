@@ -157,6 +157,100 @@
 }
 
 /* =========================================
+   RECIPE STEPS (Kroki przygotowania)
+   ========================================= */
+
+.recipe-step-card {
+    border-radius: 16px;
+    background: transparent;
+}
+
+.step-text-panel {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+[data-bs-theme="dark"] .step-text-panel {
+    background: rgba(20, 16, 12, 0.9);
+}
+
+.step-number {
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.step-title {
+    font-size: 1.75rem;
+    font-weight: 400;
+    line-height: 1.3;
+}
+
+.step-text {
+    font-size: 1.05rem;
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+.step-actions .btn {
+    color: var(--title-color);
+    opacity: 0.6;
+    transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.step-actions .btn:hover {
+    opacity: 1;
+    color: #ff9166;
+}
+
+[data-bs-theme="dark"] .step-actions .btn {
+    color: #fdfaf6;
+}
+
+[data-bs-theme="dark"] .step-actions .btn:hover {
+    color: #ff9166;
+}
+
+.step-img-col {
+    min-height: 300px;
+}
+
+@media (min-width: 992px) {
+    .step-img-col {
+        min-height: auto;
+    }
+}
+
+/* =========================================
+   ADD NEW STEP BUTTON
+   ========================================= */
+
+.add-step-btn {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 12px;
+    color: var(--title-color);
+    transition: background-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+.add-step-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    color: #ff9166;
+}
+
+[data-bs-theme="dark"] .add-step-btn {
+    background: rgba(30, 30, 30, 0.65);
+    color: #fdfaf6;
+}
+
+[data-bs-theme="dark"] .add-step-btn:hover {
+    background: rgba(45, 45, 45, 0.9);
+    color: #ff9166;
+}
+
+/* =========================================
    RESPONSIVE (Mobile Overrides)
    ========================================= */
 @media (max-width: 991px) {
