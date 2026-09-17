@@ -14,160 +14,69 @@
 
     <main class="recipe-detail-page position-relative min-vh-100 py-5">
 
-        <div class="container position-relative z-2 mt-4 mt-md-5" style="max-width: 1000px;">
+        <!-- ========================================== -->
+        <!-- RECIPE STEPS (Renderowane z czystych danych) -->
+        <!-- ========================================== -->
+        <div class="container position-relative z-2 mt-5 stepList d-flex flex-column gap-4" style="max-width: 1000px;">
 
-            <div class="glass-card position-relative overflow-hidden w-100">
+            {% for step in recipe_steps %}
+                <div class="glass-card recipe-step-card position-relative overflow-hidden w-100 shadow-sm">
+                    <div class="row g-0 h-100">
 
-                <div class="recipe-detail-hero-bg" aria-hidden="true">
-                    <img src="https://i.imgur.com/2SjgpvQ.jpeg" alt="" class="w-100 h-100 object-fit-cover">
-                </div>
-
-                <a href="{% url 'recipes' %}"
-                   class="btn-back-glass position-absolute top-0 start-0 m-4 d-inline-flex align-items-center justify-content-center text-decoration-none z-3"
-                   aria-label="Go back">
-                    <i class="bi bi-arrow-left"></i>
-                </a>
-
-                <div class="position-relative z-2 p-3 p-md-4 p-lg-5">
-
-                    <!-- ========================================== -->
-                    <!-- NAGŁÓWEK (Tytuł + Akcje) -->
-                    <!-- ========================================== -->
-                    <div class="row mb-4">
-                        <div class="col-lg-5 d-none d-lg-block"></div>
-
-                        <div class="col-lg-7">
-                            <div class="recipe-glass-box p-4 d-flex flex-column gap-3">
-
-                                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-start gap-3">
-                                    <div>
-                                        <h1 class="expense-title mb-2">The "Midnight in Seville"<br>Oranges</h1>
-                                        <p class="recipe-meta-text mb-0">est. time: 10 h</p>
-                                    </div>
-
-                                    <div class="text-sm-end">
-                                        <button class="btn btn-recipe-verify shadow-sm mb-1">
-                                            Send recipe for<br>verification
-                                        </button>
-                                        <div class="recipe-status-text">current status: private</div>
-                                    </div>
-                                </div>
-
-                                <div class="d-flex flex-wrap gap-2 gap-sm-3 mt-2">
-                                    <button class="btn btn-recipe-action btn-recipe-edit shadow-sm d-flex align-items-center gap-2">
-                                        <i class="bi bi-pencil"></i> Edit Recipe details
+                        <div class="col-lg-6 position-relative z-2 p-4 p-md-5 step-text-panel">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h3 class="step-number mb-0">Step {{ forloop.counter }}:</h3>
+                                <div class="step-actions d-flex gap-3">
+                                    <button class="btn p-0 shadow-none" aria-label="Edit step">
+                                        <i class="bi bi-pencil-square fs-5"></i>
                                     </button>
-                                    <button class="btn btn-recipe-action btn-recipe-delete shadow-sm d-flex align-items-center gap-2"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#deleteRecipeModal">
-                                        <i class="bi bi-trash"></i> Delete recipe
+                                    <button class="btn p-0 shadow-none" aria-label="Delete step">
+                                        <i class="bi bi-trash fs-5"></i>
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- ========================================== -->
-                    <!-- TREŚĆ (Docelowo zaciągana z bazy i generowana jakimś .map()) -->
-                    <!-- ========================================== -->
-                    <div class="row g-4 mt-1">
+                            <h4 class="step-title mb-4">
+                                {{ step.title }}
+                                {% if step.subtitle %}
+                                    <br>{{ step.subtitle }}
+                                {% endif %}
+                            </h4>
 
-                        <div class="col-md-5">
-                            <div class="recipe-glass-box p-4 h-100">
-                                <h3 class="recipe-section-title mb-4">Ingredients:</h3>
-                                <ul class="recipe-ingredients-list list-unstyled m-0 p-0">
+                            <div class="step-text">
+                                <p class="{% if step.instructions %}mb-3{% else %}mb-0{% endif %}">
+                                    {{ step.description }}
+                                </p>
 
-                                    <li class="d-flex justify-content-between mb-2">
-                                        <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Sicilian Blood Oranges</span>
-                                        <span class="ingredient-qty text-end">67 pcs.</span>
-                                    </li>
-                                    <li class="d-flex justify-content-between mb-2">
-                                        <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Oranges with Stems and Leaves</span>
-                                        <span class="ingredient-qty text-end">21 pcs.</span>
-                                    </li>
-                                    <li class="d-flex justify-content-between mb-2">
-                                        <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Orange Blossom Honey</span>
-                                        <span class="ingredient-qty text-end">37 L</span>
-                                    </li>
-                                    <li class="d-flex justify-content-between mb-2">
-                                        <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Grand Marnier or Cointreau</span>
-                                        <span class="ingredient-qty text-end">42 L</span>
-                                    </li>
-                                    <li class="d-flex justify-content-between mb-0">
-                                        <span class="ingredient-name"><span class="ingredient-bullet">&bull;</span> Rose Water</span>
-                                        <span class="ingredient-qty text-end">2 L</span>
-                                    </li>
-
-                                </ul>
+                                {% if step.instructions %}
+                                    <ol class="ps-3 mb-0">
+                                        {% for instruction in step.instructions %}
+                                            <li class="{% if not forloop.last %}mb-2{% endif %}">
+                                                {{ instruction }}
+                                            </li>
+                                        {% endfor %}
+                                    </ol>
+                                {% endif %}
                             </div>
                         </div>
 
-                        <div class="col-md-7">
-                            <div class="recipe-glass-box p-4 h-100">
-                                <h3 class="recipe-section-title text-center text-md-start mb-4">Description:</h3>
-                                <div class="recipe-description-text">
-                                    <p>An elegant recipe for scrumptious oranges with or without leaves.</p>
-                                    <p>This isn't just a fruit plate; it's a masterclass in citrus minimalism. By
-                                        stripping
-                                        away the mundane "peel and pith," you transform a common supermarket staple into
-                                        a
-                                        glistening, jewel-toned centerpiece. Whether you've managed to find oranges with
-                                        their pristine leaves attached or you're working with "naked" fruit, the secret
-                                        lies
-                                        in the contrast between the cold, sharp citrus and the warm, aromatic syrup.</p>
-                                </div>
-                            </div>
+                        <div class="col-lg-6 position-relative step-img-col">
+                            <img src="{{ step.image_url }}" alt="Step {{ forloop.counter }} image"
+                                 class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
                         </div>
 
                     </div>
-
                 </div>
-            </div>
-
-            <div class="container position-relative z-2 mt-5 stepList d-flex flex-column gap-4" style="max-width: 1000px;">
-
-            <div class="glass-card recipe-step-card position-relative overflow-hidden w-100 shadow-sm">
-                <div class="row g-0 h-100">
-
-                    <div class="col-lg-6 position-relative z-2 p-4 p-md-5 step-text-panel">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <h3 class="step-number mb-0">Step 1:</h3>
-                            <div class="step-actions d-flex gap-3">
-                                <button class="btn p-0 shadow-none" aria-label="Edit step">
-                                    <i class="bi bi-pencil-square fs-5"></i>
-                                </button>
-                                <button class="btn p-0 shadow-none" aria-label="Delete step">
-                                    <i class="bi bi-trash fs-5"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <h4 class="step-title mb-4">The "Orange Surgery"<br>(The Supreme Cut)</h4>
-
-                        <div class="step-text">
-                            <p class="mb-3">Forget peeling; we're performing an extraction. To achieve "scrumptious" status, you must transform the fruit into Supremes - naked, glowing wedges free from all bitter white pith and membranes.</p>
-                            <ol class="ps-3 mb-0">
-                                <li class="mb-2">Behead & Base: Slice off the top and bottom until you see the vibrant flesh.</li>
-                                <li class="mb-2">The Shave: Curve your knife from top to bottom, stripping away the peel and all white pith. You want a bald, glistening sphere.</li>
-                                <li class="mb-2">The Extraction: Slide your knife between the membranes to pop out individual wedges.</li>
-                                <li>Save the Gold: Squeeze the leftover "carcass" over your wedges for a natural bath of juice.</li>
-                            </ol>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6 position-relative step-img-col">
-                        <img src="https://i.imgur.com/2SjgpvQ.jpeg" alt="Step 1 image" class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
-                    </div>
-
+            {% empty %}
+                <div class="text-center py-5">
+                    <p class="fs-5 opacity-75">No steps added yet. Start by adding the first one!</p>
                 </div>
-            </div>
+            {% endfor %}
 
             <button class="add-step-btn w-100 d-flex align-items-center gap-3 p-3 px-md-4 mt-2 border-0 shadow-sm">
                 <i class="bi bi-plus-lg fs-3"></i>
                 <span class="fs-5">Add new step</span>
             </button>
-
-        </div>
 
         </div>
     </main>
@@ -182,7 +91,8 @@
                     <h3 class="popup-title mb-5">Are you sure to delete this recipe?</h3>
 
                     <div class="d-flex flex-column align-items-center">
-                        <button type="button" class="btn custom-link-button popup-btn-text mb-4" data-bs-dismiss="modal">
+                        <button type="button" class="btn custom-link-button popup-btn-text mb-4"
+                                data-bs-dismiss="modal">
                             Nah, just kidding
                         </button>
 

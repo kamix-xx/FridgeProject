@@ -407,4 +407,30 @@ def recipes(request):
 
 def recipe_detail(request, recipe_id):
     # recipe = get_object_or_404(Recipe, id=recipe_id)
-    return render(request, 'recipes/recipe_detail.html')
+    recipe_steps = [
+        {
+            "title": 'The "Orange Surgery"',
+            "subtitle": "(The Supreme Cut)",
+            "description": 'Forget peeling; we\'re performing an extraction. To achieve "scrumptious" status, you must transform the fruit into Supremes - naked, glowing wedges free from all bitter white pith and membranes.',
+            "instructions": [
+                'Behead & Base: Slice off the top and bottom until you see the vibrant flesh.',
+                'The Shave: Curve your knife from top to bottom, stripping away the peel and all white pith. You want a bald, glistening sphere.',
+                'The Extraction: Slide your knife between the membranes to pop out individual wedges.',
+                'Save the Gold: Squeeze the leftover "carcass" over your wedges for a natural bath of juice.'
+            ],
+            "image_url": "https://i.imgur.com/2SjgpvQ.jpeg"
+        },
+        {
+            "title": "The Sweet Bath",
+            "subtitle": None,
+            "description": "Now it's time for the magic. Pour the orange blossom honey and Grand Marnier mixture over your freshly cut supremes. Cover with cling film and let it rest in the fridge for at least 2 hours so the flavors intertwine perfectly.",
+            "instructions": [],  # Pusta lista, jeśli krok nie ma wypunktowań
+            "image_url": "https://i.imgur.com/2SjgpvQ.jpeg"
+        }
+    ]
+
+    context = {
+        'recipe_steps': recipe_steps
+    }
+
+    return render(request, 'recipes/recipe_detail.html', context)

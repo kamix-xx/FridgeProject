@@ -101,6 +101,32 @@
 }
 
 /* =========================================
+   SCROLLABLE INGREDIENTS CONTAINER
+   ========================================= */
+.ingredients-scroll-container {
+    max-height: 145px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px; 
+    scroll-behavior: smooth;
+}
+
+.ingredients-scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+.ingredients-scroll-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+}
+.ingredients-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(81, 67, 54, 0.3);
+    border-radius: 4px;
+}
+[data-bs-theme="dark"] .ingredients-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* =========================================
    DARK MODE OVERRIDES
    ========================================= */
 [data-bs-theme="dark"] .recipe-card {
