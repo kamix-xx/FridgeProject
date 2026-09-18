@@ -33,6 +33,74 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
+    function applyPhysicsHover(container, itemSelector) {
+        container.classList.add('has-sliding-hover');
+        let pill = null;
+        let lastX = 0, lastY = 0, stretchTimer = null, fastTimer = null, lastMove = 0;
+
+        const getPill = () => {
+            if (!pill || !container.contains(pill)) {
+                pill = document.createElement('div');
+                pill.className = 'sliding-hover-pill';
+                container.appendChild(pill);
+            }
+            return pill;
+        };
+
+        container.addEventListener('mousemove', (e) => {
+            const item = e.target.closest(itemSelector);
+            if (item) {
+                const p = getPill();
+                const newX = item.offsetLeft;
+                const newY = item.offsetTop;
+                const dx = newX - lastX;
+                const dy = newY - lastY;
+
+                let scaleX = 1, scaleY = 1, originX = 'center', originY = 'center';
+
+                if (dx !== 0 || dy !== 0) {
+                    // Tuned sensitivity for short picker distances (~30-50px)
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                        scaleX = 1 + Math.min(Math.abs(dx) / 55, 0.28); // Noticeable stretch
+                        scaleY = 1 - Math.min(Math.abs(dx) / 110, 0.12); // Squash for volume
+                        originX = dx > 0 ? 'left' : 'right';
+                    } else {
+                        scaleY = 1 + Math.min(Math.abs(dy) / 55, 0.28);
+                        scaleX = 1 - Math.min(Math.abs(dy) / 110, 0.12);
+                        originY = dy > 0 ? 'top' : 'bottom';
+                    }
+
+                    const now = performance.now();
+                    if (now - lastMove < 120) {
+                        p.classList.add('is-fast');
+                        clearTimeout(fastTimer);
+                        fastTimer = setTimeout(() => p.classList.remove('is-fast'), 180);
+                    }
+                    lastMove = now;
+
+                    clearTimeout(stretchTimer);
+                    stretchTimer = setTimeout(() => {
+                        p.style.transform = `translate3d(${newX}px, ${newY}px, 0) scale(1, 1)`;
+                    }, 150);
+                }
+
+                p.style.transformOrigin = `${originX} ${originY}`;
+                p.style.width = `${item.offsetWidth}px`;
+                p.style.height = `${item.offsetHeight}px`;
+                p.style.transform = `translate3d(${newX}px, ${newY}px, 0) scale(${scaleX}, ${scaleY})`;
+                p.style.opacity = '1';
+
+                lastX = newX;
+                lastY = newY;
+            }
+        });
+
+        container.addEventListener('mouseleave', () => {
+            if (pill) pill.style.opacity = '0';
+        });
+    }
+
+
     // -----------------------------------------
     // Custom select (area / unit)
     // -----------------------------------------
@@ -93,6 +161,10 @@ document.addEventListener('DOMContentLoaded', () => {
         function syncOptions() {
             panel.innerHTML = '';
 
+            // --- HOVER SLIDE WITH PHYSICS ---
+            applyPhysicsHover(panel, '.picker-option');
+            // --------------------------------
+
             Array.from(selectEl.options).forEach((option) => {
                 const item = document.createElement('button');
                 item.type = 'button';
@@ -107,8 +179,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 item.addEventListener('click', () => {
                     selectEl.value = option.value;
-                    selectEl.dispatchEvent(new Event('change', { bubbles: true }));
-                    closePanel();
+                    selectEl.dispatchEvent(new Event('change', {bubbles: true}));
+                    closePanel(); // Immediate close with zero delay
                 });
 
                 panel.appendChild(item);
@@ -233,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function setDate(date) {
             inputEl.value = `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
-            inputEl.dispatchEvent(new Event('change', { bubbles: true }));
+            inputEl.dispatchEvent(new Event('change', {bubbles: true}));
         }
 
         function renderCalendar() {
@@ -286,8 +358,6 @@ document.addEventListener('DOMContentLoaded', () => {
             grid.className = 'picker-cal-grid';
 
             const firstOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1);
-            // Monday-first week: getDay() is 0 (Sun) .. 6 (Sat) — shift so
-            // Monday is 0.
             const leadingBlanks = (firstOfMonth.getDay() + 6) % 7;
             const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
             const today = new Date();
@@ -322,6 +392,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 grid.appendChild(dayBtn);
             }
 
+            // --- CALENDAR SLIDING HOVER WITH PHYSICS ---
+            applyPhysicsHover(grid, '.picker-cal-day:not(.is-empty)');
+            // -------------------------------------------
+
             panel.appendChild(grid);
 
             const footer = document.createElement('div');
@@ -333,7 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
             clearBtn.textContent = 'Clear';
             clearBtn.addEventListener('click', () => {
                 inputEl.value = '';
-                inputEl.dispatchEvent(new Event('change', { bubbles: true }));
+                inputEl.dispatchEvent(new Event('change', {bubbles: true}));
                 syncLabel();
                 closePanel();
             });

@@ -239,3 +239,123 @@ if (document.readyState === 'loading') {
 } else {
     initAddAreaModal();
 }
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const sharedList = document.getElementById('editAreaPeopleList');
+    if (!sharedList) return;
+
+    sharedList.classList.add('has-sliding-hover');
+
+    let pill = null;
+    let activeRow = null;
+    let pointerX = 0;
+    let pointerY = 0;
+
+    let lastMove = 0;
+    let fastTimer = null;
+    let stretchTimer = null;
+    let lastX = 0;
+    let lastY = 0;
+
+    const getPill = () => {
+        // FIX: Ensure the pill is actually in the DOM (catches theme-change DOM wipes)
+        if (!pill || !sharedList.contains(pill)) {
+            pill = document.createElement('div');
+            pill.className = 'sliding-hover-pill';
+            sharedList.appendChild(pill);
+        }
+        return pill;
+    };
+
+    const movePill = (row) => {
+        const p = getPill();
+
+        const newX = row.offsetLeft - sharedList.scrollLeft;
+        const newY = row.offsetTop - sharedList.scrollTop;
+
+        const dx = newX - lastX;
+        const dy = newY - lastY;
+
+        let scaleX = 1;
+        let scaleY = 1;
+        let originX = 'center';
+        let originY = 'center';
+
+        if (dx !== 0 || dy !== 0) {
+            // Tuned sensitivity for list item distances
+            if (Math.abs(dx) > Math.abs(dy)) {
+                scaleX = 1 + Math.min(Math.abs(dx) / 55, 0.28);
+                scaleY = 1 - Math.min(Math.abs(dx) / 110, 0.12);
+                originX = dx > 0 ? 'left' : 'right';
+            } else {
+                scaleY = 1 + Math.min(Math.abs(dy) / 55, 0.28);
+                scaleX = 1 - Math.min(Math.abs(dy) / 110, 0.12);
+                originY = dy > 0 ? 'top' : 'bottom';
+            }
+
+            clearTimeout(stretchTimer);
+            stretchTimer = setTimeout(() => {
+                if (activeRow === row) {
+                    p.style.transform = `translate3d(${newX}px, ${newY}px, 0) scale(1, 1)`;
+                }
+            }, 150);
+        }
+
+        p.style.transformOrigin = `${originX} ${originY}`;
+        p.style.width = `${row.offsetWidth}px`;
+        p.style.height = `${row.offsetHeight}px`;
+        p.style.transform = `translate3d(${newX}px, ${newY}px, 0) scale(${scaleX}, ${scaleY})`;
+        p.style.opacity = '1';
+
+        lastX = newX;
+        lastY = newY;
+        activeRow = row;
+    };
+
+    const findRowUnderPointer = () => {
+        const el = document.elementFromPoint(pointerX, pointerY);
+        const row = el?.closest('#editAreaPeopleList > .edit-area-person-row');
+
+        return row && row.parentElement === sharedList ? row : null;
+    };
+
+    sharedList.addEventListener('mousemove', (e) => {
+        pointerX = e.clientX;
+        pointerY = e.clientY;
+
+        const row = e.target.closest('#editAreaPeopleList > .edit-area-person-row');
+        if (!row) return;
+
+        const p = getPill();
+
+        const now = performance.now();
+        if (now - lastMove < 80) {
+            p.classList.add('is-fast');
+
+            clearTimeout(fastTimer);
+            fastTimer = setTimeout(() => {
+                p.classList.remove('is-fast');
+            }, 120);
+        }
+        lastMove = now;
+
+        movePill(row);
+    });
+
+    sharedList.addEventListener('scroll', () => {
+        const row = findRowUnderPointer();
+
+        if (row) {
+            movePill(row);
+        } else if (pill) {
+            pill.style.opacity = '0';
+            activeRow = null;
+        }
+    }, {passive: true});
+
+    sharedList.addEventListener('mouseleave', () => {
+        if (pill) pill.style.opacity = '0';
+        activeRow = null;
+    });
+});
