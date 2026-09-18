@@ -6,6 +6,7 @@
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/recipe_details.css' %}">
     <link rel="stylesheet" href="{% static 'css/modals.css' %}">
+    <link rel="stylesheet" href="{% static 'css/recipe_modal.css' %}">
     <script src="{% static 'js/modals.js' %}" defer></script>
 {% endblock %}
 
@@ -27,10 +28,12 @@
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <h3 class="step-number mb-0">Step {{ forloop.counter }}:</h3>
                                 <div class="step-actions d-flex gap-3">
-                                    <button class="btn p-0 shadow-none" aria-label="Edit step">
+                                    <button class="btn p-0 shadow-none" aria-label="Edit step" data-bs-toggle="modal"
+                                            data-bs-target="#editStepModal">
                                         <i class="bi bi-pencil-square fs-5"></i>
                                     </button>
-                                    <button class="btn p-0 shadow-none" aria-label="Delete step">
+                                    <button class="btn p-0 shadow-none" aria-label="Delete step" data-bs-toggle="modal"
+                                            data-bs-target="#deleteStepModal">
                                         <i class="bi bi-trash fs-5"></i>
                                     </button>
                                 </div>
@@ -73,7 +76,8 @@
                 </div>
             {% endfor %}
 
-            <button class="add-step-btn w-100 d-flex align-items-center gap-3 p-3 px-md-4 mt-2 border-0 shadow-sm">
+            <button class="add-step-btn w-100 d-flex align-items-center gap-3 p-3 px-md-4 mt-2 border-0 shadow-sm"
+                    data-bs-toggle="modal" data-bs-target="#addStepModal">
                 <i class="bi bi-plus-lg fs-3"></i>
                 <span class="fs-5">Add new step</span>
             </button>
@@ -98,13 +102,85 @@
 
                         <hr class="popup-divider mx-auto mb-4">
 
-                        <!-- Zamiast button, docelowo może to być <form method="POST">  -->
+                        <!-- <form method="POST"> albo JS -->
                         <button type="button" class="btn custom-link-button popup-btn-danger">
                             Do it!
                         </button>
                     </div>
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteStepModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+            <div class="modal-content custom-popup t-modal border-0 text-center p-4 p-md-5">
+
+                <div class="modal-body p-0">
+                    <h3 class="popup-title mb-5">Are you sure to delete this step?</h3>
+
+                    <div class="d-flex flex-column align-items-center">
+                        <button type="button" class="btn custom-link-button popup-btn-text mb-4"
+                                data-bs-dismiss="modal">
+                            Nah, just kidding
+                        </button>
+
+                        <hr class="popup-divider mx-auto mb-4">
+
+                        <!-- Docelowo tutaj formularz lub funkcja JSowa -->
+                        <button type="button" class="btn custom-link-button popup-btn-danger">
+                            Do it!
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- POP-UP: Add Step -->
+    <!-- ========================================== -->
+    <div class="modal fade" id="addStepModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content custom-popup t-modal border-0">
+
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div class="modal-body p-4 p-md-5">
+                    <h3 class="popup-title text-center mb-4">Add step</h3>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-sm-5 col-md-4">
+                            <div class="recipe-img-upload h-100" style="min-height: 140px;" role="button" tabindex="0"
+                                 aria-label="Upload step image">
+                                <i class="bi bi-image upload-main-icon"></i>
+                                <i class="bi bi-box-arrow-up upload-corner-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-7 col-md-8 d-flex flex-column justify-content-end">
+                            <div>
+                                <label for="newStepTitle" class="form-label popup-label">Step title</label>
+                                <input type="text" class="form-control popup-input shadow-none w-100" id="newStepTitle">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 mb-md-5">
+                        <label for="newStepDesc" class="form-label popup-label">Description</label>
+                        <textarea class="form-control popup-input shadow-none w-100" id="newStepDesc" rows="5"
+                                  style="resize: none;"></textarea>
+                    </div>
+
+                    <button type="button" class="popup-circular-btn mx-auto d-block">
+                        <i class="bi bi-plus"></i>
+                    </button>
+
+                </div>
             </div>
         </div>
     </div>
