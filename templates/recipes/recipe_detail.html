@@ -11,6 +11,8 @@
 {% endblock %}
 
 {% block content %}
+{#    FIXME brakuje całego panelu z widoku "recipe details" z Figmy, mimo tego że widok był odznaczony jako zrobiony! #}
+    {% include "partials/no_page_transition_panel.html" %}
     {% include "partials/background_images.html" %}
 
     <main class="recipe-detail-page position-relative min-vh-100 py-5">

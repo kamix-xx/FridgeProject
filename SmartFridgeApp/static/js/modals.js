@@ -138,3 +138,104 @@ document.addEventListener('hidden.bs.modal', function (e) {
         }
     }
 });
+
+// =========================================
+// 5. Add Area Modal (Single Modal Dual-Face Switch)
+// =========================================
+function initAddAreaModal() {
+    const modal = document.getElementById('addAreaModal');
+    if (!modal) return;
+
+    const track = modal.querySelector('.add-area-slider-track');
+    if (!track) return;
+
+    const panelCreate = modal.querySelector('.add-area-panel-create');
+    const panelCode = modal.querySelector('.add-area-panel-code');
+
+    function setMode(mode, animate) {
+        const isCode = mode === 'code';
+
+        if (!animate) {
+            track.classList.add('no-transition');
+        } else {
+            track.classList.remove('no-transition');
+        }
+
+        track.classList.toggle('is-code', isCode);
+
+        if (panelCreate && panelCode) {
+            panelCreate.setAttribute('aria-hidden', isCode ? 'true' : 'false');
+            panelCreate.querySelectorAll('input, button').forEach(el => {
+                if (isCode) el.setAttribute('tabindex', '-1');
+                else el.removeAttribute('tabindex');
+            });
+
+            panelCode.setAttribute('aria-hidden', isCode ? 'false' : 'true');
+            panelCode.querySelectorAll('input, button').forEach(el => {
+                if (isCode) el.removeAttribute('tabindex');
+                else el.setAttribute('tabindex', '-1');
+            });
+        }
+
+        if (!animate) {
+            void track.offsetWidth; // Force reflow
+            track.classList.remove('no-transition');
+        }
+
+        const targetInput = isCode
+            ? modal.querySelector('.add-area-panel-code input')
+            : modal.querySelector('.add-area-panel-create input');
+
+        if (targetInput) {
+            setTimeout(() => {
+                if (modal.classList.contains('show')) {
+                    targetInput.focus();
+                }
+            }, animate ? 220 : 60);
+        }
+    }
+
+    // Switch buttons ("HERE")
+    modal.querySelectorAll('.add-area-switch-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const targetMode = btn.dataset.switchTo;
+            setMode(targetMode, true);
+        });
+    });
+
+    // When modal is shown
+    modal.addEventListener('show.bs.modal', (e) => {
+        const trigger = e.relatedTarget;
+        const mode = trigger && (trigger.dataset.areaMode === 'code' || trigger.dataset.initialMode === 'code')
+            ? 'code'
+            : 'create';
+        setMode(mode, false);
+    });
+
+    // When modal is hidden, reset to create mode
+    modal.addEventListener('hidden.bs.modal', () => {
+        setMode('create', false);
+    });
+}
+
+// Fallback click delegation if any link/button still targets #addSharedAreaModal
+document.addEventListener('click', function (e) {
+    const trigger = e.target.closest('[data-bs-target="#addSharedAreaModal"]');
+    if (trigger) {
+        e.preventDefault();
+        const addAreaModalEl = document.getElementById('addAreaModal');
+        if (addAreaModalEl && window.bootstrap && bootstrap.Modal) {
+            const instance = bootstrap.Modal.getOrCreateInstance(addAreaModalEl);
+            trigger.dataset.areaMode = 'code';
+            instance.show(trigger);
+        }
+    }
+});
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAddAreaModal);
+} else {
+    initAddAreaModal();
+}

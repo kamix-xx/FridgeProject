@@ -274,7 +274,71 @@
     transform: scale(0.96);
 }
 
-/* Prevent hidden modals from blocking mouse interaction during rapid swaps */
-.modal:not(.show) {
+/* =========================================
+   Add Area Modal — Sliding Dual-Face Panel
+   ========================================= */
+
+.add-area-slider-wrap {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.add-area-slider-track {
+    display: flex;
+    width: 200%;
+    transform: translateX(0%);
+    transition: transform 340ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+}
+
+.add-area-slider-track.is-code {
+    transform: translateX(-50%);
+}
+
+.add-area-slider-track.no-transition {
+    transition: none !important;
+}
+
+.add-area-panel {
+    width: 50%;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1),
+                transform 340ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+}
+
+/* When in create mode */
+.add-area-slider-track:not(.is-code) .add-area-panel-create {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+.add-area-slider-track:not(.is-code) .add-area-panel-code {
+    opacity: 0;
+    transform: scale(0.96);
     pointer-events: none;
+}
+
+/* When in code mode */
+.add-area-slider-track.is-code .add-area-panel-code {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+
+.add-area-slider-track.is-code .add-area-panel-create {
+    opacity: 0;
+    transform: scale(0.96);
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .add-area-slider-track,
+    .add-area-panel {
+        transition: none !important;
+    }
 }
