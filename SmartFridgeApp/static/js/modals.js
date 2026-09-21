@@ -70,12 +70,26 @@ document.addEventListener('show.bs.modal', function (e) {
 });
 
 // 2. Handle Backdrop Click-Away Cancellation (Clicking off to instantly close/cancel)
+// 2. Handle Backdrop Click-Away Cancellation (Clicking off to instantly close/cancel)
 document.addEventListener('click', function (e) {
     const openModal = document.querySelector('.modal.show');
     if (!openModal) return;
 
     // Check if the click was directly on the modal container backdrop (outside the dialog)
     if (e.target === openModal) {
+
+
+        const isStatic = openModal.getAttribute('data-bs-backdrop') === 'static';
+        if (isStatic) {
+
+            openModal.classList.add('modal-static');
+            setTimeout(() => {
+                openModal.classList.remove('modal-static');
+            }, 300);
+            return; // Przerwij działanie skryptu - NIE zamykaj modala!
+        }
+        // ------------------------------------------------
+
         // Instantly cancel transitions to avoid lingering animation lockup
         openModal.style.transition = 'none';
         const dialog = openModal.querySelector('.modal-dialog');

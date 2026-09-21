@@ -85,7 +85,7 @@
     <!-- ========================================== -->
     <!-- POP-UP: Create Recipe -->
     <!-- ========================================== -->
-    <div class="modal fade" id="createRecipeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="createRecipeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
 
             <div class="modal-content custom-popup t-modal border-0">
@@ -119,8 +119,9 @@
 
                     <div class="mb-3">
                         <label for="newRecipeDesc" class="form-label popup-label">Short description:</label>
-                        <textarea class="form-control popup-input shadow-none w-100" id="newRecipeDesc" rows="2"
-                                  style="resize: none;"></textarea>
+                        <div class="form-control popup-input shadow-none p-0 overflow-hidden d-flex">
+                            <textarea class="w-100 border-0 bg-transparent shadow-none p-2 m-1" id="editRecipeDesc" rows="2" style="resize: none; outline: none;">{{ recipe.description_short }}</textarea>
+                        </div>
                     </div>
 
                     <div class="mb-4">

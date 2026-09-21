@@ -41,26 +41,25 @@ background-color: #ff9166;
 }
 
 /* -----------------------------------------
-   Ingredients Grid System (Zoptymalizowane wyrównanie)
+   Ingredients Grid System
    ----------------------------------------- */
 .recipe-ingredient-grid {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 36px;
     gap: 0.5rem;
-    align-items: center; /* Dodajemy wyrównanie w pionie do samej siatki */
+    align-items: center;
 }
 
 .recipe-ingredient-grid.header-row span {
     font-size: 0.8rem;
     opacity: 0.8;
-    padding: 0 0.75rem; /* Zrównanie nagłówków z inputami */
+    padding: 0 0.75rem;
 }
 
-/* Szklane tło dla dodanych już składników */
 .recipe-ingredient-grid.existing-row {
     background: rgba(81, 67, 54, 0.08);
     border-radius: 8px;
-    padding: 0.2rem 0; /* USUNIĘTO boczne paddingi! Wiersz zachowuje pełną szerokość */
+    padding: 0.2rem 0;
     min-height: 42px;
 }
 
@@ -75,20 +74,19 @@ background-color: #ff9166;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding: 0 0.75rem; /* Padding przeniesiony tutaj, aby idealnie zrównał się z wnętrzem inputów */
+    padding: 0 0.75rem;
 }
 
 [data-bs-theme="dark"] .ingredient-text {
     color: #fdfaf6;
 }
 
-/* Wiersz dodawania (pola wejściowe) */
+
 .recipe-ingredient-grid.input-row .popup-input {
     padding: 0.4rem 0.75rem !important;
     font-size: 0.95rem;
 }
 
-/* Przyciski akcji wewnątrz siatki (Kwadratowe, czerwone/pomarańczowe) */
 .btn-recipe-row-action {
     padding: 0;
     display: flex;

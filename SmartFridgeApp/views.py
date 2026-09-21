@@ -407,6 +407,27 @@ def recipes(request):
 
 def recipe_detail(request, recipe_id):
     # recipe = get_object_or_404(Recipe, id=recipe_id)
+
+    # Mock danych - symulacja obiektu przepisu z bazy
+    recipe = {
+        "title": 'The "Midnight in Seville"<br>Oranges',
+        "est_time": "10 h",
+        "status": "private",
+        "image_url": "https://i.imgur.com/2SjgpvQ.jpeg",
+        "description_short": "An elegant recipe for scrumptious oranges with or without leaves.",
+        "description_long": "This isn't just a fruit plate; it's a masterclass in citrus minimalism. By stripping away the mundane \"peel and pith,\" you transform a common supermarket staple into a glistening, jewel-toned centerpiece. Whether you've managed to find oranges with their pristine leaves attached or you're working with \"naked\" fruit, the secret lies in the contrast between the cold, sharp citrus and the warm, aromatic syrup.",
+        "ingredients": [
+            {"name": "Sicilian Blood Oranges", "quantity": "67", "unit": "pcs."},
+            {"name": "Oranges with Stems and Leaves", "quantity": "21", "unit": "pcs."},
+            {"name": "Orange Blossom Honey", "quantity": "37", "unit": "L"},
+            {"name": "Grand Marnier or Cointreau", "quantity": "42", "unit": "L"},
+            {"name": "Rose Water", "quantity": "2", "unit": "L"},
+            {"name": "Pistachios (Bright Green)", "quantity": "300", "unit": "g"},
+            {"name": "Micro-Basil", "quantity": "2", "unit": "pinch"},
+            {"name": "Pomegranate Arils", "quantity": "30", "unit": "g"}
+        ]
+    }
+
     recipe_steps = [
         {
             "title": 'The "Orange Surgery"',
@@ -430,6 +451,7 @@ def recipe_detail(request, recipe_id):
     ]
 
     context = {
+        'recipe': recipe,
         'recipe_steps': recipe_steps
     }
 

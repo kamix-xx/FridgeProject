@@ -11,11 +11,99 @@
 {% endblock %}
 
 {% block content %}
-{#    FIXME brakuje całego panelu z widoku "recipe details" z Figmy, mimo tego że widok był odznaczony jako zrobiony! #}
     {% include "partials/no_page_transition_panel.html" %}
     {% include "partials/background_images.html" %}
 
     <main class="recipe-detail-page position-relative min-vh-100 py-5">
+
+        <!-- ========================================== -->
+        <!-- MAIN RECIPE CARD (Tytuł, Składniki, Opis) -->
+        <!-- ========================================== -->
+
+        <div class="container position-relative z-2 mt-4 mt-md-5 mb-5" style="max-width: 1000px;">
+
+            <div class="mb-3">
+                <a href="/recipes"
+                   class="btn-back-glass d-inline-flex align-items-center justify-content-center text-decoration-none"
+                   aria-label="Go back">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+            </div>
+
+            <div class="glass-card position-relative overflow-hidden w-100">
+
+                <div class="recipe-detail-hero-bg" aria-hidden="true">
+                    <img src="{{ recipe.image_url }}" alt="" class="w-100 h-100 object-fit-cover">
+                </div>
+
+                <div class="position-relative z-2 p-4 p-md-5">
+
+                    <div class="row mb-5">
+                        <div class="col-lg-5 d-none d-lg-block"></div>
+
+                        <div class="col-lg-7 d-flex flex-column gap-3">
+                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-start gap-3">
+                                <div>
+                                    <h1 class="expense-title mb-2">{{ recipe.title|safe }}</h1>
+                                    <p class="recipe-meta-text mb-0">est. time: {{ recipe.est_time }}</p>
+                                </div>
+
+                                <div class="text-sm-end">
+                                    <button class="btn btn-recipe-verify shadow-sm mb-1">
+                                        Send recipe for<br>verification
+                                    </button>
+                                    <div class="recipe-status-text">current status: {{ recipe.status }}</div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-3 mt-2">
+                                <button class="btn btn-recipe-action btn-recipe-edit shadow-sm d-flex align-items-center gap-2"
+                                        data-bs-toggle="modal" data-bs-target="#editRecipeDetailsModal"
+                                        data-bs-backdrop="static" data-bs-keyboard="false">
+                                    <i class="bi bi-pencil"></i> Edit Recipe details
+                                </button>
+                                <button class="btn btn-recipe-action btn-recipe-delete shadow-sm d-flex align-items-center gap-2"
+                                        data-bs-toggle="modal" data-bs-target="#deleteRecipeModal">
+                                    <i class="bi bi-trash"></i> Delete recipe
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-5 mt-2">
+                        <div class="col-md-5">
+                            <h3 class="recipe-section-title mb-4">Ingredients:</h3>
+                            <ul class="recipe-ingredients-list list-unstyled m-0 p-0">
+
+                                {% for ingredient in recipe.ingredients %}
+                                    <li class="d-flex justify-content-between {% if not forloop.last %}mb-2{% else %}mb-0{% endif %}">
+                                        <span class="ingredient-name"><span
+                                                class="ingredient-bullet">&bull;</span> {{ ingredient.name }}</span>
+                                        <span class="ingredient-qty text-end">{{ ingredient.quantity }} {{ ingredient.unit }}</span>
+                                    </li>
+                                {% empty %}
+                                    <li class="text-muted opacity-75">No ingredients added yet.</li>
+                                {% endfor %}
+
+                            </ul>
+                        </div>
+
+                        <div class="col-md-7">
+                            <h3 class="recipe-section-title text-center text-md-start mb-4">Description:</h3>
+                            <div class="recipe-description-text">
+                                {% if recipe.description_short %}
+                                    <p>{{ recipe.description_short }}</p>
+                                {% endif %}
+                                {% if recipe.description_long %}
+                                    <p>{{ recipe.description_long }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
 
         <!-- ========================================== -->
         <!-- RECIPE STEPS (Renderowane z czystych danych) -->
@@ -79,7 +167,8 @@
             {% endfor %}
 
             <button class="add-step-btn w-100 d-flex align-items-center gap-3 p-3 px-md-4 mt-2 border-0 shadow-sm"
-                    data-bs-toggle="modal" data-bs-target="#addStepModal">
+                    data-bs-toggle="modal" data-bs-target="#addStepModal"
+                    data-bs-backdrop="static" data-bs-keyboard="false">
                 <i class="bi bi-plus-lg fs-3"></i>
                 <span class="fs-5">Add new step</span>
             </button>
@@ -144,7 +233,8 @@
     <!-- ========================================== -->
     <!-- POP-UP: Add Step -->
     <!-- ========================================== -->
-    <div class="modal fade" id="addStepModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="addStepModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content custom-popup t-modal border-0">
 
@@ -174,12 +264,170 @@
 
                     <div class="mb-4 mb-md-5">
                         <label for="newStepDesc" class="form-label popup-label">Description</label>
-                        <textarea class="form-control popup-input shadow-none w-100" id="newStepDesc" rows="5"
-                                  style="resize: none;"></textarea>
+                        <div class="form-control popup-input shadow-none p-0 overflow-hidden d-flex">
+
+                        <textarea class="w-100 border-0 bg-transparent shadow-none p-2 m-1" id="editStepDesc" rows="7"
+                                  style="resize: none; outline: none;">
+
+                        </textarea>
+
+                        </div>
                     </div>
 
                     <button type="button" class="popup-circular-btn mx-auto d-block">
                         <i class="bi bi-plus"></i>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- POP-UP: Edit Step -->
+    <!-- Docelowo, jak już będzie backend solidny, to będzie to jeden modal dla dodawania i edycji -->
+    <!-- ========================================== -->
+    <div class="modal fade" id="editStepModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content custom-popup t-modal border-0">
+
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div class="modal-body p-4 p-md-5">
+                    <h3 class="popup-title text-center mb-4">Edit step</h3>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-sm-5 col-md-4">
+                            <div class="recipe-img-upload h-100" style="min-height: 140px;" role="button" tabindex="0"
+                                 aria-label="Upload step image">
+                                <i class="bi bi-image upload-main-icon"></i>
+                                <i class="bi bi-box-arrow-up upload-corner-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-7 col-md-8 d-flex flex-column justify-content-end">
+                            <div>
+                                <label for="editStepTitle" class="form-label popup-label">Step title</label>
+                                <input type="text" class="form-control popup-input shadow-none w-100" id="editStepTitle"
+                                       value='The "Orange Surgery" (The Supreme Cut)'>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 mb-md-5">
+                        <label for="editStepDesc" class="form-label popup-label">Description</label>
+
+                        <div class="form-control popup-input shadow-none p-0 overflow-hidden d-flex">
+
+                        <textarea class="w-100 border-0 bg-transparent shadow-none p-2 m-1" id="editStepDesc" rows="7"
+                                  style="resize: none; outline: none;">Forget peeling; we're performing an extraction. To achieve "scrumptious" status, you must transform the fruit into Supremes - naked, glowing wedges free from all bitter white pith and membranes.
+1. Behead & Base: Slice off the top and bottom until you see the vibrant flesh.
+2. The Shave: Curve your knife from top to bottom, stripping away the peel and all white pith. You want a bald, glistening sphere.
+3. The Extraction: Slide your knife between the membranes to pop out individual wedges.
+4. Save the Gold: Squeeze the leftover "carcass" over your wedges for a natural bath of juice.</textarea>
+
+                        </div>
+                    </div>
+
+                    <!-- Docelowo JS albo form  -->
+                    <button type="button" class="popup-circular-btn mx-auto d-block">
+                        <i class="bi bi-floppy"></i>
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- POP-UP: Edit Recipe Details -->
+    <!-- ========================================== -->
+    <div class="modal fade" id="editRecipeDetailsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+
+            <div class="modal-content custom-popup t-modal border-0">
+                <button type="button" class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <div class="modal-body p-4">
+                    <h3 class="popup-title text-center mb-3 mt-1">Edit recipe</h3>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-5">
+                            <label class="form-label popup-label d-none d-sm-block">&nbsp;</label>
+
+                            <div class="recipe-img-upload position-relative overflow-hidden p-0 border-0" role="button" tabindex="0" aria-label="Change recipe image">
+                                <img src="{{ recipe.image_url }}" alt="Recipe cover" class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
+                                <div class="position-absolute bottom-0 end-0 p-2 z-2">
+                                    <i class="bi bi-box-arrow-up text-white" style="font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-7 d-flex flex-column justify-content-between">
+                            <div class="mb-2">
+                                <label for="editRecipeName" class="form-label popup-label">Recipe name</label>
+                                <input type="text" class="form-control popup-input shadow-none w-100" id="editRecipeName" value="{{ recipe.title|striptags }}">
+                            </div>
+                            <div>
+                                <label for="editRecipeTime" class="form-label popup-label">Preparation time</label>
+                                <input type="text" class="form-control popup-input shadow-none w-100" id="editRecipeTime" value="{{ recipe.est_time }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editRecipeDesc" class="form-label popup-label" style="margin-top: 10px">Short description:</label>
+                        <div class="form-control popup-input shadow-none p-0 overflow-hidden d-flex">
+                            <textarea class="w-100 border-0 bg-transparent shadow-none p-2 m-1" id="editRecipeDesc" rows="2" style="resize: none; outline: none;">{{ recipe.description_short }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label popup-label mb-2">Ingredients:</label>
+
+                        <div class="recipe-ingredient-grid header-row px-3 mb-1">
+                            <span class="popup-label fw-normal mb-0">Name</span>
+                            <span class="popup-label fw-normal mb-0 text-center">Quantity</span>
+                            <span class="popup-label fw-normal mb-0 text-center">Unit</span>
+                            <span></span>
+                        </div>
+
+                        <div id="editRecipeIngredientsList" class="ingredients-scroll-container mb-2" style="max-height: 140px; overflow-y: auto; overflow-x: hidden; display: block;">
+
+                            {% for ingredient in recipe.ingredients %}
+                                <div class="recipe-ingredient-grid existing-row align-items-center mb-2">
+                                    <div class="ingredient-text text-truncate px-1" title="{{ ingredient.name }}">{{ ingredient.name }}</div>
+                                    <div class="ingredient-text text-center">{{ ingredient.quantity }}</div>
+                                    <div class="ingredient-text text-center">{{ ingredient.unit }}</div>
+                                    <button type="button" class="btn btn-recipe-row-action btn-danger shadow-none delete-ing-btn">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            {% endfor %}
+
+                        </div>
+
+                        <div class="recipe-ingredient-grid input-row mt-2">
+                            <input type="text" id="editAddIngName" class="form-control popup-input shadow-none" placeholder="Name">
+                            <input type="number" id="editAddIngQty" class="form-control popup-input shadow-none text-center" placeholder="0.0" step="0.1" min="0">
+                            <select id="editAddIngUnit" class="form-select popup-input shadow-none custom-select-style text-center">
+                                <option value="" selected disabled></option>
+                                <option value="kg">kg</option>
+                                <option value="g">g</option>
+                                <option value="L">L</option>
+                                <option value="pcs">pcs</option>
+                            </select>
+                            <button type="button" id="editAddIngBtn" class="btn btn-recipe-row-action btn-add shadow-none">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="button" class="popup-circular-btn mx-auto">
+                        <i class="bi bi-floppy"></i>
                     </button>
 
                 </div>
