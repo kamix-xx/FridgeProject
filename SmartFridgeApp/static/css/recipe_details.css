@@ -283,6 +283,24 @@ div.popup-input:focus-within {
     border-color: #ff9166 !important;
 }
 
+.popup-btn-confirm {
+    color: #ff9166;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.popup-btn-confirm:hover {
+    color: #e25327;
+}
+
+[data-bs-theme="dark"] .popup-btn-confirm {
+    color: #ffb094;
+}
+
+[data-bs-theme="dark"] .popup-btn-confirm:hover {
+    color: #ff9166;
+}
+
 /* =========================================
    RESPONSIVE (Mobile Overrides)
    ========================================= */

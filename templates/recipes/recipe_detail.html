@@ -49,7 +49,8 @@
                                 </div>
 
                                 <div class="text-sm-end">
-                                    <button class="btn btn-recipe-verify shadow-sm mb-1">
+                                    <button class="btn btn-recipe-verify shadow-sm mb-1"
+                                            data-bs-toggle="modal" data-bs-target="#verifyRecipeModal">
                                         Send recipe for<br>verification
                                     </button>
                                     <div class="recipe-status-text">current status: {{ recipe.status }}</div>
@@ -345,11 +346,14 @@
     <!-- ========================================== -->
     <!-- POP-UP: Edit Recipe Details -->
     <!-- ========================================== -->
-    <div class="modal fade" id="editRecipeDetailsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="editRecipeDetailsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
 
             <div class="modal-content custom-popup t-modal border-0">
-                <button type="button" class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
 
                 <div class="modal-body p-4">
                     <h3 class="popup-title text-center mb-3 mt-1">Edit recipe</h3>
@@ -358,10 +362,13 @@
                         <div class="col-sm-5">
                             <label class="form-label popup-label d-none d-sm-block">&nbsp;</label>
 
-                            <div class="recipe-img-upload position-relative overflow-hidden p-0 border-0" role="button" tabindex="0" aria-label="Change recipe image">
-                                <img src="{{ recipe.image_url }}" alt="Recipe cover" class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
+                            <div class="recipe-img-upload position-relative overflow-hidden p-0 border-0" role="button"
+                                 tabindex="0" aria-label="Change recipe image">
+                                <img src="{{ recipe.image_url }}" alt="Recipe cover"
+                                     class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
                                 <div class="position-absolute bottom-0 end-0 p-2 z-2">
-                                    <i class="bi bi-box-arrow-up text-white" style="font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));"></i>
+                                    <i class="bi bi-box-arrow-up text-white"
+                                       style="font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));"></i>
                                 </div>
                             </div>
                         </div>
@@ -369,19 +376,24 @@
                         <div class="col-sm-7 d-flex flex-column justify-content-between">
                             <div class="mb-2">
                                 <label for="editRecipeName" class="form-label popup-label">Recipe name</label>
-                                <input type="text" class="form-control popup-input shadow-none w-100" id="editRecipeName" value="{{ recipe.title|striptags }}">
+                                <input type="text" class="form-control popup-input shadow-none w-100"
+                                       id="editRecipeName" value="{{ recipe.title|striptags }}">
                             </div>
                             <div>
                                 <label for="editRecipeTime" class="form-label popup-label">Preparation time</label>
-                                <input type="text" class="form-control popup-input shadow-none w-100" id="editRecipeTime" value="{{ recipe.est_time }}">
+                                <input type="text" class="form-control popup-input shadow-none w-100"
+                                       id="editRecipeTime" value="{{ recipe.est_time }}">
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="editRecipeDesc" class="form-label popup-label" style="margin-top: 10px">Short description:</label>
+                        <label for="editRecipeDesc" class="form-label popup-label" style="margin-top: 10px">Short
+                            description:</label>
                         <div class="form-control popup-input shadow-none p-0 overflow-hidden d-flex">
-                            <textarea class="w-100 border-0 bg-transparent shadow-none p-2 m-1" id="editRecipeDesc" rows="2" style="resize: none; outline: none;">{{ recipe.description_short }}</textarea>
+                            <textarea class="w-100 border-0 bg-transparent shadow-none p-2 m-1" id="editRecipeDesc"
+                                      rows="2"
+                                      style="resize: none; outline: none;">{{ recipe.description_short }}</textarea>
                         </div>
                     </div>
 
@@ -395,14 +407,17 @@
                             <span></span>
                         </div>
 
-                        <div id="editRecipeIngredientsList" class="ingredients-scroll-container mb-2" style="max-height: 140px; overflow-y: auto; overflow-x: hidden; display: block;">
+                        <div id="editRecipeIngredientsList" class="ingredients-scroll-container mb-2"
+                             style="max-height: 140px; overflow-y: auto; overflow-x: hidden; display: block;">
 
                             {% for ingredient in recipe.ingredients %}
                                 <div class="recipe-ingredient-grid existing-row align-items-center mb-2">
-                                    <div class="ingredient-text text-truncate px-1" title="{{ ingredient.name }}">{{ ingredient.name }}</div>
+                                    <div class="ingredient-text text-truncate px-1"
+                                         title="{{ ingredient.name }}">{{ ingredient.name }}</div>
                                     <div class="ingredient-text text-center">{{ ingredient.quantity }}</div>
                                     <div class="ingredient-text text-center">{{ ingredient.unit }}</div>
-                                    <button type="button" class="btn btn-recipe-row-action btn-danger shadow-none delete-ing-btn">
+                                    <button type="button"
+                                            class="btn btn-recipe-row-action btn-danger shadow-none delete-ing-btn">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -411,16 +426,21 @@
                         </div>
 
                         <div class="recipe-ingredient-grid input-row mt-2">
-                            <input type="text" id="editAddIngName" class="form-control popup-input shadow-none" placeholder="Name">
-                            <input type="number" id="editAddIngQty" class="form-control popup-input shadow-none text-center" placeholder="0.0" step="0.1" min="0">
-                            <select id="editAddIngUnit" class="form-select popup-input shadow-none custom-select-style text-center">
+                            <input type="text" id="editAddIngName" class="form-control popup-input shadow-none"
+                                   placeholder="Name">
+                            <input type="number" id="editAddIngQty"
+                                   class="form-control popup-input shadow-none text-center" placeholder="0.0" step="0.1"
+                                   min="0">
+                            <select id="editAddIngUnit"
+                                    class="form-select popup-input shadow-none custom-select-style text-center">
                                 <option value="" selected disabled></option>
                                 <option value="kg">kg</option>
                                 <option value="g">g</option>
                                 <option value="L">L</option>
                                 <option value="pcs">pcs</option>
                             </select>
-                            <button type="button" id="editAddIngBtn" class="btn btn-recipe-row-action btn-add shadow-none">
+                            <button type="button" id="editAddIngBtn"
+                                    class="btn btn-recipe-row-action btn-add shadow-none">
                                 <i class="bi bi-plus-lg"></i>
                             </button>
                         </div>
@@ -431,6 +451,38 @@
                     </button>
 
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- POP-UP: Send Recipe for Verification -->
+    <!-- ========================================== -->
+    <div class="modal fade" id="verifyRecipeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+            <div class="modal-content custom-popup t-modal border-0 text-center p-4 p-md-5">
+
+                <div class="modal-body p-0">
+                    <h3 class="popup-title mb-3">Send for verification?</h3>
+                    <p class="mb-5 text-muted" style="font-size: 0.95rem;">
+                        Once verified, this recipe will become global and visible to all SmartFridge+ users.
+                    </p>
+
+                    <div class="d-flex flex-column align-items-center">
+                        <button type="button" class="btn custom-link-button popup-btn-text mb-4"
+                                data-bs-dismiss="modal">
+                            Not yet
+                        </button>
+
+                        <hr class="popup-divider mx-auto mb-4">
+
+                        <!-- Docelowo tutaj będzie <form method="POST"> albo JS -->
+                        <button type="button" class="btn custom-link-button popup-btn-confirm">
+                            Yes, send it!
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
