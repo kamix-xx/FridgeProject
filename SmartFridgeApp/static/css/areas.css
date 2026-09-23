@@ -521,7 +521,7 @@
     /* bouncy spring is the resting/return transition; JS swaps this to a
        clean ease-in right before it sets --shift on hover so lifting off
        doesn't overshoot, only the return does */
-    transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: transform 230ms cubic-bezier(0.06, 1.18, 0.03, 1.14);
     transform: translateY(var(--shift)) scale(var(--scale));
     z-index: 1;
 }
