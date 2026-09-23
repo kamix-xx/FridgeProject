@@ -7,7 +7,7 @@
     /* -----------------------------------------
        Input clear + dissolve
        ----------------------------------------- */
-    --clear-dur: 1000ms;
+    --clear-dur: 700ms;
 
     --clear-out-dur: 400ms;
     --clear-in-dur: 400ms;
