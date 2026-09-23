@@ -208,6 +208,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const panel = areaPanels[index];
         const areaName = panel.dataset.areaName || '';
         const isShared = panel.dataset.isShared === 'true';
+        const areaId = panel.dataset.areaId || '';
+        const isOwner = panel.dataset.areaOwner === 'true';
+
+        // Update the edit button dataset to match the currently displayed area
+        const editBtn = document.getElementById('areaEditBtn');
+        if (editBtn) {
+            editBtn.dataset.areaId = areaId;
+            editBtn.dataset.areaName = areaName;
+            editBtn.dataset.areaShared = isShared ? 'true' : 'false';
+            editBtn.dataset.areaOwner = isOwner ? 'true' : 'false';
+        }
 
         if (instant) {
             clearTimeout(titleMorphTimer);

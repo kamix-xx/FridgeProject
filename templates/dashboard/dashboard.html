@@ -10,10 +10,12 @@
     <script src="{% static 'js/productRowActions.js' %}" defer></script>
     <script src="{% static 'js/productModal.js' %}" defer></script>
     <script src="{% static 'js/productPickers.js' %}" defer></script>
+    <script src="{% static 'js/editAreaModal.js' %}" defer></script>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=5">
     <link rel="stylesheet" href="{% static 'css/morphMenu.css' %}">
     <link rel="stylesheet" href="{% static 'css/modals.css' %}?v=3">
     <link rel="stylesheet" href="{% static 'css/productModal.css' %}">
+    <link rel="stylesheet" href="{% static 'css/editAreaModal.css' %}">
 {% endblock %}
 
 {% block title %}SmartFridge+ | Dashboard{% endblock %}
@@ -99,7 +101,8 @@
                 <div class="fridge-panel-body" id="page-transition-panel">
                     <header class="fridge-panel-header">
                         <h2 class="fridge-panel-title" id="areaTitle">
-                            <span class="area-title-text" id="areaTitleText">{% if areas %}{{ areas.0.name }}{% else %}No areas{% endif %}{% if areas and areas.0.is_shared %}
+                            <span class="area-title-text" id="areaTitleText">{% if areas %}{{ areas.0.name }}{% else %}
+                                No areas{% endif %}{% if areas and areas.0.is_shared %}
                                 <span class="area-shared-icon area-title-word"
                                       title="Shared area"
                                       aria-label="Shared area">
@@ -108,11 +111,24 @@
                             {% endif %}</span>
                         </h2>
 
-{#                    TODO add the edit area modal to this button from the areas page#}
-                        <!-- Moved the edit pencil here -->
-                        <a href="#" class="area-edit-btn" title="Edit area" aria-label="Edit area">
+                        <!-- Edit area button -->
+                        <button type="button"
+                                class="area-edit-btn"
+                                id="areaEditBtn"
+                                title="Edit area"
+                                aria-label="Edit area"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editAreaModal"
+                                {% if areas %}
+                                data-area-id="{{ areas.0.id }}"
+                                data-area-name="{{ areas.0.name }}"
+                                data-area-shared="{{ areas.0.is_shared|yesno:'true,false' }}"
+                                data-area-owner="{{ areas.0.is_owner|yesno:'true,false' }}"
+                                {% else %}
+                                disabled
+                                {% endif %}>
                             <i class="bi bi-pencil"></i>
-                        </a>
+                        </button>
 
                         {# Quick-add popover #}
                         <div class="t-morph" data-open="false">
@@ -146,11 +162,19 @@
                     <div class="area-carousel-viewport">
                         <div class="area-carousel" id="areaCarousel">
                             {% for area in areas %}
-                                <div class="area-panel" data-area-name="{{ area.name }}" data-is-shared="{{ area.is_shared|yesno:"true,false" }}">
+                                <div class="area-panel"
+                                     data-area-id="{{ area.id }}"
+                                     data-area-name="{{ area.name }}"
+                                     data-is-shared="{{ area.is_shared|yesno:'true,false' }}"
+                                     data-area-owner="{{ area.is_owner|yesno:'true,false' }}">
+
+                                    {% if area.shared_users_script %}{{ area.shared_users_script }}{% endif %}
+
                                     {% if area.products %}
                                         <ul class="product-list">
                                             {% for user_product in area.products %}
-                                                {% include "partials/product_row.html" with up=user_product area_name=area.name %}{% endfor %}
+                                                {% include "partials/product_row.html" with up=user_product area_name=area.name %}
+                                            {% endfor %}
                                         </ul>
                                     {% else %}
                                         <p class="dashboard-empty-state">No products in this area yet.</p>
@@ -218,11 +242,13 @@
                 <div class="add-area-slider-wrap">
                     <div class="add-area-slider-track">
                         <!-- Panel: Add Area -->
-                        <div class="add-area-panel add-area-panel-create modal-body text-center p-4 p-md-5" data-panel="create">
+                        <div class="add-area-panel add-area-panel-create modal-body text-center p-4 p-md-5"
+                             data-panel="create">
                             <h3 class="popup-title mb-4">Add Area</h3>
                             <div class="text-start mb-2">
                                 <label for="newAreaNameDashboard" class="form-label popup-label">Area Name</label>
-                                <input type="text" class="form-control popup-input shadow-none" id="newAreaNameDashboard">
+                                <input type="text" class="form-control popup-input shadow-none"
+                                       id="newAreaNameDashboard">
                             </div>
                             <p class="custom-subtext mb-5">
                                 Add a shared area
@@ -238,11 +264,13 @@
                         </div>
 
                         <!-- Panel: Add Shared Area with Code -->
-                        <div class="add-area-panel add-area-panel-code modal-body text-center p-4 p-md-5" data-panel="code" aria-hidden="true">
+                        <div class="add-area-panel add-area-panel-code modal-body text-center p-4 p-md-5"
+                             data-panel="code" aria-hidden="true">
                             <h3 class="popup-title mb-4">Add Shared Area</h3>
                             <div class="text-start mb-2">
                                 <label for="newAreaCodeDashboard" class="form-label popup-label">Area Code</label>
-                                <input type="text" class="form-control popup-input shadow-none" id="newAreaCodeDashboard">
+                                <input type="text" class="form-control popup-input shadow-none"
+                                       id="newAreaCodeDashboard">
                             </div>
                             <p class="custom-subtext mb-5">
                                 Add a new area
@@ -261,6 +289,9 @@
             </div>
         </div>
     </div>
+
+    {% include "partials/edit_area_modal.html" %}
+
 
     <!-- Add Product — one modal with two faces: a barcode-scan view (camera
          preview) and a manual-entry view. Both live in this same Bootstrap
@@ -351,7 +382,6 @@
          doesn't need a barcode capture step). None of the fields are
          disabled — every one of them should stay editable.
 
-         TODO: nothing opens this yet — call window.openEditProductModal()
          (see productModal.js) from wherever a product row's edit action
          ends up living. -->
     <div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">

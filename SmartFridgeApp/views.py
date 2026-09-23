@@ -7,26 +7,9 @@ from datetime import date, datetime, timedelta
 from types import SimpleNamespace
 from django.utils.html import json_script
 
-# Create your views here.
-
-# ---------------------------------------------------------------------------
-# DEV/DESIGN TOGGLE — set to False (or delete this + _fake_dashboard_areas)
-# once you're done eyeballing the carousel/product-list styling. When True,
-# home() shows made-up areas/products instead of the logged-in user's real
-# data, so you can see the carousel with several areas and every freshness
-# state without needing real DB rows.
-# ---------------------------------------------------------------------------
 USE_FAKE_DASHBOARD_DATA = True
 
 def _with_freshness(user_product):
-    """
-    Attaches two convenience attributes to a UserProduct instance so the
-    template stays free of date arithmetic:
-
-      - freshness_percent: 0-100, how much of the shelf life is left
-        (None if the product has no expiration date)
-      - freshness_level: 'fresh' | 'warning' | 'critical' | 'expired' | 'unknown'
-    """
     exp = user_product.expiration_date
 
     if not exp:
@@ -59,24 +42,13 @@ def _with_freshness(user_product):
     return user_product
 
 
-def _fake_dashboard_areas():
-    """
-    TEMPORARY demo data for the dashboard (see USE_FAKE_DASHBOARD_DATA above).
+def _fake_dashboard_areas(user=None):
+    display_name = user.username if (user and user.is_authenticated) else "You"
+    user_avatar = user.avatar.url if (user and user.is_authenticated and hasattr(user, 'avatar') and user.avatar) else None
 
-    Names deliberately match the fake_areas list in areas() below, so the
-    "click an area card -> land on it in the dashboard carousel" link
-    (see areaCardLink.js / dashboardAreaJump.js) actually finds a match.
-    In production both pages read the same real Area rows, so this
-    matching happens naturally — this is only needed because these are
-    two independent, hand-written mock datasets.
+    def user_stub(username, avatar_url=None):
+        return {"username": username, "avatar_url": avatar_url}
 
-    Reuses _with_freshness so the freshness bars/colors are computed
-    exactly like production. Covers:
-      - every freshness state (fresh, warning, critical, expired, unknown)
-      - an empty area (tests the "No products in this area yet." state)
-      - enough products per area to reliably need scrolling
-      - enough areas to test the carousel's prev/next arrows
-    """
     today = date.today()
 
     def fake_product(name, days_left=None, added_days_ago=14):
@@ -88,8 +60,10 @@ def _fake_dashboard_areas():
         return _with_freshness(up)
 
     fridge = SimpleNamespace(
+        id=1,
         name="Fridge",
         is_shared=False,
+        is_owner=True,
         products=[
             fake_product("Whole Milk", days_left=2, added_days_ago=10),       # critical
             fake_product("Free-range Eggs", days_left=18, added_days_ago=4),  # fresh
@@ -100,23 +74,16 @@ def _fake_dashboard_areas():
         ],
     )
 
-    attic = SimpleNamespace(name="Attic", is_shared=False, products=[])
-
-    freezer = SimpleNamespace(
-        name="Freezer",
-        is_shared=False,
-        products=[
-            fake_product("Vanilla Ice Cream", days_left=120, added_days_ago=5),
-            fake_product("Frozen Peas", days_left=5, added_days_ago=25),
-            fake_product("Sourdough Loaf", days_left=45, added_days_ago=3),
-            fake_product("Mixed Veg Bag", days_left=9, added_days_ago=20),
-            fake_product("Dumplings", days_left=60, added_days_ago=10),
-        ],
-    )
-
     pantry = SimpleNamespace(
+        id=2,
         name="Pantry",
         is_shared=True,
+        is_owner=False,
+        owner=SimpleNamespace(username="Gacek"),
+        shared_users_script=json_script(
+            [user_stub("Kasia"), user_stub("Marek"), user_stub(display_name, user_avatar)],
+            "area-users-2"
+        ),
         products=[
             fake_product("Canned Tomatoes", days_left=300, added_days_ago=20),
             fake_product("Homemade Jam", days_left=10, added_days_ago=40),
@@ -126,9 +93,36 @@ def _fake_dashboard_areas():
         ],
     )
 
+    freezer = SimpleNamespace(
+        id=3,
+        name="Freezer",
+        is_shared=False,
+        is_owner=True,
+        products=[
+            fake_product("Vanilla Ice Cream", days_left=120, added_days_ago=5),
+            fake_product("Frozen Peas", days_left=5, added_days_ago=25),
+            fake_product("Sourdough Loaf", days_left=45, added_days_ago=3),
+            fake_product("Mixed Veg Bag", days_left=9, added_days_ago=20),
+            fake_product("Dumplings", days_left=60, added_days_ago=10),
+        ],
+    )
+
+    attic = SimpleNamespace(
+        id=4,
+        name="Attic",
+        is_shared=False,
+        is_owner=True,
+        products=[]
+    )
+
+    room_fridge_members = [user_stub("Kasia"), user_stub("Marek")]
     room_fridge = SimpleNamespace(
+        id=5,
         name="Room fridge",
         is_shared=True,
+        is_owner=True,
+        owner=SimpleNamespace(username=display_name, avatar_url=user_avatar),
+        shared_users_script=json_script(room_fridge_members, "area-users-5"),
         products=[
             fake_product("Sparkling Water", days_left=180, added_days_ago=10),
             fake_product("Leftover Pizza", days_left=1, added_days_ago=3),
@@ -138,9 +132,18 @@ def _fake_dashboard_areas():
         ],
     )
 
+    kitchen_cabinet_members = [
+        user_stub("Kasia"), user_stub("Marek"), user_stub("Ola"),
+        user_stub("Tomek"), user_stub("Zosia"), user_stub("Piotr"),
+        user_stub("Ania"), user_stub("Wiktor"), user_stub("Bartek"),
+    ]
     kitchen_cabinet = SimpleNamespace(
+        id=6,
         name="Kitchen cabinet",
         is_shared=True,
+        is_owner=True,
+        owner=SimpleNamespace(username=display_name, avatar_url=user_avatar),
+        shared_users_script=json_script(kitchen_cabinet_members, "area-users-6"),
         products=[
             fake_product(f"Canned Beans #{i}", days_left=200 - i * 15, added_days_ago=30)
             for i in range(1, 9)
@@ -151,16 +154,11 @@ def _fake_dashboard_areas():
 
 
 def home(request):
-
     if not request.user.is_authenticated:
         return redirect('landing')
 
-    """
-    Dashboard / "Fridge" view. Shows a carousel of the areas the current
-    user belongs to, each with the products currently stored in it.
-    """
     if USE_FAKE_DASHBOARD_DATA:
-        areas = _fake_dashboard_areas()
+        areas = _fake_dashboard_areas(request.user)
     else:
         areas = list(
             request.user.areas
@@ -174,6 +172,16 @@ def home(request):
 
         for area in areas:
             area.products = [_with_freshness(up) for up in area.userproduct_set.all()]
+            area.is_owner = (getattr(area, 'owner', None) == request.user)
+            if area.is_shared and area.is_owner:
+                members = [
+                    {
+                        "username": u.username,
+                        "avatar_url": u.avatar.url if (hasattr(u, 'avatar') and u.avatar) else None
+                    }
+                    for u in area.users.all() if u != request.user
+                ]
+                area.shared_users_script = json_script(members, f"area-users-{area.id}")
 
     return render(request, 'dashboard/dashboard.html', {
         'areas': areas,
