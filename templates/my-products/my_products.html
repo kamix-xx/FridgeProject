@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}SmartFridge+ — My Products{% endblock %}
+
+{% load static %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=5">
+    <script src="{% static 'js/productModal.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<main class="dashboard-page position-relative">
+
+    <div class="dashboard-inner d-flex flex-row align-items-center justify-content-center h-100">
+
+        <button class="btn btn-link text-decoration-none shadow-none text-dark fs-2 carousel-arrow d-none d-md-block" aria-label="Previous">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+
+        <div class="fridge-panel-body mx-0 mx-md-3 d-flex flex-column h-100 position-relative" style="max-width: 900px; width: 100%;">
+
+            <div class="fridge-panel-header justify-content-center border-bottom border-dark border-opacity-25 pb-3 mb-4">
+                <h2 class="fridge-panel-title m-0 p-0 text-center" style="letter-spacing: 0.15em;">My products</h2>
+            </div>
+
+            <div class="area-panel flex-grow-1" style="padding-bottom: 3.5rem;">
+
+                <svg width="0" height="0" class="position-absolute" style="visibility: hidden;">
+                    <defs>
+                        <filter id="goo" x="-200%" y="-100%" width="400%" height="300%">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+                            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo"/>
+                            <feBlend in="SourceGraphic" in2="goo"/>
+                        </filter>
+                    </defs>
+                </svg>
+
+                <ul class="product-list">
+                    {% for p in my_products %}
+                    <li class="product-row"
+                        data-product-name="{{ p.name|lower }}"
+                        role="button"
+                        tabindex="0">
+
+                        <span class="product-icon" aria-hidden="true">
+                            <i class="bi bi-basket2-fill"></i>
+                        </span>
+
+                        <div class="product-info">
+                            <div class="d-flex justify-content-between align-items-baseline w-100">
+                                <span class="product-name">{{ p.name }}</span>
+                                <span class="d-block d-md-none fw-medium small text-dark opacity-75 ms-2">{{ p.area }}</span>
+                            </div>
+                            <span class="product-exp">exp. {{ p.exp_date }}</span>
+                        </div>
+
+                        <div class="freshness-bar freshness-{{ p.freshness_level }}"
+                             role="progressbar"
+                             aria-valuenow="{{ p.freshness_percent }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                            <div class="freshness-bar-fill" style="width: {{ p.freshness_percent }}%"></div>
+                        </div>
+
+                        <div class="d-none d-md-block fw-medium text-dark ms-3 me-2" style="font-size: 1.05rem;">
+                            {{ p.area }}
+                        </div>
+
+                        <div class="product-row-actions gooey-menu">
+                            <input type="checkbox" id="gooey-chk-myprod-{{ forloop.counter }}" class="gooey-chk d-none">
+                            <div class="gooey-container">
+                                
+                                <button type="button" class="gooey-item item-remove" data-bs-toggle="modal" data-bs-target="#deleteProductModal" aria-label="Remove {{ p.name }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                
+                                <a href="#" class="gooey-item item-edit" aria-label="Edit {{ p.name }}">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                
+                                <label class="gooey-main-btn" for="gooey-chk-myprod-{{ forloop.counter }}">
+                                    <i class="bi bi-three-dots"></i>
+                                </label>
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="d-flex justify-content-center position-absolute w-100" style="bottom: -28px; left: 0;">
+                <button class="btn btn-light rounded-circle shadow-sm d-flex align-items-center justify-content-center"
+                        style="width: 56px; height: 56px; font-size: 2rem; color: var(--title-color);"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#addProductModal" 
+                        data-initial-mode="manual" 
+                        aria-label="Add product">
+                    <i class="bi bi-plus"></i>
+                </button>
+            </div>
+            
+        </div>
+
+        <button class="btn btn-link text-decoration-none shadow-none text-dark fs-2 carousel-arrow d-none d-md-block" aria-label="Next">
+            <i class="bi bi-arrow-right"></i>
+        </button>
+
+    </div>
+</main>
+{% endblock %}

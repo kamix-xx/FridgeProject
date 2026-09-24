@@ -408,6 +408,40 @@ def change_password_view(request):
     return redirect('profile')
 
 
+def my_products_view(request):
+    mock_my_products = [
+        {
+            'name': 'Milk',
+            'exp_date': '01.04.27',
+            'area': 'Fridge',
+            'freshness_percent': 100,
+            'freshness_level': 'fresh'
+        },
+        {
+            'name': 'Cottage cheese',
+            'exp_date': '01.12.26',
+            'area': 'Fridge',
+            'freshness_percent': 65,
+            'freshness_level': 'warning'
+        },
+        {
+            'name': 'Mozarella',
+            'exp_date': '12.06.26',
+            'area': 'Fridge',
+            'freshness_percent': 25,
+            'freshness_level': 'critical'
+        },
+        {
+            'name': 'Orange juice',
+            'exp_date': '01.04.28',
+            'area': 'Pantry',
+            'freshness_percent': 100,
+            'freshness_level': 'fresh'
+        },
+    ]
+
+    return render(request, 'my-products/my_products.html', {'my_products': mock_my_products})
+
 def recipes(request):
     # recipes = Recipe.objects.all()
     return render(request, 'recipes/recipes.html')
