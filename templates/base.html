@@ -146,7 +146,7 @@
             <a href="{% url 'recipes' %}" class="side-menu-link">My menu</a>
             <a href="{% url 'profile' %}" class="side-menu-link">Profile</a>
             {% if user.role == 'ADMIN' %}
-                <a href="#" class="side-menu-link side-menu-link-admin">Administrator panel</a>
+                <a href="{% url 'admin-panel' %}" class="side-menu-link side-menu-link-admin">Administrator panel</a>
             {% endif %}
         </nav>
 

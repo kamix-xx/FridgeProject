@@ -106,6 +106,25 @@
     color: #a71d2a;
 }
 
+.popup-btn-confirm {
+    color: #2e9f45 !important;
+    font-weight: 600;
+    transition: color 0.2s ease, transform 0.1s ease;
+}
+
+.popup-btn-confirm:hover {
+    color: #217a33 !important;
+    transform: scale(1.05);
+}
+
+[data-bs-theme="dark"] .popup-btn-confirm {
+    color: #51d270 !important;
+}
+
+[data-bs-theme="dark"] .popup-btn-confirm:hover {
+    color: #3bb558 !important;
+}
+
 .popup-circular-btn {
     width: 55px;
     height: 55px;

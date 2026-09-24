@@ -47,8 +47,7 @@ def _with_freshness(user_product):
 
 def _fake_dashboard_areas(user=None):
     display_name = user.username if (user and user.is_authenticated) else "You"
-    user_avatar = user.avatar.url if (
-            user and user.is_authenticated and hasattr(user, 'avatar') and user.avatar) else None
+    user_avatar = user.avatar.url if (user and user.is_authenticated and hasattr(user, 'avatar') and user.avatar) else None
 
     def user_stub(username, avatar_url=None):
         return {"username": username, "avatar_url": avatar_url}
@@ -69,12 +68,12 @@ def _fake_dashboard_areas(user=None):
         is_shared=False,
         is_owner=True,
         products=[
-            fake_product("Whole Milk", days_left=2, added_days_ago=10),  # critical
+            fake_product("Whole Milk", days_left=2, added_days_ago=10),       # critical
             fake_product("Free-range Eggs", days_left=18, added_days_ago=4),  # fresh
-            fake_product("Leftover Soup", days_left=-1, added_days_ago=6),  # expired
-            fake_product("Greek Yogurt", days_left=9, added_days_ago=6),  # warning
-            fake_product("Cheddar Block", days_left=25, added_days_ago=5),  # fresh
-            fake_product("Mystery Jar", days_left=None),  # unknown
+            fake_product("Leftover Soup", days_left=-1, added_days_ago=6),    # expired
+            fake_product("Greek Yogurt", days_left=9, added_days_ago=6),      # warning
+            fake_product("Cheddar Block", days_left=25, added_days_ago=5),    # fresh
+            fake_product("Mystery Jar", days_left=None),                      # unknown
         ],
     )
 
@@ -269,7 +268,6 @@ def areas(request):
     }
 
     return render(request, 'areas/areas.html', context)
-
 
 def shopping_list_view(request):
     mock_shopping_list = {
@@ -538,3 +536,37 @@ def create_recipe(request):
         messages.success(request, 'Recipe created successfully.')
 
     return redirect('recipes')
+
+
+def admin_panel_view(request):
+
+    all_users = User.objects.all().exclude(role='ADMIN')
+
+    mock_pending_recipes = [
+        {'id': 1, 'name': 'Recipe 1'},
+        {'id': 2, 'name': 'Recipe 2'},
+        {'id': 3, 'name': 'Spicy Tomato Soup'},
+    ]
+
+    mock_public_recipes = [
+        {'id': 101, 'name': 'Classic Caesar Salad'},
+        {'id': 102, 'name': 'The "Midnight in Seville" Oranges'},
+        {'id': 103, 'name': 'The "Vampire\'s Orchard" Oranges'},
+    ]
+
+    mock_global_units = [
+        {'id': 1, 'name': 'Kilogram (kg)'},
+        {'id': 2, 'name': 'Liter (L)'},
+        {'id': 3, 'name': 'Piece (pcs)'},
+        {'id': 4, 'name': 'Gram (g)'},
+        {'id': 5, 'name': 'Milliliter (ml)'},
+    ]
+
+    context = {
+        'db_users': all_users,
+        'pending_recipes': mock_pending_recipes,
+        'public_recipes': mock_public_recipes,
+        'global_units': mock_global_units,
+    }
+
+    return render(request, 'admin/admin_panel.html', context)
