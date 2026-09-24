@@ -88,6 +88,14 @@
     background-color: #d1be31;
 }
 
+.admin-item-peach {
+    background-color: #ffbe76;
+}
+
+[data-bs-theme="dark"] .admin-item-peach {
+    background-color: #c98c4b;
+}
+
 .admin-item-actions {
     display: flex;
     gap: 0.5rem;

@@ -482,10 +482,19 @@ def admin_panel_view(request):
         {'id': 103, 'name': 'The "Vampire\'s Orchard" Oranges'},
     ]
 
+    mock_global_units = [
+        {'id': 1, 'name': 'Kilogram (kg)'},
+        {'id': 2, 'name': 'Liter (L)'},
+        {'id': 3, 'name': 'Piece (pcs)'},
+        {'id': 4, 'name': 'Gram (g)'},
+        {'id': 5, 'name': 'Milliliter (ml)'},
+    ]
+
     context = {
         'db_users': all_users,
         'pending_recipes': mock_pending_recipes,
-        'public_recipes': mock_public_recipes
+        'public_recipes': mock_public_recipes,
+        'global_units': mock_global_units,
     }
 
     return render(request, 'admin/admin_panel.html', context)
