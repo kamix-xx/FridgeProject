@@ -12,16 +12,16 @@
 {% block title %}SmartFridge+ — Shopping List{% endblock %}
 
 {% block content %}
-     {% include "partials/background_images.html" %}
+    {% include "partials/background_images.html" %}
 
     <main class="position-relative min-vh-100 d-flex flex-column align-items-center justify-content-center py-5">
         <svg width="0" height="0" class="position-absolute" style="visibility: hidden;">
             <defs>
                 <filter id="goo">
-                    <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"></feGaussianBlur>
                     <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"
-                                   result="goo"/>
-                    <feBlend in="SourceGraphic" in2="goo"/>
+                                   result="goo"></feColorMatrix>
+                    <feBlend in="SourceGraphic" in2="goo"></feBlend>
                 </filter>
             </defs>
         </svg>
@@ -52,9 +52,9 @@
                     </button>
                 </div>
 
-{#            FIXME mobile styling of these product rows, they overflow all buttons and spill them on the side of the screen breaking the aspect ratio #}
-{#            consider using a partial, and copying the style of dashboard product row, also consider hiding the edit and remove button behind morph menu/ goey menu #}
-{#            TODO making the checkbox cross out the whole product, and styling it gray, but first fix the responsiveness ! #}
+                {#            FIXME mobile styling of these product rows, they overflow all buttons and spill them on the side of the screen breaking the aspect ratio #}
+                {#            consider using a partial, and copying the style of dashboard product row, also consider hiding the edit and remove button behind morph menu/ goey menu #}
+                {#            TODO making the checkbox cross out the whole product, and styling it gray, but first fix the responsiveness ! #}
 
                 <div class="areas-scroll-container pe-2 pe-md-4" style="max-height: 45vh;">
                     <ul class="product-list">
