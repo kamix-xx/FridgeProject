@@ -27,6 +27,39 @@
                 </button>
             </div>
 
+            <!-- ========================================== -->
+            <!-- DYNAMICZNA LISTA PRZEPISÓW Z BAZY DANYCH -->
+            <!-- ========================================== -->
+
+            {% for recipe in user_recipes %}
+                <a href="{% url 'recipe_detail' recipe_id=recipe.id %}"
+                   class="recipe-card text-decoration-none position-relative overflow-hidden mb-4 d-block">
+
+                    <div class="recipe-img-bg">
+                        <!-- Zabezpieczenie: jeśli nie ma wgranego obrazka, używamy szarego tła lub domyślnej grafiki -->
+                        {% if recipe.thumbnail %}
+                            <img src="{{ recipe.thumbnail.url }}" alt="{{ recipe.name }}"
+                                 class="w-100 h-100 object-fit-cover">
+                        {% else %}
+                            <div class="w-100 h-100 bg-secondary opacity-50"></div>
+                        {% endif %}
+                    </div>
+
+                    <div class="recipe-content position-relative z-2">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                            <h3 class="recipe-title mb-0">{{ recipe.name }}</h3>
+                            <div class="recipe-meta text-end mt-1 mt-sm-0">
+                                <span class="me-3">est. time: {{ recipe.prep_time|time:"H:i" }}</span>
+                                <span>Status: {% if recipe.is_global %}Global{% else %}Private{% endif %}</span>
+                            </div>
+                        </div>
+                        <!-- Skrócenie długiego opisu do max 100 znaków za pomocą filtra truncatechars -->
+                        <p class="recipe-desc mb-0">{{ recipe.description|truncatechars:100 }}</p>
+                    </div>
+                </a>
+            {% endfor %}
+            <!-- KONIEC DYNAMICZNEJ LISTY -->
+
             <a href="{% url 'recipe_detail' recipe_id=1 %}"
                class="recipe-card text-decoration-none position-relative overflow-hidden mb-4 d-block">
                 <div class="recipe-img-bg">
@@ -85,7 +118,8 @@
     <!-- ========================================== -->
     <!-- POP-UP: Create Recipe -->
     <!-- ========================================== -->
-    <div class="modal fade" id="createRecipeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="createRecipeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
 
             <div class="modal-content custom-popup t-modal border-0">
@@ -93,37 +127,64 @@
                         class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
                         data-bs-dismiss="modal" aria-label="Close"></button>
 
-                <div class="modal-body p-4">
+                <!-- FORMULARZ DODAWANIA PRZEPISU -->
+                <form method="post" action="{% url 'create_recipe' %}" enctype="multipart/form-data"
+                      id="createRecipeForm" class="modal-body p-4">
+                    {% csrf_token %}
                     <h3 class="popup-title text-center mb-3 mt-1">Create recipe</h3>
+
                     <div class="row g-3 mb-5">
+
+                        <!-- UPLOAD ZDJĘCIA (Na wzór awatara z profilu) -->
                         <div class="col-sm-5">
                             <label class="form-label popup-label d-none d-sm-block">&nbsp;</label>
-                            <div class="recipe-img-upload" role="button" tabindex="0" aria-label="Upload recipe image">
-                                <i class="bi bi-image upload-main-icon"></i>
-                                <i class="bi bi-box-arrow-up upload-corner-icon"></i>
-                            </div>
+                            <label for="recipeThumbnail"
+                                   class="recipe-img-upload m-0 d-flex justify-content-center align-items-center position-relative overflow-hidden"
+                                   style="cursor: pointer;">
+
+                                <!-- Ukryty input pliku -->
+                                <input type="file" name="thumbnail" id="recipeThumbnail" class="d-none"
+                                       accept="image/*">
+
+                                <!-- Ikony widoczne przed wgraniem -->
+                                <div id="thumbnailIconsPlaceholder" class="text-center">
+                                    <i class="bi bi-image upload-main-icon d-block"></i>
+                                    <i class="bi bi-box-arrow-up upload-corner-icon position-absolute top-0 end-0 m-2"></i>
+                                </div>
+
+                                <!-- Podgląd zdjęcia -->
+                                <img id="recipeThumbnailPreview"
+                                     class="d-none w-100 h-100 object-fit-cover position-absolute top-0 start-0"
+                                     alt="Preview">
+                            </label>
                         </div>
+
+                        <!-- DANE PODSTAWOWE -->
                         <div class="col-sm-7 d-flex flex-column justify-content-between">
                             <div class="mb-2">
                                 <label for="newRecipeName" class="form-label popup-label">Recipe name</label>
-                                <input type="text" class="form-control popup-input shadow-none w-100"
-                                       id="newRecipeName">
+                                <input type="text" name="name" class="form-control popup-input shadow-none w-100"
+                                       id="newRecipeName" required>
                             </div>
                             <div>
+                                <!-- Użycie typu 'time' zgodnie z polem prep_time w bazie danych -->
                                 <label for="newRecipeTime" class="form-label popup-label">Preparation time</label>
-                                <input type="text" class="form-control popup-input shadow-none w-100" id="newRecipeTime"
-                                       placeholder="e.g., 30 min">
+                                <input type="time" name="prep_time" class="form-control popup-input shadow-none w-100"
+                                       id="newRecipeTime" required>
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="newRecipeDesc" class="form-label popup-label">Short description:</label>
+                        <label for="editRecipeDesc" class="form-label popup-label">Short description:</label>
                         <div class="form-control popup-input shadow-none p-0 overflow-hidden d-flex">
-                            <textarea class="w-100 border-0 bg-transparent shadow-none p-2 m-1" id="editRecipeDesc" rows="2" style="resize: none; outline: none;">{{ recipe.description_short }}</textarea>
+                            <textarea name="description" class="w-100 border-0 bg-transparent shadow-none p-2 m-1"
+                                      id="editRecipeDesc" rows="2" style="resize: none; outline: none;"
+                                      required></textarea>
                         </div>
                     </div>
 
+                    <!-- SKŁADNIKI -->
                     <div class="mb-4">
                         <label class="form-label popup-label mb-2">Ingredients:</label>
 
@@ -135,18 +196,8 @@
                         </div>
 
                         <div id="recipeIngredientsList" class="ingredients-scroll-container mb-2"
-                             style="max-height: 50px; overflow-y: auto; overflow-x: hidden; display: block;">
-
-                            <div class="recipe-ingredient-grid existing-row align-items-center mb-2">
-                                <div class="ingredient-text">Milk</div>
-                                <div class="ingredient-text text-center">0.4</div>
-                                <div class="ingredient-text text-center">L</div>
-                                <button type="button"
-                                        class="btn btn-recipe-row-action btn-danger shadow-none delete-ing-btn">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-
+                             style="max-height: 150px; overflow-y: auto; overflow-x: hidden; display: block;">
+                            <!-- JS będzie tutaj wstawiał nowe wiersze -->
                         </div>
 
                         <div class="recipe-ingredient-grid input-row mt-2">
@@ -168,11 +219,14 @@
                         </div>
                     </div>
 
-                    <button type="button" class="popup-circular-btn mx-auto">
+                    <!-- Ukryte pole na zserializowaną listę składników (JSON) -->
+                    <input type="hidden" name="ingredients_data" id="ingredientsData">
+
+                    <!-- Przycisk zapisu zmieniony na type="submit" -->
+                    <button type="submit" class="popup-circular-btn mx-auto">
                         <i class="bi bi-plus"></i>
                     </button>
-
-                </div>
+                </form>
             </div>
         </div>
     </div>

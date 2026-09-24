@@ -1,9 +1,15 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const addBtn = document.getElementById('addIngBtn');
     const nameInput = document.getElementById('addIngName');
     const qtyInput = document.getElementById('addIngQty');
     const unitInput = document.getElementById('addIngUnit');
     const listContainer = document.getElementById('recipeIngredientsList');
+
+    const form = document.getElementById('createRecipeForm');
+    const ingredientsDataInput = document.getElementById('ingredientsData');
+
+    // Tablica przechowująca dodane składniki w pamięci
+    let ingredientsArray = [];
 
     if (!addBtn) return;
 
@@ -23,6 +29,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        // 1. Zapis do tablicy obiektów
+        const ingredientObj = { name: name, quantity: parseFloat(qty), unit: unit };
+        ingredientsArray.push(ingredientObj);
+
+        // 2. Dodanie wiersza do UI
         const newRow = document.createElement('div');
         newRow.className = 'recipe-ingredient-grid existing-row align-items-center mb-2';
 
@@ -35,15 +46,20 @@ document.addEventListener('DOMContentLoaded', function() {
             </button>
         `;
 
+        // 3. Usuwanie wiersza (z UI i z tablicy w pamięci)
         const deleteBtn = newRow.querySelector('.delete-ing-btn');
-        deleteBtn.addEventListener('click', function() {
+        deleteBtn.addEventListener('click', function () {
+            const index = ingredientsArray.indexOf(ingredientObj);
+            if (index > -1) {
+                ingredientsArray.splice(index, 1);
+            }
             newRow.remove();
         });
 
         listContainer.appendChild(newRow);
-
         listContainer.scrollTop = listContainer.scrollHeight;
 
+        // 4. Czyszczenie inputów
         nameInput.value = '';
         qtyInput.value = '';
         unitInput.value = '';
@@ -53,18 +69,63 @@ document.addEventListener('DOMContentLoaded', function() {
     addBtn.addEventListener('click', addIngredient);
 
     [nameInput, qtyInput, unitInput].forEach(input => {
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                addIngredient();
-            }
-        });
+        if (input) {
+            input.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addIngredient();
+                }
+            });
+        }
     });
 
     const existingDeleteBtns = listContainer.querySelectorAll('.delete-ing-btn');
     existingDeleteBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function () {
             btn.closest('.existing-row').remove();
         });
     });
+
+    // ---------------------------------------------------------
+    // PODGLĄD ZDJĘCIA W LOCIE
+    // ---------------------------------------------------------
+    const thumbnailInput = document.getElementById('recipeThumbnail');
+    const thumbnailPreview = document.getElementById('recipeThumbnailPreview');
+    const iconsPlaceholder = document.getElementById('thumbnailIconsPlaceholder');
+
+    if (thumbnailInput && thumbnailPreview) {
+        thumbnailInput.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const objectUrl = URL.createObjectURL(file);
+                thumbnailPreview.src = objectUrl;
+                thumbnailPreview.classList.remove('d-none');
+                if (iconsPlaceholder) iconsPlaceholder.classList.add('d-none');
+            }
+        });
+    }
+
+    // ---------------------------------------------------------
+    // KONWERSJA DO JSON PRZY WYSYŁANIU FORMULARZA
+    // ---------------------------------------------------------
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            // Zabezpieczenie: jeśli wpisano dane w inputy, ale zapomniano wcisnąć "+", dopiszmy je przed wysłaniem
+            const pendingName = nameInput.value.trim();
+            const pendingQty = qtyInput.value.trim();
+            const pendingUnit = unitInput.value;
+
+            if (pendingName && pendingQty && pendingUnit) {
+                ingredientsArray.push({
+                    name: pendingName,
+                    quantity: parseFloat(pendingQty),
+                    unit: pendingUnit
+                });
+            }
+
+            if (ingredientsDataInput) {
+                ingredientsDataInput.value = JSON.stringify(ingredientsArray);
+            }
+        });
+    }
 });
