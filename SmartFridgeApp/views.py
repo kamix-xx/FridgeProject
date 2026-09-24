@@ -1,13 +1,16 @@
 from django.contrib.auth import login, logout, get_user_model, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm
 from django.contrib import messages
 from datetime import date, datetime, timedelta
 from types import SimpleNamespace
 from django.utils.html import json_script
+from .models import ProductDictionary, Recipe, RecipeProduct, Unit
+from .forms import CustomUserCreationForm
+import json
 
 USE_FAKE_DASHBOARD_DATA = True
+
 
 def _with_freshness(user_product):
     exp = user_product.expiration_date
@@ -44,7 +47,8 @@ def _with_freshness(user_product):
 
 def _fake_dashboard_areas(user=None):
     display_name = user.username if (user and user.is_authenticated) else "You"
-    user_avatar = user.avatar.url if (user and user.is_authenticated and hasattr(user, 'avatar') and user.avatar) else None
+    user_avatar = user.avatar.url if (
+            user and user.is_authenticated and hasattr(user, 'avatar') and user.avatar) else None
 
     def user_stub(username, avatar_url=None):
         return {"username": username, "avatar_url": avatar_url}
@@ -65,12 +69,12 @@ def _fake_dashboard_areas(user=None):
         is_shared=False,
         is_owner=True,
         products=[
-            fake_product("Whole Milk", days_left=2, added_days_ago=10),       # critical
+            fake_product("Whole Milk", days_left=2, added_days_ago=10),  # critical
             fake_product("Free-range Eggs", days_left=18, added_days_ago=4),  # fresh
-            fake_product("Leftover Soup", days_left=-1, added_days_ago=6),    # expired
-            fake_product("Greek Yogurt", days_left=9, added_days_ago=6),      # warning
-            fake_product("Cheddar Block", days_left=25, added_days_ago=5),    # fresh
-            fake_product("Mystery Jar", days_left=None),                      # unknown
+            fake_product("Leftover Soup", days_left=-1, added_days_ago=6),  # expired
+            fake_product("Greek Yogurt", days_left=9, added_days_ago=6),  # warning
+            fake_product("Cheddar Block", days_left=25, added_days_ago=5),  # fresh
+            fake_product("Mystery Jar", days_left=None),  # unknown
         ],
     )
 
@@ -187,6 +191,7 @@ def home(request):
         'areas': areas,
     })
 
+
 def landing(request):
     return render(request, "landing.html")
 
@@ -264,6 +269,7 @@ def areas(request):
     }
 
     return render(request, 'areas/areas.html', context)
+
 
 def shopping_list_view(request):
     mock_shopping_list = {
@@ -410,7 +416,13 @@ def change_password_view(request):
 
 def recipes(request):
     # recipes = Recipe.objects.all()
-    return render(request, 'recipes/recipes.html')
+    # Pobieramy przepisy użytkownika (najnowsze na górze)
+    user_recipes = Recipe.objects.filter(user=request.user).order_by('-id')
+
+    context = {
+        'user_recipes': user_recipes
+    }
+    return render(request, 'recipes/recipes.html', context)
 
 
 def recipe_detail(request, recipe_id):
@@ -464,3 +476,65 @@ def recipe_detail(request, recipe_id):
     }
 
     return render(request, 'recipes/recipe_detail.html', context)
+
+
+@login_required(login_url='login')
+def create_recipe(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        prep_time = request.POST.get('prep_time')
+        thumbnail = request.FILES.get('thumbnail')
+        ingredients_json = request.POST.get('ingredients_data')
+
+        # 1. Zapis Przepisu
+        recipe = Recipe.objects.create(
+            name=name,
+            description=description,
+            prep_time=prep_time,
+            thumbnail=thumbnail,
+            user=request.user,
+            calories=1,  # Validator wymusza wartość >= 1
+            is_global=False  # Przepis dodany przez użytkownika jest prywatny
+        )
+
+        # 2. Przetworzenie składników i zapis do tabeli pośredniej (RecipeProduct)
+        if ingredients_json:
+            print(f"--- DANE SKŁADNIKÓW Z FORMULARZA: {ingredients_json} ---")  # LOG DO KONSOLI
+            ingredients = json.loads(ingredients_json)
+
+            for item in ingredients:
+                ing_name = item.get('name')
+                ing_qty = item.get('quantity')
+                ing_unit_symbol = item.get('unit')
+
+                # Znajdź lub stwórz jednostkę
+                unit_obj, _ = Unit.objects.get_or_create(
+                    symbol=ing_unit_symbol,
+                    defaults={'user': request.user, 'is_global': False}
+                )
+
+                # Znajdź lub stwórz produkt w słowniku
+                product_obj, _ = ProductDictionary.objects.get_or_create(
+                    name=ing_name,
+                    defaults={
+                        'user': request.user,
+                        'is_global': False,
+                        'icon_number': 1,  # Wymagane przez model (null=False)
+                        'nutriscore': 'X'  # Wymagane przez model (max_length=1)
+                    }
+                )
+
+                # Utworzenie relacji z użyciem prawidłowej nazwy modelu (RecipeProduct)
+                RecipeProduct.objects.create(
+                    quantity=ing_qty,
+                    unit=unit_obj,
+                    recipe=recipe,
+                    product=product_obj
+                )
+        else:
+            print("--- UWAGA: Otrzymano pustą listę składników (None lub '') ---")
+
+        messages.success(request, 'Recipe created successfully.')
+
+    return redirect('recipes')

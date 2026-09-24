@@ -30,7 +30,9 @@ urlpatterns = [
 
     path('recipes/', views.recipes, name='recipes'),
 
-    path('recipes/<int:recipe_id>/', views.recipe_detail, name='recipe_detail')
+    path('recipes/<int:recipe_id>/', views.recipe_detail, name='recipe_detail'),
+
+    path('recipes/create/', views.create_recipe, name='create_recipe'),
 ]
 
 if settings.DEBUG:
