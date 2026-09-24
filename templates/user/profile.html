@@ -14,12 +14,12 @@
     {% include "partials/no_page_transition_panel.html" %}
 
     <!-- Errors and notifications -->
-    <!-- System powiadomień (Toasts) dla błędów i sukcesów -->
     {% if messages %}
-        <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-4" style="z-index: 1070; margin-top: 60px;">
+        <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-4"
+             style="z-index: 1070; margin-top: 60px;">
             {% for message in messages %}
 
-                <!-- Wyświetlanie powiadomienia -->
+                <!-- Notifications display -->
                 <div class="toast align-items-center text-bg-{% if 'error' in message.tags %}danger{% else %}success{% endif %} border-0 show shadow-lg"
                      role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="d-flex">
@@ -31,11 +31,11 @@
                     </div>
                 </div>
 
-                <!-- Otwarcie modala zmiany hasła z automatu, jeśli wystąpił błąd hasła -->
+                <!-- If there was any password error, open the password change modal -->
                 {% if 'password_error' in message.tags %}
                     <script>
                         document.addEventListener('DOMContentLoaded', function () {
-                            // Wywołanie modala z użyciem API Bootstrapa
+                            // Open modal with Bootstrap API
                             const changePassModal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
                             changePassModal.show();
                         });
@@ -46,7 +46,7 @@
         </div>
 
         <script>
-            // Automatyczne znikanie powiadomień po 5 sekundach
+            // Clear notofications after  5 seconds
             setTimeout(() => {
                 document.querySelectorAll('.toast').forEach(t => t.classList.remove('show'));
             }, 5000);
@@ -117,16 +117,16 @@
         </div>
     </div>
 
-    <!-- Modal Potwierdzenia Usunięcia Konta -->
+    <!-- Modal: Account Deletion Confirmation -->
     <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered custom-delete-modal-dialog">
             <div class="modal-content custom-delete-modal-content text-center text-white py-5 px-4">
 
-                <!-- Główny tekst -->
+                <!-- Main text -->
                 <h2 class="delete-modal-title mb-2">Are you sure you want to delete your account?</h2>
                 <p class="delete-modal-subtitle mb-4">This action is irreversible</p>
 
-                <!-- Przycisk YES -->
+                <!-- YES button -->
                 <form method="post" action="{% url 'delete_account' %}" class="w-100">
                     {% csrf_token %}
                     <button type="submit"
@@ -136,10 +136,10 @@
                     </button>
                 </form>
 
-                <!-- Linia podziału -->
+                <!-- Line -->
                 <div class="delete-modal-divider mx-auto my-3"></div>
 
-                <!-- Przycisk NO -->
+                <!-- NO button -->
                 <div>
                     <button type="button"
                             class="btn btn-delete-action text-white bg-transparent border-0 p-0 d-inline-flex align-items-center justify-content-center gap-2"
@@ -158,11 +158,11 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content edit-modal-container p-4 p-md-5">
 
-                <!-- Przycisk zamykania X -->
+                <!-- Closing button (X) -->
                 <button type="button" class="btn-close edit-modal-close shadow-none" data-bs-dismiss="modal"
                         aria-label="Close"></button>
 
-                <!-- FORMULARZ EDYCJI -->
+                <!-- Form: Account data edit -->
                 <form method="post" action="{% url 'edit_profile' %}" enctype="multipart/form-data"
                       class="modal-body p-0">
                     {% csrf_token %}
@@ -170,7 +170,7 @@
 
                     <div class="row g-4 align-items-start mt-1">
 
-                        <!-- LEWA KOLUMNA -->
+                        <!-- Left column -->
                         <div class="col-md-6 d-flex flex-column gap-4">
 
                             <!-- Login -->
@@ -204,16 +204,16 @@
 
                         </div>
 
-                        <!-- PRAWA KOLUMNA -->
+                        <!-- Right column -->
                         <div class="col-md-6 d-flex flex-column gap-4">
 
                             <!-- Avatar -->
                             <div class="d-flex flex-column align-items-start align-items-md-center pe-md-4 gap-2">
 
-                                <!-- Zmieniono div na label, aby kliknięcie otwierało wybór pliku -->
+                                <!-- Label: Upload file -->
                                 <label for="avatarUpload" class="edit-avatar-frame m-0" style="cursor: pointer;">
 
-                                    <!-- Ukryty input do pliku -->
+                                    <!-- Hidden file input -->
                                     <input type="file" name="avatar" id="avatarUpload" class="d-none" accept="image/*">
 
                                     <!-- Upload Icon -->
@@ -246,9 +246,10 @@
                                     {% endif %}
                                 </label>
 
-                                <!-- UKRYTY INPUT DLA BACKENDU I PRZYCISK USUWANIA -->
+                                <!-- Hidden input -->
                                 <input type="hidden" name="remove_avatar" id="removeAvatarFlag" value="false">
 
+                                <!-- Avatar remove button -->
                                 <button type="button" id="removeAvatarBtn"
                                         class="btn btn-link text-danger text-decoration-none p-0 align-items-center gap-1 mt-1 {% if user.avatar %}d-flex{% else %}d-none{% endif %}"
                                         style="font-size: 0.95rem; font-weight: 500; border: none; background: transparent;">
@@ -293,11 +294,11 @@
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content edit-modal-container p-4 p-md-5">
 
-                <!-- Close button X -->
+                <!-- Close button (X) -->
                 <button type="button" class="btn-close edit-modal-close shadow-none" data-bs-dismiss="modal"
                         aria-label="Close"></button>
 
-                <!-- CHANGE PASSWORD FORM -->
+                <!-- Form: change password -->
                 <form method="post" action="{% url 'change_password' %}" class="modal-body p-0">
                     {% csrf_token %}
                     <h2 class="edit-modal-heading mb-5">Change Password</h2>
@@ -345,13 +346,13 @@
                     <!-- Errors -->
                     <div id="passwordErrorMsg" class="text-danger text-center mb-3 d-none fw-medium"></div>
 
-                    <!-- Przyciski Zapisz / Anuluj -->
+                    <!-- Save / cancel buttons -->
                     <div class="d-flex align-items-center justify-content-center gap-3 mt-4">
-                        <!-- Przycisk z samą ikonką dyskietki -->
+                        <!-- Save button -->
                         <button type="submit" class="btn edit-btn-save px-3 py-2">
                             <i class="bi bi-floppy fs-5"></i>
                         </button>
-                        <!-- Przycisk Cancel -->
+                        <!-- Cancel button -->
                         <button type="button" class="btn edit-btn-cancel px-4 py-2" data-bs-dismiss="modal">
                             Cancel
                         </button>
@@ -361,10 +362,12 @@
             </div>
         </div>
     </div>
+
+    <!-- Script: cancelled form data reset -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
 
-            // 1. Resetowanie modala Edycji Konta
+            // Edit account modal reset
             const editModal = document.getElementById('editAccountModal');
             if (editModal) {
                 editModal.addEventListener('hidden.bs.modal', function () {
@@ -373,16 +376,16 @@
                 });
             }
 
-            // 2. Resetowanie modala Zmiany Hasła
+            // Change password modal reset
             const passwordModal = document.getElementById('changePasswordModal');
             if (passwordModal) {
                 passwordModal.addEventListener('hidden.bs.modal', function () {
                     const form = passwordModal.querySelector('form');
                     if (form) {
-                        // Wyczyść wpisane hasła
+                        // Passwords reset
                         form.reset();
 
-                        // Zresetuj ikonki "oka" (przywróć ukrywanie haseł)
+                        // Icons reset
                         const passwordToggles = form.querySelectorAll('.toggle-password');
                         passwordToggles.forEach(icon => {
                             icon.classList.remove('bi-eye');
