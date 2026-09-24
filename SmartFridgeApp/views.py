@@ -476,9 +476,16 @@ def admin_panel_view(request):
         {'id': 3, 'name': 'Spicy Tomato Soup'},
     ]
 
+    mock_public_recipes = [
+        {'id': 101, 'name': 'Classic Caesar Salad'},
+        {'id': 102, 'name': 'The "Midnight in Seville" Oranges'},
+        {'id': 103, 'name': 'The "Vampire\'s Orchard" Oranges'},
+    ]
+
     context = {
         'db_users': all_users,
         'pending_recipes': mock_pending_recipes,
+        'public_recipes': mock_public_recipes
     }
 
     return render(request, 'admin/admin_panel.html', context)
