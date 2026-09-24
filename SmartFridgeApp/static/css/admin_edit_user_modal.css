@@ -1,0 +1,226 @@
+/* =========================================
+   ADMIN USER EDIT MODAL
+   ========================================= */
+
+.admin-modal-card {
+    background-color: var(--landing-page-bg) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+    color: var(--title-color);
+}
+
+[data-bs-theme="dark"] .admin-modal-card {
+    background-color: #1a1a1a !important;
+    color: var(--sidemenu-text);
+}
+
+.admin-modal-title {
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: inherit;
+}
+
+.admin-modal-close {
+    font-size: 1rem;
+    filter: invert(var(--bs-theme-invert, 0));
+}
+
+.admin-field-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+    color: inherit;
+}
+
+.admin-underline-input-wrap {
+    border-bottom: 1.5px solid var(--title-color);
+    padding-bottom: 0.2rem;
+}
+
+[data-bs-theme="dark"] .admin-underline-input-wrap {
+    border-bottom-color: rgba(255, 255, 255, 0.4);
+}
+
+.admin-underline-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    color: inherit;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.admin-edit-icon {
+    font-size: 0.95rem;
+    opacity: 0.6;
+}
+
+.admin-role-badge {
+    background-color: rgba(0, 0, 0, 0.08);
+    padding: 0.5rem 1.25rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+[data-bs-theme="dark"] .admin-role-badge {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-status-select {
+    background-color: #bbf7a7;
+    color: #19520b;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    padding: 0.5rem 2.2rem 0.5rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    box-shadow: none;
+    cursor: pointer;
+}
+
+.admin-status-select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(187, 247, 167, 0.4);
+    border-color: #92e078;
+}
+
+.admin-status-select.status-deleted {
+    background-color: #ffc9c9;
+    color: #8c1d1d;
+}
+
+.admin-btn-outline {
+    border: 1.5px solid var(--title-color);
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    padding: 0.4rem 1rem;
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+}
+
+.admin-btn-outline:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+[data-bs-theme="dark"] .admin-btn-outline {
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.admin-avatar-box {
+    width: 170px;
+    height: 170px;
+    border: 2px solid var(--title-color);
+    border-radius: 20px;
+    overflow: hidden;
+    background: transparent;
+}
+
+[data-bs-theme="dark"] .admin-avatar-box {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.admin-placeholder-icon {
+    font-size: 5rem;
+    color: inherit;
+    opacity: 0.7;
+}
+
+.admin-avatar-upload-btn {
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: inherit;
+    padding: 0.2rem 0.4rem;
+    border-radius: 6px;
+    transition: transform 0.15s ease;
+}
+
+.admin-avatar-upload-btn:hover {
+    transform: translateY(-2px);
+}
+
+.admin-creation-date {
+    font-size: 0.85rem;
+    opacity: 0.75;
+}
+
+/* =========================================
+   CUSTOM STATUS DROPDOWN (Symulowany Select)
+   ========================================= */
+
+.admin-custom-select-wrap {
+    min-width: 190px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    user-select: none; 
+}
+
+.admin-custom-select-trigger {
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.admin-custom-select-trigger:hover {
+    filter: brightness(0.95);
+}
+
+.admin-custom-select-trigger.status-active {
+    background-color: #bbf7a7;
+    color: #19520b;
+}
+
+.admin-custom-select-trigger.status-deleted {
+    background-color: #ffc9c9;
+    color: #8c1d1d;
+}
+
+.admin-custom-select-options {
+    position: absolute;
+    top: 115%;
+    left: 0;
+    right: 0;
+    background: var(--landing-page-bg);
+    border-radius: 10px;
+    list-style: none;
+    padding: 0.5rem 0;
+    margin: 0;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+}
+
+[data-bs-theme="dark"] .admin-custom-select-options {
+    background: #2a2a2a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-custom-select-options.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.admin-custom-option {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    color: var(--title-color);
+}
+
+.admin-custom-option:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+[data-bs-theme="dark"] .admin-custom-option {
+    color: var(--sidemenu-text);
+}
+
+[data-bs-theme="dark"] .admin-custom-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+}

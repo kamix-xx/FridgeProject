@@ -1,0 +1,175 @@
+/* =========================================
+   ADMINISTRATOR PANEL STYLES
+   ========================================= */
+
+.admin-page-wrapper {
+    /* Admin panel image here */
+    background-image: url('https://i.imgur.com/2SjgpvQ.jpeg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.admin-page-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(226, 203, 171, 0.4);
+    z-index: 1;
+}
+
+[data-bs-theme="dark"] .admin-page-wrapper::before {
+    background: rgba(9, 10, 12, 0.75);
+}
+
+.admin-section-title {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--title-color);
+}
+
+.admin-scroll-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(81, 67, 54, 0.4) transparent;
+}
+
+[data-bs-theme="dark"] .admin-scroll-container {
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.admin-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.admin-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.7rem 1.25rem;
+    border-radius: 6px;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.admin-list-item:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+}
+
+.admin-item-name {
+    font-size: 1.05rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-item-orange {
+    background-color: #ff9166;
+    color: #ffffff;
+}
+
+[data-bs-theme="dark"] .admin-item-orange {
+    background-color: #d8683b;
+}
+
+.admin-item-yellow {
+    background-color: #fce853;
+}
+
+[data-bs-theme="dark"] .admin-item-yellow {
+    background-color: #d1be31;
+}
+
+.admin-item-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.admin-icon-btn {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 1.25rem;
+    padding: 0 0.25rem;
+    opacity: 0.8;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.admin-icon-btn:hover {
+    opacity: 1;
+    transform: scale(1.15);
+}
+
+.admin-add-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--title-color);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.admin-add-btn:hover {
+    background: rgba(255, 255, 255, 0.8);
+    transform: translateY(-2px);
+}
+
+[data-bs-theme="dark"] .admin-add-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+}
+
+[data-bs-theme="dark"] .admin-add-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* =========================================
+   CUSTOM SCROLLBAR (Nienachalny suwak)
+   ========================================= */
+
+.admin-scroll-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(81, 67, 54, 0.4) transparent;
+    padding-top: 1rem;
+}
+
+.admin-scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.admin-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.admin-scroll-container::-webkit-scrollbar-thumb {
+    background-color: rgba(81, 67, 54, 0.4);
+    border-radius: 10px;
+}
+
+[data-bs-theme="dark"] .admin-scroll-container {
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+[data-bs-theme="dark"] .admin-scroll-container::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+}

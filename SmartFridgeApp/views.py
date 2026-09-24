@@ -464,3 +464,14 @@ def recipe_detail(request, recipe_id):
     }
 
     return render(request, 'recipes/recipe_detail.html', context)
+
+
+def admin_panel_view(request):
+
+    all_users = User.objects.all().exclude(role='ADMIN')
+
+    context = {
+        'db_users': all_users,
+    }
+
+    return render(request, 'admin/admin_panel.html', context)

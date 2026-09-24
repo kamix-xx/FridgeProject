@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=8">
+    <link rel="stylesheet" href="{% static 'css/admin_panel.css' %}?v=1">
+    <link rel="stylesheet" href="{% static 'css/admin_edit_user_modal.css' %}?v=1">
+    <link rel="stylesheet" href="{% static 'css/modals.css' %}?v=1">
+    <script src="{% static 'js/modals.js' %}" defer></script>
+    <script src="{% static 'js/admin_edit_user.js' %}" defer></script>
+{% endblock %}
+
+{% block title %}SmartFridge+ — Administrator Panel{% endblock %}
+
+{% block content %}
+    <main class="admin-page-wrapper position-relative min-vh-100 py-5">
+
+        <div class="container position-relative z-2" style="max-width: 1200px; margin-top: 4rem;">
+
+            <h1 class="expense-title mb-4 px-2">Administrator panel</h1>
+
+            <div class="row g-4">
+
+                <div class="col-lg-6">
+                    <div class="glass-card h-100 p-4 p-md-5 d-flex flex-column" style="max-width: 100%;">
+                        <h2 class="admin-section-title text-center mb-4">Users</h2>
+
+                        <div class="admin-scroll-container flex-grow-1" style="max-height: 75vh;">
+                            <ul class="admin-list">
+
+                                {% for user_item in db_users %}
+                                    <li class="admin-list-item admin-item-orange shadow-sm">
+
+                                        <span class="admin-item-name" title="{{ user_item.email }}">
+                                            {{ user_item.username }}
+                                            <small class="text-white-50 ms-1 fw-normal">({{ user_item.email }})</small>
+                                        </span>
+
+                                        <div class="admin-item-actions">
+                                            <button class="admin-icon-btn btn-open-user-modal"
+                                                    type="button"
+                                                    title="View details"
+                                                    aria-label="View user"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editUserModal"
+                                                    data-id="{{ user_item.id }}"
+                                                    data-username="{{ user_item.username }}"
+                                                    data-name="{{ user_item.first_name|default:'' }}"
+                                                    data-email="{{ user_item.email }}"
+                                                    data-role="{{ user_item.role }}"
+                                                    data-status="{{ user_item.status }}"
+                                                    data-date="{{ user_item.date_joined|date:'d.m.Y' }}"
+                                                    data-avatar="
+
+
+                                                            {% if user_item.avatar %}{{ user_item.avatar.url }}{% endif %}">
+                                                <i class="bi bi-zoom-in"></i>
+                                            </button>
+                                            <button class="admin-icon-btn" aria-label="Delete user" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+
+                                    </li>
+                                {% empty %}
+                                    <li class="text-center text-muted py-4">
+                                        No users found in the database.
+                                    </li>
+                                {% endfor %}
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 d-flex flex-column gap-4">
+
+                    <div class="glass-card p-4 p-md-5" style="max-width: 100%;">
+                        <h2 class="admin-section-title text-center mb-4">Pending recipes</h2>
+
+                        <div class="admin-scroll-container" style="max-height: 35vh;">
+                            <ul class="admin-list">
+                                <li class="admin-list-item admin-item-orange shadow-sm">
+                                    <span class="admin-item-name">Recipe 1</span>
+                                    <div class="admin-item-actions">
+                                        <button class="admin-icon-btn" aria-label="Accept" title="Accept">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                        <button class="admin-icon-btn" aria-label="Reject" title="Reject">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </div>
+                                </li>
+                                <li class="admin-list-item admin-item-orange shadow-sm">
+                                    <span class="admin-item-name">Recipe 2</span>
+                                    <div class="admin-item-actions">
+                                        <button class="admin-icon-btn" aria-label="Accept"><i
+                                                class="bi bi-check-lg"></i></button>
+                                        <button class="admin-icon-btn" aria-label="Reject"><i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-4 p-md-5 flex-grow-1" style="max-width: 100%;">
+                        <h2 class="admin-section-title text-center mb-4">Public recipes</h2>
+
+                        <div class="admin-scroll-container mb-4" style="max-height: 35vh;">
+                            <ul class="admin-list">
+                                <li class="admin-list-item admin-item-yellow shadow-sm">
+                                    <span class="admin-item-name text-dark">Recipe for dark orange</span>
+                                    <div class="admin-item-actions text-dark">
+                                        <button class="admin-icon-btn text-dark" aria-label="Edit recipe" title="Edit">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button class="admin-icon-btn text-dark" aria-label="Remove recipe"
+                                                title="Remove">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="d-flex justify-content-center mt-auto">
+                            <button class="admin-add-btn shadow-sm" aria-label="Add new public recipe">
+                                <i class="bi bi-plus-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content admin-modal-card p-4 p-md-5 border-0 position-relative">
+
+                <button type="button" class="btn-close admin-modal-close position-absolute top-0 end-0 m-4 shadow-none"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+
+                <h2 class="admin-modal-title mb-4">Account details</h2>
+
+                <form method="post" action="#" enctype="multipart/form-data" id="adminUserEditForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" id="modalUserId">
+
+                    <div class="row g-4 align-items-start">
+
+                        <div class="col-12 col-md-7">
+                            <div class="row g-3">
+
+                                <div class="col-6 mb-3">
+                                    <label class="admin-field-label">Login</label>
+                                    <div class="admin-underline-input-wrap d-flex align-items-center">
+                                        <input type="text" name="username" id="modalUserLogin"
+                                               class="admin-underline-input" required>
+                                        <i class="bi bi-pencil ms-2 admin-edit-icon"></i>
+                                    </div>
+                                </div>
+
+                                <div class="col-6 mb-3">
+                                    <label class="admin-field-label">Name</label>
+                                    <div class="admin-underline-input-wrap d-flex align-items-center">
+                                        <input type="text" name="first_name" id="modalUserName"
+                                               class="admin-underline-input">
+                                        <i class="bi bi-pencil ms-2 admin-edit-icon"></i>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 mb-3">
+                                    <label class="admin-field-label">Email</label>
+                                    <div class="admin-underline-input-wrap d-flex align-items-center">
+                                        <input type="email" name="email" id="modalUserEmail"
+                                               class="admin-underline-input" required>
+                                        <i class="bi bi-pencil ms-2 admin-edit-icon"></i>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 d-flex flex-wrap align-items-center gap-3 my-2">
+                                    <div class="admin-role-badge">
+                                        Role — <span id="modalUserRole">USER</span>
+                                    </div>
+
+                                    <div class="admin-custom-select-wrap position-relative">
+                                        
+                                        <input type="hidden" name="status" id="modalUserStatus" value="ACTIVE">
+
+                                        <div class="admin-custom-select-trigger status-active shadow-sm d-flex justify-content-between align-items-center"
+                                             id="customStatusTrigger">
+                                            <span id="customStatusText">Status — ACTIVE</span>
+                                            <i class="bi bi-chevron-down ms-2" style="font-size: 0.8rem;"></i>
+                                        </div>
+
+                                        <ul class="admin-custom-select-options shadow" id="customStatusOptions">
+                                            <li class="admin-custom-option" data-value="ACTIVE">Status — ACTIVE</li>
+                                            <li class="admin-custom-option" data-value="DELETED">Status — DELETED</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 mt-3">
+                                    <label class="admin-field-label d-block">Password</label>
+                                    <button type="button"
+                                            class="btn admin-btn-outline d-inline-flex align-items-center gap-2">
+                                        <i class="bi bi-pencil"></i> Change password
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-5 d-flex flex-column align-items-center">
+                            <div class="admin-avatar-box position-relative mb-2">
+                                <img id="modalUserAvatarImg" src="" alt="User Avatar"
+                                     class="w-100 h-100 object-fit-cover d-none">
+                                <div id="modalUserAvatarPlaceholder"
+                                     class="w-100 h-100 d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-person admin-placeholder-icon"></i>
+                                </div>
+
+                                <label for="adminAvatarUpload"
+                                       class="admin-avatar-upload-btn position-absolute top-0 end-0 m-2"
+                                       title="Upload avatar">
+                                    <i class="bi bi-upload"></i>
+                                </label>
+                                <input type="file" name="avatar" id="adminAvatarUpload" class="d-none" accept="image/*">
+                            </div>
+
+                            <span class="admin-creation-date">creation date: <span id="modalUserDate">01.01.2027</span></span>
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="submit"
+                                class="btn btn-custom-orange rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2">
+                            <i class="bi bi-floppy"></i> Save
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
