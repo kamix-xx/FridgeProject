@@ -73,3 +73,38 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const universalModal = document.getElementById('universalConfirmModal');
+    if (!universalModal) return;
+
+    universalModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget; 
+        if (!button) return;
+
+        const title = button.getAttribute('data-title');
+        const desc = button.getAttribute('data-desc');
+        const btnText = button.getAttribute('data-btn-text');
+        const btnClass = button.getAttribute('data-btn-class');
+        const itemId = button.getAttribute('data-item-id');
+        const actionType = button.getAttribute('data-action');
+
+        document.getElementById('confirmModalTitle').innerHTML = title;
+
+        const descEl = document.getElementById('confirmModalDesc');
+        if (desc) {
+            descEl.innerHTML = desc;
+            descEl.classList.remove('d-none');
+        } else {
+            descEl.classList.add('d-none');
+        }
+
+
+        const submitBtn = document.getElementById('confirmModalSubmitBtn');
+        submitBtn.innerHTML = btnText;
+        submitBtn.className = 'btn custom-link-button ' + btnClass;
+
+        document.getElementById('confirmModalItemId').value = itemId;
+        document.getElementById('confirmModalActionType').value = actionType;
+    });
+});

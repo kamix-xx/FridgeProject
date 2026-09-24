@@ -470,8 +470,15 @@ def admin_panel_view(request):
 
     all_users = User.objects.all().exclude(role='ADMIN')
 
+    mock_pending_recipes = [
+        {'id': 1, 'name': 'Recipe 1'},
+        {'id': 2, 'name': 'Recipe 2'},
+        {'id': 3, 'name': 'Spicy Tomato Soup'},
+    ]
+
     context = {
         'db_users': all_users,
+        'pending_recipes': mock_pending_recipes,
     }
 
     return render(request, 'admin/admin_panel.html', context)
