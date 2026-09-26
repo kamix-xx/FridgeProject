@@ -3,9 +3,10 @@
 
 {% block head %}
     <link rel="expect" href="#page-transition-panel" blocking="render">
-    <link rel="stylesheet" href="{% static 'css/shopping_list.css' %}?v=8">
+    <link rel="stylesheet" href="{% static 'css/shopping_list.css' %}?v=9">
     <link rel="stylesheet" href="{% static 'css/modals.css' %}">
     <script src="{% static 'js/gooeyMenu.js' %}" defer></script>
+    <script src="{% static 'js/shopping_list.js' %}?v=1" defer></script>
     <script src="{% static 'js/modals.js' %}?v=2" defer></script>
 {% endblock %}
 
@@ -32,7 +33,8 @@
 
             <button type="button"
                     class="btn-scroll-down carousel-arrow shopping-arrow-prev d-none d-md-flex align-items-center justify-content-center"
-                    aria-label="Previous list">
+                    aria-label="Previous list"
+                    {% if not shopping_lists or shopping_lists|length < 2 %}disabled{% endif %}>
                 <i class="bi bi-chevron-left"></i>
             </button>
 
@@ -41,53 +43,86 @@
                  id="page-transition-panel"
                  style="max-width: 900px;">
 
-                <div class="d-flex justify-content-between align-items-center mb-5 pb-2 border-bottom border-dark border-opacity-25">
+                <header class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-dark border-opacity-25 shopping-list-header">
+                    <div class="header-spacer d-none d-sm-block" style="width: 42px;"></div>
                     <div class="flex-grow-1 text-center">
-                        <h2 class="expense-title m-0">Shopping list #1</h2>
+                        <h2 class="expense-title m-0" id="shoppingListTitle">{{ shopping_list.name|default:"Shopping list #1" }}</h2>
                     </div>
-                    <button class="btn btn-danger rounded-3 d-flex align-items-center justify-content-center shadow-sm"
-                            style="width: 42px; height: 42px;"
-                            data-bs-toggle="modal" data-bs-target="#deleteShoppingListModal">
-                        <i class="bi bi-trash fs-5"></i>
-                    </button>
+
+                    <!-- Shopping List Actions Gooey Menu -->
+                    <div class="shopping-header-actions">
+                        <div class="gooey-menu shopping-card-gooey">
+                            <input type="checkbox" id="gooey-chk-header" class="gooey-chk d-none">
+                            <div class="gooey-container">
+                                <button type="button" class="gooey-item item-delete"
+                                        aria-label="Delete shopping list"
+                                        title="Delete list"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteShoppingListModal">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                                <button type="button" class="gooey-item item-edit"
+                                        aria-label="Edit shopping list"
+                                        title="Edit list"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editShoppingListModal">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <label class="gooey-main-btn" for="gooey-chk-header"
+                                       title="List options"
+                                       aria-label="Shopping list actions">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <!-- Completion Celebration Banner -->
+                <div class="shopping-complete-banner d-none mb-3" id="shoppingCompleteBanner">
+                    <div class="d-flex align-items-center justify-content-center gap-2 py-2 px-3">
+                        <i class="bi bi-stars fs-5 text-warning"></i>
+                        <span class="fw-semibold">All products completed! 🎉</span>
+                        <i class="bi bi-stars fs-5 text-warning"></i>
+                    </div>
                 </div>
 
-                {#            FIXME mobile styling of these product rows, they overflow all buttons and spill them on the side of the screen breaking the aspect ratio #}
-                {#            consider using a partial, and copying the style of dashboard product row, also consider hiding the edit and remove button behind morph menu/ goey menu #}
-                {#            TODO making the checkbox cross out the whole product, and styling it gray, but first fix the responsiveness ! #}
-
-                <div class="areas-scroll-container pe-2 pe-md-4" style="max-height: 45vh;">
+                <div class="areas-scroll-container pe-1 pe-md-3">
                     <ul class="product-list">
 
                         {% for item in shopping_items %}
-                            <li class="product-row">
+                            <li class="product-row {% if item.is_bought or item.is_done %}is-completed{% endif %}">
 
                                 <span class="product-icon" aria-hidden="true">
                                     <i class="bi bi-basket2-fill"></i>
                                 </span>
 
-
-                                <div class="product-info shopping-product-info d-flex flex-row align-items-center flex-grow-1 ms-2">
-                                    <span class="product-name fw-medium"
-                                          style="font-size: 1.15rem;">{{ item.name }}</span>
-                                    <div class="shopping-divider mx-3"></div>
+                                <div class="product-info shopping-product-info">
+                                    <span class="product-name fw-medium">{{ item.name }}</span>
+                                    <div class="shopping-divider"></div>
                                     <span class="product-qty text-nowrap">{{ item.quantity }} {{ item.unit }}</span>
                                 </div>
 
-                                <div class="product-row-actions d-flex flex-row flex-nowrap align-items-center ms-auto gap-2 gap-md-3">
-                                    <a href="#" class="icon-btn fs-5" aria-label="Edit" data-bs-toggle="modal"
-                                       data-bs-target="#editProductModal">
+                                <div class="product-row-actions">
+                                    <a href="#" class="icon-btn" aria-label="Edit product"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#editProductModal"
+                                       data-item-name="{{ item.name }}"
+                                       data-item-quantity="{{ item.quantity }}"
+                                       data-item-unit="{{ item.unit }}">
                                         <i class="bi bi-pencil-square"></i>
                                     </a>
 
-                                    <a href="#" class="icon-btn icon-btn-danger fs-5" aria-label="Remove"
-                                       data-bs-toggle="modal" data-bs-target="#deleteProductModal">
-                                        <i class="bi bi-dash-square"></i>
+                                    <a href="#" class="icon-btn icon-btn-danger" aria-label="Remove product"
+                                       data-bs-toggle="modal"
+                                       data-bs-target="#deleteProductModal"
+                                       data-item-name="{{ item.name }}">
+                                        <i class="bi bi-trash"></i>
                                     </a>
 
-                                    <label class="shopping-checkbox-wrapper mb-0 ms-2 ms-md-3">
+                                    <label class="shopping-checkbox-wrapper mb-0" aria-label="Mark {{ item.name }} as bought">
                                         <input type="checkbox" class="shopping-checkbox"
-                                               {% if item.is_bought %}checked{% endif %}>
+                                               {% if item.is_bought or item.is_done %}checked{% endif %}>
                                         <span class="shopping-checkmark"></span>
                                     </label>
                                 </div>
@@ -98,7 +133,7 @@
                 </div>
 
 
-                <div class="d-flex justify-content-center mt-4 pt-4 pb-3 position-relative">
+                <div class="d-flex justify-content-center mt-auto pt-3 pb-2 position-relative shopping-bottom-actions">
 
                     <div class="gooey-menu shopping-gooey-menu">
                         <input type="checkbox" id="gooey-chk-main" class="gooey-chk d-none">
@@ -128,11 +163,39 @@
 
             <button type="button"
                     class="btn-scroll-down carousel-arrow shopping-arrow-next d-none d-md-flex align-items-center justify-content-center"
-                    aria-label="Next list">
+                    aria-label="Next list"
+                    {% if not shopping_lists or shopping_lists|length < 2 %}disabled{% endif %}>
                 <i class="bi bi-chevron-right"></i>
             </button>
 
         </section>
+
+        <!-- ========================================== -->
+        <!-- POP-UP: Edit Shopping List Name -->
+        <!-- ========================================== -->
+        <div class="modal fade" id="editShoppingListModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content custom-popup position-relative border-0">
+                    <button type="button"
+                            class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    <div class="modal-body text-center p-4 p-md-5">
+                        <h3 class="popup-title mb-4 mt-2">Edit shopping list</h3>
+
+                        <div class="text-start mb-5">
+                            <label for="editShoppingListName" class="form-label popup-label">Shopping list name</label>
+                            <input type="text" class="form-control popup-input shadow-none"
+                                   id="editShoppingListName" value="{{ shopping_list.name|default:'Shopping list #1' }}">
+                        </div>
+
+                        <button type="button" class="popup-circular-btn mx-auto" data-bs-dismiss="modal" id="saveShoppingListNameBtn">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="modal fade" id="createShoppingListModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">

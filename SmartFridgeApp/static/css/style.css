@@ -1651,7 +1651,7 @@ option {
     transform: translateX(calc(-50% + 75px)) scale(1);
 }
 
-.shopping-gooey-menu .gooey-chk:checked ~ .gooey-container .item-add-product:hover ~
+/* .shopping-gooey-menu .gooey-chk:checked ~ .gooey-container .item-add-product:hover ~ */
 
 
 /*

@@ -301,6 +301,7 @@ def shopping_list_view(request):
 
     context = {
         'shopping_list': mock_shopping_list,
+        'shopping_lists': [mock_shopping_list],
         'shopping_items': mock_items
     }
 
