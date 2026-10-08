@@ -35,6 +35,10 @@ urlpatterns = [
 
     path('areas', views.areas, name='areas'),
 
+    path('areas/create/', views.create_area, name='create_area'),
+
+    path('areas/join/', views.join_area, name='join_area'),
+
     path('profile/delete', views.delete_account, name='delete_account'),
 
     path('expenses', views.expenses, name='expenses'),
