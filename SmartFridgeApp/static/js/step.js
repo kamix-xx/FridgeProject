@@ -11,6 +11,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const iconsPlaceholder = document.getElementById('stepIconsPlaceholder');
     const submitIcon = document.getElementById('stepSubmitIcon');
 
+    const deleteModal = document.getElementById('universalDeleteModal');
+    if (!deleteModal) return;
+
+    const deleteForm = document.getElementById('deleteModalForm');
+    const deleteTitle = document.getElementById('deleteModalTitle');
+
     // Obsługa wywołania modala
     stepModal.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
@@ -57,5 +63,18 @@ document.addEventListener('DOMContentLoaded', function () {
             picPreview.classList.remove('d-none');
             iconsPlaceholder.classList.add('d-none');
         }
+    });
+
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+        // Przycisk, który wywołał usunięcie
+        const button = event.relatedTarget;
+
+        // Pobranie danych
+        const actionUrl = button.getAttribute('data-action-url');
+        const title = button.getAttribute('data-title');
+
+        // Aktualizacja modala
+        if (actionUrl) deleteForm.setAttribute('action', actionUrl);
+        if (title) deleteTitle.textContent = title;
     });
 });
