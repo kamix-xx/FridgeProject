@@ -145,3 +145,21 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+
+if os.getenv('ENVIRONMENT') == 'PRODUCTION':
+    MAILERS = {
+        'default': {
+            'BACKEND': 'django.core.mail.backends.smtp.EmailBackend',
+            'HOST': 'smtp.gmail.com',
+            'PORT': 587,
+            'USE_TLS': True,
+            'USER': os.getenv('EMAIL_HOST_USER'),
+            'PASSWORD': os.getenv('EMAIL_HOST_PASSWORD'),  # DANE KONTA GMAIL
+        }
+    }
+else:
+    MAILERS = {
+        'default': {
+            'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+        }
+    }

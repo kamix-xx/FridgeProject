@@ -1,0 +1,97 @@
+/* =========================================
+   REGAIN ACCESS (PASSWORD RESET) STYLES
+   ========================================= */
+
+.reset-status-icon {
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+
+.reset-icon-orange { color: #e25327; }
+.reset-icon-green  { color: #28a745; }
+.reset-icon-red    { color: #dc3545; }
+
+
+.reset-subtext-small {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+
+.django-reset-form input[type="password"],
+.django-reset-form input[type="email"],
+.django-reset-form input[type="text"] {
+    width: 100%;
+    display: block;
+    padding: 0.65rem 1.25rem;
+    border-radius: 50rem;
+    border: none;
+    background-color: #ffffff;
+    color: #000000;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.django-reset-form input[type="password"]:focus,
+.django-reset-form input[type="email"]:focus,
+.django-reset-form input[type="text"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.25rem rgba(229, 83, 37, 0.25);
+}
+
+input#id_email,
+input#id_new_password1,
+input#id_new_password2 {
+    width: 100%;
+    display: block;
+    padding: 0.65rem 1.25rem;
+    border-radius: 50rem;
+    border: none;
+    background-color: #ffffff;
+    color: #000000;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input#id_email:focus,
+input#id_new_password1:focus,
+input#id_new_password2:focus {
+    outline: none;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 0.25rem rgba(229, 83, 37, 0.25);
+}
+
+.helptext ul,
+.helptext {
+    display: block;
+    padding-left: 1.2rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+    font-size: 0.8rem;
+    color: var(--title-color);
+    opacity: 0.85;
+}
+
+.helptext li {
+    margin-bottom: 0.2rem;
+}
+
+.django-reset-form .helptext {
+    display: block;
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-top: 0.35rem;
+    color: var(--title-color);
+}
+
+.django-reset-form ul.errorlist {
+    color: #dc3545;
+    font-size: 0.85rem;
+    padding-left: 0;
+    list-style: none;
+    margin-bottom: 0.5rem;
+    margin-top: 0.25rem;
+}
