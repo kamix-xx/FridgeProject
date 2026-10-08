@@ -33,6 +33,13 @@ urlpatterns = [
     path('profile', views.profile, name='profile'),
     path('profile/edit/', views.edit_profile_view, name='edit_profile'),
     path('profile/change-password/', views.change_password_view, name='change_password'),
+
+    path('areas', views.areas, name='areas'),
+
+    path('areas/create/', views.create_area, name='create_area'),
+
+    path('areas/join/', views.join_area, name='join_area'),
+
     path('profile/delete', views.delete_account, name='delete_account'),
 
     path('areas', views.areas, name='areas'),

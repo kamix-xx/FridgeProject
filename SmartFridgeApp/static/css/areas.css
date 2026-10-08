@@ -441,3 +441,17 @@
     }
 
 }
+
+input#shareCodeInput {
+    color: #000000 !important;
+    background-color: #f8f9fa !important;
+    font-weight: 600;
+    text-align: center;
+    opacity: 1 !important;
+}
+
+input#shareCodeInput:focus {
+    outline: none;
+    box-shadow: none;
+    background-color: #ffffff !important;
+}

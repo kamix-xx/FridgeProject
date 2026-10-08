@@ -199,6 +199,7 @@
 
             <div class="dashboard-actions">
                 <a href="{% url 'areas' %}" class="btn-fridge-outline" data-page-transition>View all areas</a>
+
                 <button type="button" class="btn-fridge-outline"
                         data-bs-toggle="modal" data-bs-target="#addAreaModal"
                         data-area-mode="create">
@@ -245,44 +246,52 @@
                         <div class="add-area-panel add-area-panel-create modal-body text-center p-4 p-md-5"
                              data-panel="create">
                             <h3 class="popup-title mb-4">Add Area</h3>
-                            <div class="text-start mb-2">
-                                <label for="newAreaNameDashboard" class="form-label popup-label">Area Name</label>
-                                <input type="text" class="form-control popup-input shadow-none"
-                                       id="newAreaNameDashboard">
-                            </div>
-                            <p class="custom-subtext mb-5">
-                                Add a shared area
-                                <button type="button"
-                                        class="custom-link custom-link-button add-area-switch-btn"
-                                        data-switch-to="code">
-                                    HERE
+                            
+                            <form method="POST" action="{% url 'create_area' %}">
+                                {% csrf_token %}
+                                <div class="text-start mb-2">
+                                    <label for="newAreaNameDashboard" class="form-label popup-label">Area Name</label>
+                                    <input type="text" name="area_name" class="form-control popup-input shadow-none"
+                                           id="newAreaNameDashboard" required maxlength="10">
+                                </div>
+                                <p class="custom-subtext mb-5">
+                                    Add a shared area
+                                    <button type="button"
+                                            class="custom-link custom-link-button add-area-switch-btn"
+                                            data-switch-to="code">
+                                        HERE
+                                    </button>
+                                </p>
+                                <button type="submit" class="popup-circular-btn mx-auto" aria-label="Add Area">
+                                    <i class="bi bi-plus"></i>
                                 </button>
-                            </p>
-                            <button type="button" class="popup-circular-btn mx-auto" aria-label="Add Area">
-                                <i class="bi bi-plus"></i>
-                            </button>
+                            </form>
                         </div>
 
                         <!-- Panel: Add Shared Area with Code -->
                         <div class="add-area-panel add-area-panel-code modal-body text-center p-4 p-md-5"
                              data-panel="code" aria-hidden="true">
                             <h3 class="popup-title mb-4">Add Shared Area</h3>
-                            <div class="text-start mb-2">
-                                <label for="newAreaCodeDashboard" class="form-label popup-label">Area Code</label>
-                                <input type="text" class="form-control popup-input shadow-none"
-                                       id="newAreaCodeDashboard">
-                            </div>
-                            <p class="custom-subtext mb-5">
-                                Add a new area
-                                <button type="button"
-                                        class="custom-link custom-link-button add-area-switch-btn"
-                                        data-switch-to="create">
-                                    HERE
+
+                            <form method="POST" action="{% url 'join_area' %}">
+                                {% csrf_token %}
+                                <div class="text-start mb-2">
+                                    <label for="newAreaCodeDashboard" class="form-label popup-label">Area Code</label>
+                                    <input type="text" name="area_code" class="form-control popup-input shadow-none"
+                                           id="newAreaCodeDashboard" required>
+                                </div>
+                                <p class="custom-subtext mb-5">
+                                    Add a new area
+                                    <button type="button"
+                                            class="custom-link custom-link-button add-area-switch-btn"
+                                            data-switch-to="create">
+                                        HERE
+                                    </button>
+                                </p>
+                                <button type="submit" class="popup-circular-btn mx-auto" aria-label="Add Shared Area">
+                                    <i class="bi bi-plus"></i>
                                 </button>
-                            </p>
-                            <button type="button" class="popup-circular-btn mx-auto" aria-label="Add Shared Area">
-                                <i class="bi bi-plus"></i>
-                            </button>
+                            </form>
                         </div>
                     </div>
                 </div>
