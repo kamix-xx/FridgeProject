@@ -13,7 +13,7 @@
             <!-- Light Theme Images -->
             <picture class="theme-img-light">
                 <!-- Mobile Image (Fires on screens < 768px) -->
-{#                <source media="(max-width: 768px)" srcset="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop">#}
+                {#                <source media="(max-width: 768px)" srcset="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop">#}
                 <!-- Desktop Image (Default) -->
                 <img src="https://i.imgur.com/1zKDj0E.jpeg" alt="Light background" class="responsive-bg-img">
             </picture>
@@ -21,7 +21,7 @@
             <!-- Dark Theme Images -->
             <picture class="theme-img-dark">
                 <!-- Mobile Image (Fires on screens < 768px) -->
-{#                <source media="(max-width: 768px)" srcset="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800&auto=format&fit=crop">#}
+                {#                <source media="(max-width: 768px)" srcset="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800&auto=format&fit=crop">#}
                 <!-- Desktop Image (Default) -->
                 <img src="https://i.imgur.com/Y5lnSGL.jpeg" alt="Dark background" class="responsive-bg-img">
             </picture>
@@ -49,25 +49,38 @@
                         <!-- Login / Username -->
                         <div class="mb-3">
                             <label for="loginInput" class="form-label custom-label">Login</label>
-                            <input type="text" name="username" class="form-control custom-input rounded-pill {% if form.username.errors or form.non_field_errors %}is-invalid{% endif %}" id="loginInput" value="{{ form.username.value|default:'' }}" required>
+                            <input type="text" name="username"
+                                   class="form-control custom-input rounded-pill {% if form.username.errors or form.non_field_errors %}is-invalid{% endif %}"
+                                   id="loginInput" value="{{ form.username.value|default:'' }}" required>
                             {% for error in form.username.errors %}
                                 <div class="invalid-feedback d-block ms-2">{{ error }}</div>
                             {% endfor %}
                         </div>
 
                         <!-- Password -->
-                        <div class="mb-4">
+                        <div class="mb-2"> <!-- Zmiana z mb-4 na mb-2 -->
                             <label for="passwordInput" class="form-label custom-label">Password</label>
                             <div class="position-relative">
-                                <input type="password" name="password" class="form-control custom-input rounded-pill {% if form.password.errors or form.non_field_errors %}is-invalid{% endif %}" id="passwordInput" required>
-                                <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 custom-eye-icon" onclick="togglePasswordVisibility('passwordInput', this)"></i>
+                                <input type="password" name="password"
+                                       class="form-control custom-input rounded-pill {% if form.password.errors or form.non_field_errors %}is-invalid{% endif %}"
+                                       id="passwordInput" required>
+                                <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 custom-eye-icon"
+                                   onclick="togglePasswordVisibility('passwordInput', this)"></i>
                             </div>
                             {% for error in form.password.errors %}
                                 <div class="invalid-feedback d-block ms-2">{{ error }}</div>
                             {% endfor %}
                         </div>
 
-                        <button type="submit" class="btn btn-custom-orange rounded-pill w-100 py-2.5 mb-4 d-flex align-items-center justify-content-center gap-1">
+                        <!-- Link do resetu hasła -->
+                        <div class="text-end mb-4">
+                            <a href="{% url 'password_reset' %}" class="custom-link" style="font-size: 0.9rem;">Forgot
+                                password?</a>
+                        </div>
+
+
+                        <button type="submit"
+                                class="btn btn-custom-orange rounded-pill w-100 py-2.5 mb-4 d-flex align-items-center justify-content-center gap-1">
                             Sign in <i class="bi bi-chevron-right fs-6"></i>
                         </button>
 
