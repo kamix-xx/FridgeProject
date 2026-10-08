@@ -120,10 +120,6 @@
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <h3 class="step-number mb-0">Step {{ forloop.counter }}:</h3>
                                 <div class="step-actions d-flex gap-3">
-                                    {% comment %}<button class="btn p-0 shadow-none" aria-label="Edit step" data-bs-toggle="modal"
-                                            data-bs-target="#editStepModal">
-                                        <i class="bi bi-pencil-square fs-5"></i>
-                                    </button>{% endcomment %}
                                     <button class="btn p-0 shadow-none step-modal-trigger"
                                             aria-label="Edit step"
                                             data-bs-toggle="modal"
@@ -179,12 +175,6 @@
                 </div>
             {% endfor %}
 
-            {% comment %}<button class="add-step-btn w-100 d-flex align-items-center gap-3 p-3 px-md-4 mt-2 border-0 shadow-sm"
-                    data-bs-toggle="modal" data-bs-target="#addStepModal"
-                    data-bs-backdrop="static" data-bs-keyboard="false">
-                <i class="bi bi-plus-lg fs-3"></i>
-                <span class="fs-5">Add new step</span>
-            </button>{% endcomment %}
             <button class="add-step-btn w-100 d-flex align-items-center gap-3 p-3 px-md-4 mt-2 border-0 shadow-sm step-modal-trigger"
                     data-bs-toggle="modal"
                     data-bs-target="#stepModal"
