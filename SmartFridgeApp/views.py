@@ -5,9 +5,10 @@ from django.contrib import messages
 from datetime import date, datetime, timedelta
 from types import SimpleNamespace
 from django.utils.html import json_script
-from .models import ProductDictionary, Recipe, RecipeProduct, Unit, Step
+from .models import ProductDictionary, Recipe, RecipeProduct, Unit, Step, Area
 from .forms import CustomUserCreationForm
 import json
+import uuid
 
 USE_FAKE_DASHBOARD_DATA = True
 
@@ -216,61 +217,67 @@ def register(request):
 
 @login_required(login_url='login')
 def areas(request):
-    display_name = request.user.username if request.user.is_authenticated else "You"
+    display_name = request.user.username
+    user_avatar = request.user.avatar.url if request.user.avatar else None
 
-    # Fetch the real avatar URL if the user has uploaded one
-    user_avatar = (
-        request.user.avatar.url
-        if request.user.is_authenticated and request.user.avatar
-        else None
-    )
-
-    def user_stub(username, avatar_url=None):
-        return {"username": username, "avatar_url": avatar_url}
-
-    def shared_block(area_id, owner, members):
+    def user_stub(user):
         return {
-            "owner": owner,
-            "is_owner": owner["username"] == display_name,
-            "shared_users": members,
-            "shared_users_script": json_script(members, f"area-users-{area_id}"),
+            "username": user.username,
+            "avatar_url": user.avatar.url if user.avatar else None
         }
 
-    fake_areas = [
-        {"id": 1, "name": "Fridge", "created_at": "01.01.2026", "is_shared": False},
-        {
-            # shared, but owned by someone else
-            "id": 2, "name": "Pantry", "created_at": "01.01.2026", "is_shared": True,
-            **shared_block(2, user_stub("Gacek"), [
-                user_stub("Kasia"), user_stub("Marek"), user_stub(display_name, user_avatar),
-            ]),
-        },
-        {"id": 3, "name": "Freezer", "created_at": "12.02.2026", "is_shared": False},
-        {"id": 4, "name": "Attic", "created_at": "08.03.2026", "is_shared": False},
-        {
-            # shared, you're the owner
-            "id": 5, "name": "Room fridge", "created_at": "20.04.2026", "is_shared": True,
-            **shared_block(5, user_stub(display_name, user_avatar), [
-                user_stub("Kasia"), user_stub("Marek"),
-            ]),
-        },
-        {
-            # shared, you're the owner
-            "id": 6, "name": "Kitchen cabinet", "created_at": "23.04.2026", "is_shared": True,
-            **shared_block(6, user_stub(display_name, user_avatar), [
-                user_stub("Kasia"), user_stub("Marek"), user_stub("Ola"),
-                user_stub("Tomek"), user_stub("Zosia"), user_stub("Piotr"),
-                user_stub("Ania"), user_stub("Wiktor"), user_stub("Bartek"),
-            ]),
-        },
-    ]
+    db_areas = request.user.areas.prefetch_related('users', 'owner').order_by('-creation_date')
+
+    formatted_areas = []
+
+    for area in db_areas:
+        is_owner = (area.owner == request.user)
+        is_shared = area.is_shared
+
+        area_data = {
+            "id": area.id,
+            "name": area.name,
+            "created_at": area.creation_date.strftime("%d.%m.%Y"),
+            "is_shared": is_shared,
+            "share_code": area.key if area.key else "ERROR",
+        }
+
+        if is_shared:
+            area_data["owner"] = user_stub(area.owner) if area.owner else None
+            area_data["is_owner"] = is_owner
+
+            # Pobieramy wszystkich członków oprocz obecnego użytkownika,
+            members = [user_stub(u) for u in area.users.all() if u != request.user]
+            area_data["shared_users"] = members
+            area_data["shared_users_script"] = json_script(members, f"area-users-{area.id}")
+
+        formatted_areas.append(area_data)
 
     context = {
-        'user_areas': fake_areas
+        'user_areas': formatted_areas
     }
 
     return render(request, 'areas/areas.html', context)
 
+
+@login_required(login_url='login')
+def join_area(request):
+    if request.method == 'POST':
+        area_code = request.POST.get('area_code', '').strip()
+
+        if area_code:
+            try:
+                area = Area.objects.get(key=area_code)
+
+                if request.user in area.users.all():
+                    messages.info(request, f'You are already a member of "{area.name}".')
+                else:
+                    area.users.add(request.user)
+                    messages.success(request, f'Successfully joined "{area.name}"!')
+            except Area.DoesNotExist:
+                messages.error(request, 'Invalid area code. Please check and try again.')
+
+    return redirect('areas')
 
 @login_required(login_url='login')
 def shopping_list_view(request):
@@ -417,6 +424,28 @@ def change_password_view(request):
         messages.success(request, 'Password changed successfully.')
 
     return redirect('profile')
+
+
+@login_required(login_url='login')
+def create_area(request):
+    if request.method == 'POST':
+        area_name = request.POST.get('area_name')
+
+        if area_name:
+            # invitation code (12 chars)
+            unique_key = uuid.uuid4().hex[:12].upper()
+
+            new_area = Area.objects.create(
+                name=area_name,
+                key=unique_key,
+                owner=request.user
+            )
+
+            new_area.users.add(request.user)
+
+            messages.success(request, f'Area "{area_name}" created successfully!')
+
+    return redirect('areas')
 
 
 @login_required(login_url='login')
