@@ -269,11 +269,16 @@ def join_area(request):
             try:
                 area = Area.objects.get(key=area_code)
 
-                if request.user in area.users.all():
+                if area.owner == request.user:
+                    messages.info(request, f'You are the owner of "{area.name}", you cannot join it again.')
+
+                elif area.users.filter(id=request.user.id).exists():
                     messages.info(request, f'You are already a member of "{area.name}".')
+
                 else:
                     area.users.add(request.user)
                     messages.success(request, f'Successfully joined "{area.name}"!')
+
             except Area.DoesNotExist:
                 messages.error(request, 'Invalid area code. Please check and try again.')
 
