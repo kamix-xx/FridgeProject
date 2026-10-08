@@ -459,48 +459,43 @@ def recipes(request):
 
 
 def recipe_detail(request, recipe_id):
-    # recipe = get_object_or_404(Recipe, id=recipe_id)
+    # Pobieramy obiekt z bazy
+    recipe_obj = get_object_or_404(Recipe, id=recipe_id)
 
-    # Mock danych - symulacja obiektu przepisu z bazy
+    # Pobieramy składniki
+    ingredients_qs = RecipeProduct.objects.filter(recipe=recipe_obj).select_related('product', 'unit')
+
+    # Pobieramy kroki
+    steps_qs = Step.objects.filter(recipe=recipe_obj).order_by('order')
+
+    # Formatujemy dane dokładnie pod Twój istniejący szkielet HTML
     recipe = {
-        "title": 'The "Midnight in Seville"<br>Oranges',
-        "est_time": "10 h",
-        "status": "private",
-        "image_url": "https://i.imgur.com/2SjgpvQ.jpeg",
-        "description_short": "An elegant recipe for scrumptious oranges with or without leaves.",
-        "description_long": "This isn't just a fruit plate; it's a masterclass in citrus minimalism. By stripping away the mundane \"peel and pith,\" you transform a common supermarket staple into a glistening, jewel-toned centerpiece. Whether you've managed to find oranges with their pristine leaves attached or you're working with \"naked\" fruit, the secret lies in the contrast between the cold, sharp citrus and the warm, aromatic syrup.",
+        "title": recipe_obj.name,
+        "est_time": recipe_obj.prep_time.strftime("%H:%M") if recipe_obj.prep_time else "N/A",
+        "status": "official" if recipe_obj.is_global else "private",
+        "image_url": recipe_obj.thumbnail.url if recipe_obj.thumbnail else "https://i.imgur.com/2SjgpvQ.jpeg",
+        "description_short": recipe_obj.description,
+        "description_long": "",  # Jeśli masz osobne pole, możesz tu przekazać
         "ingredients": [
-            {"name": "Sicilian Blood Oranges", "quantity": "67", "unit": "pcs."},
-            {"name": "Oranges with Stems and Leaves", "quantity": "21", "unit": "pcs."},
-            {"name": "Orange Blossom Honey", "quantity": "37", "unit": "L"},
-            {"name": "Grand Marnier or Cointreau", "quantity": "42", "unit": "L"},
-            {"name": "Rose Water", "quantity": "2", "unit": "L"},
-            {"name": "Pistachios (Bright Green)", "quantity": "300", "unit": "g"},
-            {"name": "Micro-Basil", "quantity": "2", "unit": "pinch"},
-            {"name": "Pomegranate Arils", "quantity": "30", "unit": "g"}
+            {
+                "name": item.product.name,
+                "quantity": item.quantity,
+                "unit": item.unit.symbol
+            }
+            for item in ingredients_qs
         ]
     }
 
+    # Formatujemy kroki z bazy pod pętlę w HTML
     recipe_steps = [
         {
-            "title": 'The "Orange Surgery"',
-            "subtitle": "(The Supreme Cut)",
-            "description": 'Forget peeling; we\'re performing an extraction. To achieve "scrumptious" status, you must transform the fruit into Supremes - naked, glowing wedges free from all bitter white pith and membranes.',
-            "instructions": [
-                'Behead & Base: Slice off the top and bottom until you see the vibrant flesh.',
-                'The Shave: Curve your knife from top to bottom, stripping away the peel and all white pith. You want a bald, glistening sphere.',
-                'The Extraction: Slide your knife between the membranes to pop out individual wedges.',
-                'Save the Gold: Squeeze the leftover "carcass" over your wedges for a natural bath of juice.'
-            ],
-            "image_url": "https://i.imgur.com/2SjgpvQ.jpeg"
-        },
-        {
-            "title": "The Sweet Bath",
+            "title": step.name,
             "subtitle": None,
-            "description": "Now it's time for the magic. Pour the orange blossom honey and Grand Marnier mixture over your freshly cut supremes. Cover with cling film and let it rest in the fridge for at least 2 hours so the flavors intertwine perfectly.",
-            "instructions": [],  # Pusta lista, jeśli krok nie ma wypunktowań
-            "image_url": "https://i.imgur.com/2SjgpvQ.jpeg"
+            "description": step.description,
+            "instructions": [],  # Jeśli instrukcje są w opisie, zostawiamy pustą listę
+            "image_url": step.picture.url if step.picture else "https://i.imgur.com/2SjgpvQ.jpeg"
         }
+        for step in steps_qs
     ]
 
     context = {
