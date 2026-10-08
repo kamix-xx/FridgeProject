@@ -60,25 +60,6 @@
             {% endfor %}
             <!-- KONIEC DYNAMICZNEJ LISTY -->
 
-            <a href="{% url 'recipe_detail' recipe_id=1 %}"
-               class="recipe-card text-decoration-none position-relative overflow-hidden mb-4 d-block">
-                <div class="recipe-img-bg">
-                    <img src="https://i.imgur.com/2SjgpvQ.jpeg" alt="Midnight in Seville Oranges"
-                         class="w-100 h-100 object-fit-cover">
-                </div>
-                <div class="recipe-content position-relative z-2">
-                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
-                        <h3 class="recipe-title mb-0">[Hardcoded] The "Midnight in Seville" Oranges</h3>
-                        <div class="recipe-meta text-end mt-1 mt-sm-0">
-                            <span class="me-3">est. time: 10 h</span>
-                            <span>Status: Private</span>
-                        </div>
-                    </div>
-                    <p class="recipe-desc mb-0">An elegant recipe for scrumptious oranges with or without leaves.<br>...
-                    </p>
-                </div>
-            </a>
-
             <div class="add-recipe-bar d-flex align-items-center px-4 py-3 mb-5" tabindex="0" role="button"
                  data-bs-toggle="modal" data-bs-target="#createRecipeModal">
                 <i class="bi bi-plus fs-2 me-3 fw-bold"></i>

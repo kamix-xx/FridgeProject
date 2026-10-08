@@ -615,6 +615,74 @@ def create_recipe(request):
 
 
 @login_required(login_url='login')
+def edit_recipe(request, recipe_id):
+    # Pobieramy przepis i upewniamy się, że należy do aktualnego usera
+    recipe = get_object_or_404(Recipe, id=recipe_id, user=request.user)
+
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        prep_time = request.POST.get('prep_time')
+        thumbnail = request.FILES.get('thumbnail')
+        ingredients_json = request.POST.get('ingredients_data')
+
+        # 1. Aktualizacja podstawowych danych przepisu
+        if name:
+            recipe.name = name
+        if description:
+            recipe.description = description
+        if prep_time:
+            recipe.prep_time = prep_time
+        if thumbnail:
+            recipe.thumbnail = thumbnail
+
+        recipe.save()
+
+        # 2. Aktualizacja składników (nadpisujemy stare powiązania)
+        if ingredients_json:
+            ingredients = json.loads(ingredients_json)
+
+            # Czyścimy stare powiązania produktów z tym przepisem
+            RecipeProduct.objects.filter(recipe=recipe).delete()
+
+            for item in ingredients:
+                ing_name = item.get('name')
+                ing_qty = item.get('quantity')
+                ing_unit_symbol = item.get('unit')
+
+                # Znajdź lub stwórz jednostkę
+                unit_obj, _ = Unit.objects.get_or_create(
+                    symbol=ing_unit_symbol,
+                    defaults={'user': request.user, 'is_global': False}
+                )
+
+                # Znajdź lub stwórz produkt w słowniku
+                product_obj, _ = ProductDictionary.objects.get_or_create(
+                    name=ing_name,
+                    defaults={
+                        'user': request.user,
+                        'is_global': False,
+                        'icon_number': 1,
+                        'nutriscore': 'X'
+                    }
+                )
+
+                # Tworzymy nowe relacje na podstawie zaktualizowanej listy
+                RecipeProduct.objects.create(
+                    quantity=ing_qty,
+                    unit=unit_obj,
+                    recipe=recipe,
+                    product=product_obj
+                )
+
+        messages.success(request, 'Recipe updated successfully.')
+        # Przekierowujemy z powrotem do detali zedytowanego przepisu
+        return redirect('recipe_detail', recipe_id=recipe.id)
+
+    return redirect('recipes')
+
+
+@login_required(login_url='login')
 def add_step(request, recipe_id):
     if request.method == 'POST':
         # 1. Pobieramy przepis, do którego chcemy dodać krok
@@ -650,28 +718,30 @@ def add_step(request, recipe_id):
 
 @login_required(login_url='login')
 def edit_step(request, step_id):
+    step = get_object_or_404(Step, id=step_id)
+    recipe_id = step.recipe.id
+
+    if step.recipe.user != request.user:
+        messages.error(request, 'You cannot edit this step.')
+        return redirect('recipe_detail', recipe_id=recipe_id)
+
     if request.method == 'POST':
-        step = get_object_or_404(Step, id=step_id)
+        title = request.POST.get('name')  # w formularzu HTML pole tytułu kroku ma name="name"
+        description = request.POST.get('description')
+        picture = request.FILES.get('picture')
 
-        # Zabezpieczenie: czy to przepis zalogowanego użytkownika
-        if step.recipe.user != request.user:
-            messages.error(request, "You cannot edit this step.")
-            return redirect('recipe_detail', recipe_id=step.recipe.id)
-
-        # Nadpisanie danych z formularza
-        step.name = request.POST.get('name')
-        step.description = request.POST.get('description')
-
-        # Nowe zdjęcie nadpisujemy tylko wtedy, jeśli użytkownik wgrał plik w modalu
-        new_picture = request.FILES.get('picture')
-        if new_picture:
-            step.picture = new_picture
+        if title:
+            step.title = title
+        if description:
+            step.description = description
+        if picture:
+            step.picture = picture  # Zależnie od nazwy pola w modelu Step (np. image lub picture)
 
         step.save()
-        messages.success(request, 'Step updated successfully!')
-        return redirect('recipe_detail', recipe_id=step.recipe.id)
+        messages.success(request, 'Step updated successfully.')
+        return redirect('recipe_detail', recipe_id=recipe_id)
 
-    return redirect('recipes')
+    return redirect('recipe_detail', recipe_id=recipe_id)
 
 
 @login_required(login_url='login')
@@ -698,8 +768,8 @@ def delete_step(request, step_id):
         else:
             messages.error(request, 'You cannot delete this step.')
 
-        # Przekierowanie z powrotem do detali tego samego przepisu
         return redirect('recipe_detail', recipe_id=recipe_id)
+
     return redirect('recipes')
 
 
