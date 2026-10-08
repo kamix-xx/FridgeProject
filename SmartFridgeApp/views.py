@@ -47,7 +47,8 @@ def _with_freshness(user_product):
 
 def _fake_dashboard_areas(user=None):
     display_name = user.username if (user and user.is_authenticated) else "You"
-    user_avatar = user.avatar.url if (user and user.is_authenticated and hasattr(user, 'avatar') and user.avatar) else None
+    user_avatar = user.avatar.url if (
+            user and user.is_authenticated and hasattr(user, 'avatar') and user.avatar) else None
 
     def user_stub(username, avatar_url=None):
         return {"username": username, "avatar_url": avatar_url}
@@ -68,12 +69,12 @@ def _fake_dashboard_areas(user=None):
         is_shared=False,
         is_owner=True,
         products=[
-            fake_product("Whole Milk", days_left=2, added_days_ago=10),       # critical
+            fake_product("Whole Milk", days_left=2, added_days_ago=10),  # critical
             fake_product("Free-range Eggs", days_left=18, added_days_ago=4),  # fresh
-            fake_product("Leftover Soup", days_left=-1, added_days_ago=6),    # expired
-            fake_product("Greek Yogurt", days_left=9, added_days_ago=6),      # warning
-            fake_product("Cheddar Block", days_left=25, added_days_ago=5),    # fresh
-            fake_product("Mystery Jar", days_left=None),                      # unknown
+            fake_product("Leftover Soup", days_left=-1, added_days_ago=6),  # expired
+            fake_product("Greek Yogurt", days_left=9, added_days_ago=6),  # warning
+            fake_product("Cheddar Block", days_left=25, added_days_ago=5),  # fresh
+            fake_product("Mystery Jar", days_left=None),  # unknown
         ],
     )
 
@@ -270,6 +271,7 @@ def areas(request):
 
     return render(request, 'areas/areas.html', context)
 
+
 @login_required(login_url='login')
 def shopping_list_view(request):
     mock_shopping_list = {
@@ -452,6 +454,7 @@ def my_products_view(request):
 
     return render(request, 'my-products/my_products.html', {'my_products': mock_my_products})
 
+
 @login_required(login_url='login')
 def recipes(request):
     # recipes = Recipe.objects.all()
@@ -477,6 +480,7 @@ def recipe_detail(request, recipe_id):
 
     # Formatujemy dane dokładnie pod Twój istniejący szkielet HTML
     recipe = {
+        "id": recipe_obj.id,
         "title": recipe_obj.name,
         "est_time": recipe_obj.prep_time.strftime("%H:%M") if recipe_obj.prep_time else "N/A",
         "status": "official" if recipe_obj.is_global else "private",
@@ -496,6 +500,7 @@ def recipe_detail(request, recipe_id):
     # Formatujemy kroki z bazy pod pętlę w HTML
     recipe_steps = [
         {
+            "id": step.id,
             "title": step.name,
             "subtitle": None,
             "description": step.description,
@@ -511,6 +516,66 @@ def recipe_detail(request, recipe_id):
     }
 
     return render(request, 'recipes/recipe_detail.html', context)
+
+
+@login_required(login_url='login')
+def add_step(request, recipe_id):
+    if request.method == 'POST':
+        # 1. Pobieramy przepis, do którego chcemy dodać krok
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+
+        # Zabezpieczenie (opcjonalne): sprawdź czy to faktycznie przepis tego użytkownika
+        if recipe.user != request.user:
+            messages.error(request, "You can only edit your own recipes.")
+            return redirect('recipe_detail', recipe_id=recipe_id)
+
+        # 2. Pobieramy dane z inputów modala
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        picture = request.FILES.get('picture')
+
+        # 3. Automatyczne obliczanie numeru kroku (order) - wrzucamy na sam koniec listy
+        current_steps_count = Step.objects.filter(recipe=recipe).count()
+        next_order = current_steps_count + 1
+
+        # 4. Zapis do bazy danych
+        Step.objects.create(
+            name=name,
+            description=description,
+            picture=picture,
+            order=next_order,
+            recipe=recipe
+        )
+
+        messages.success(request, 'Step added successfully!')
+
+    return redirect('recipe_detail', recipe_id=recipe_id)
+
+
+@login_required(login_url='login')
+def edit_step(request, step_id):
+    if request.method == 'POST':
+        step = get_object_or_404(Step, id=step_id)
+
+        # Zabezpieczenie: czy to przepis zalogowanego użytkownika
+        if step.recipe.user != request.user:
+            messages.error(request, "You cannot edit this step.")
+            return redirect('recipe_detail', recipe_id=step.recipe.id)
+
+        # Nadpisanie danych z formularza
+        step.name = request.POST.get('name')
+        step.description = request.POST.get('description')
+
+        # Nowe zdjęcie nadpisujemy tylko wtedy, jeśli użytkownik wgrał plik w modalu
+        new_picture = request.FILES.get('picture')
+        if new_picture:
+            step.picture = new_picture
+
+        step.save()
+        messages.success(request, 'Step updated successfully!')
+        return redirect('recipe_detail', recipe_id=step.recipe.id)
+
+    return redirect('recipes')
 
 
 @login_required(login_url='login')
@@ -577,7 +642,6 @@ def create_recipe(request):
 
 @login_required(login_url='login')
 def admin_panel_view(request):
-
     all_users = User.objects.all().exclude(role='ADMIN')
 
     mock_pending_recipes = [

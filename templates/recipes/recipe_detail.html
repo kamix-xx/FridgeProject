@@ -119,8 +119,19 @@
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <h3 class="step-number mb-0">Step {{ forloop.counter }}:</h3>
                                 <div class="step-actions d-flex gap-3">
-                                    <button class="btn p-0 shadow-none" aria-label="Edit step" data-bs-toggle="modal"
+                                    {% comment %}<button class="btn p-0 shadow-none" aria-label="Edit step" data-bs-toggle="modal"
                                             data-bs-target="#editStepModal">
+                                        <i class="bi bi-pencil-square fs-5"></i>
+                                    </button>{% endcomment %}
+                                    <button class="btn p-0 shadow-none step-modal-trigger"
+                                            aria-label="Edit step"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#stepModal"
+                                            data-mode="edit"
+                                            data-action-url="{% url 'edit_step' step.id %}"
+                                            data-title="{{ step.title }}"
+                                            data-desc="{{ step.description }}"
+                                            data-img="{{ step.image_url }}">
                                         <i class="bi bi-pencil-square fs-5"></i>
                                     </button>
                                     <button class="btn p-0 shadow-none" aria-label="Delete step" data-bs-toggle="modal"
@@ -167,9 +178,17 @@
                 </div>
             {% endfor %}
 
-            <button class="add-step-btn w-100 d-flex align-items-center gap-3 p-3 px-md-4 mt-2 border-0 shadow-sm"
+            {% comment %}<button class="add-step-btn w-100 d-flex align-items-center gap-3 p-3 px-md-4 mt-2 border-0 shadow-sm"
                     data-bs-toggle="modal" data-bs-target="#addStepModal"
                     data-bs-backdrop="static" data-bs-keyboard="false">
+                <i class="bi bi-plus-lg fs-3"></i>
+                <span class="fs-5">Add new step</span>
+            </button>{% endcomment %}
+            <button class="add-step-btn w-100 d-flex align-items-center gap-3 p-3 px-md-4 mt-2 border-0 shadow-sm step-modal-trigger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#stepModal"
+                    data-mode="add"
+                    data-action-url="{% url 'add_step' recipe.id %}">
                 <i class="bi bi-plus-lg fs-3"></i>
                 <span class="fs-5">Add new step</span>
             </button>
@@ -232,9 +251,9 @@
     </div>
 
     <!-- ========================================== -->
-    <!-- POP-UP: Add Step -->
+    <!-- UNIWERSALNY POP-UP: Add / Edit Step -->
     <!-- ========================================== -->
-    <div class="modal fade" id="addStepModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    <div class="modal fade" id="stepModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
          aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content custom-popup t-modal border-0">
@@ -243,105 +262,124 @@
                         class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
                         data-bs-dismiss="modal" aria-label="Close"></button>
 
-                <div class="modal-body p-4 p-md-5">
-                    <h3 class="popup-title text-center mb-4">Add step</h3>
+                <!-- FORMULARZ KROKU -->
+                <form method="post" action="" enctype="multipart/form-data" id="stepForm" class="modal-body p-4 p-md-5">
+                    {% csrf_token %}
+                    <h3 class="popup-title text-center mb-4" id="stepModalTitle">Add step</h3>
 
                     <div class="row g-4 mb-4">
                         <div class="col-sm-5 col-md-4">
-                            <div class="recipe-img-upload h-100" style="min-height: 140px;" role="button" tabindex="0"
-                                 aria-label="Upload step image">
-                                <i class="bi bi-image upload-main-icon"></i>
-                                <i class="bi bi-box-arrow-up upload-corner-icon"></i>
-                            </div>
+                            <label for="stepPictureInput"
+                                   class="recipe-img-upload h-100 m-0 d-flex justify-content-center align-items-center position-relative overflow-hidden"
+                                   style="min-height: 140px; cursor: pointer;" aria-label="Upload step image">
+                                <input type="file" name="picture" id="stepPictureInput" class="d-none" accept="image/*">
+
+                                <div id="stepIconsPlaceholder" class="text-center">
+                                    <i class="bi bi-image upload-main-icon"></i>
+                                    <i class="bi bi-box-arrow-up upload-corner-icon"></i>
+                                </div>
+
+                                <img id="stepPicturePreview"
+                                     class="d-none w-100 h-100 object-fit-cover position-absolute top-0 start-0"
+                                     alt="Step preview">
+                            </label>
                         </div>
 
                         <div class="col-sm-7 col-md-8 d-flex flex-column justify-content-end">
                             <div>
-                                <label for="newStepTitle" class="form-label popup-label">Step title</label>
-                                <input type="text" class="form-control popup-input shadow-none w-100" id="newStepTitle">
+                                <label for="stepNameInput" class="form-label popup-label">Step title</label>
+                                <input type="text" name="name" class="form-control popup-input shadow-none w-100"
+                                       id="stepNameInput" required>
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-4 mb-md-5">
-                        <label for="newStepDesc" class="form-label popup-label">Description</label>
+                        <label for="stepDescInput" class="form-label popup-label">Description</label>
                         <div class="form-control popup-input shadow-none p-0 overflow-hidden d-flex">
-
-                        <textarea class="w-100 border-0 bg-transparent shadow-none p-2 m-1" id="editStepDesc" rows="7"
-                                  style="resize: none; outline: none;">
-
-                        </textarea>
-
+                            <textarea name="description" class="w-100 border-0 bg-transparent shadow-none p-2 m-1"
+                                      id="stepDescInput" rows="7" style="resize: none; outline: none;"
+                                      required></textarea>
                         </div>
                     </div>
 
-                    <button type="button" class="popup-circular-btn mx-auto d-block">
-                        <i class="bi bi-plus"></i>
+                    <button type="submit" class="popup-circular-btn mx-auto d-block">
+                        <i class="bi bi-floppy" id="stepSubmitIcon"></i>
                     </button>
-
-                </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- POP-UP: Edit Step -->
-    <!-- Docelowo, jak już będzie backend solidny, to będzie to jeden modal dla dodawania i edycji -->
-    <!-- ========================================== -->
-    <div class="modal fade" id="editStepModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content custom-popup t-modal border-0">
+    <!-- SKRYPT OBSŁUGUJĄCY JEDEN MODAL -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const stepModal = document.getElementById('stepModal');
+            if (!stepModal) return;
 
-                <button type="button"
-                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
+            const form = document.getElementById('stepForm');
+            const modalTitle = document.getElementById('stepModalTitle');
+            const nameInput = document.getElementById('stepNameInput');
+            const descInput = document.getElementById('stepDescInput');
+            const picInput = document.getElementById('stepPictureInput');
+            const picPreview = document.getElementById('stepPicturePreview');
+            const iconsPlaceholder = document.getElementById('stepIconsPlaceholder');
+            const submitIcon = document.getElementById('stepSubmitIcon');
 
-                <div class="modal-body p-4 p-md-5">
-                    <h3 class="popup-title text-center mb-4">Edit step</h3>
+            // Obsługa wywołania modala
+            stepModal.addEventListener('show.bs.modal', function (event) {
+                // Przycisk, który wywołał modal
+                const button = event.relatedTarget;
 
-                    <div class="row g-4 mb-4">
-                        <div class="col-sm-5 col-md-4">
-                            <div class="recipe-img-upload h-100" style="min-height: 140px;" role="button" tabindex="0"
-                                 aria-label="Upload step image">
-                                <i class="bi bi-image upload-main-icon"></i>
-                                <i class="bi bi-box-arrow-up upload-corner-icon"></i>
-                            </div>
-                        </div>
+                // Pobieranie danych z atrybutów data-* przycisku
+                const mode = button.getAttribute('data-mode');
+                const actionUrl = button.getAttribute('data-action-url');
 
-                        <div class="col-sm-7 col-md-8 d-flex flex-column justify-content-end">
-                            <div>
-                                <label for="editStepTitle" class="form-label popup-label">Step title</label>
-                                <input type="text" class="form-control popup-input shadow-none w-100" id="editStepTitle"
-                                       value='The "Orange Surgery" (The Supreme Cut)'>
-                            </div>
-                        </div>
-                    </div>
+                // Aktualizacja akcji formularza
+                form.setAttribute('action', actionUrl);
 
-                    <div class="mb-4 mb-md-5">
-                        <label for="editStepDesc" class="form-label popup-label">Description</label>
+                // Wyczyszczenie pliku w inpucie (nie da się go przypisać ze względów bezpieczeństwa przeglądarek)
+                picInput.value = '';
 
-                        <div class="form-control popup-input shadow-none p-0 overflow-hidden d-flex">
+                if (mode === 'edit') {
+                    modalTitle.textContent = 'Edit step';
+                    submitIcon.className = 'bi bi-floppy';
 
-                        <textarea class="w-100 border-0 bg-transparent shadow-none p-2 m-1" id="editStepDesc" rows="7"
-                                  style="resize: none; outline: none;">Forget peeling; we're performing an extraction. To achieve "scrumptious" status, you must transform the fruit into Supremes - naked, glowing wedges free from all bitter white pith and membranes.
-1. Behead & Base: Slice off the top and bottom until you see the vibrant flesh.
-2. The Shave: Curve your knife from top to bottom, stripping away the peel and all white pith. You want a bald, glistening sphere.
-3. The Extraction: Slide your knife between the membranes to pop out individual wedges.
-4. Save the Gold: Squeeze the leftover "carcass" over your wedges for a natural bath of juice.</textarea>
+                    nameInput.value = button.getAttribute('data-title');
+                    descInput.value = button.getAttribute('data-desc');
 
-                        </div>
-                    </div>
+                    const imgUrl = button.getAttribute('data-img');
+                    if (imgUrl) {
+                        picPreview.src = imgUrl;
+                        picPreview.classList.remove('d-none');
+                        iconsPlaceholder.classList.add('d-none');
+                    } else {
+                        picPreview.src = '';
+                        picPreview.classList.add('d-none');
+                        iconsPlaceholder.classList.remove('d-none');
+                    }
+                } else {
+                    // Tryb ADD - czyszczenie pól
+                    modalTitle.textContent = 'Add step';
+                    submitIcon.className = 'bi bi-plus';
+                    form.reset();
+                    picPreview.src = '';
+                    picPreview.classList.add('d-none');
+                    iconsPlaceholder.classList.remove('d-none');
+                }
+            });
 
-                    <!-- Docelowo JS albo form  -->
-                    <button type="button" class="popup-circular-btn mx-auto d-block">
-                        <i class="bi bi-floppy"></i>
-                    </button>
-
-                </div>
-            </div>
-        </div>
-    </div>
+            // Podgląd wybranego zdjęcia w locie
+            picInput.addEventListener('change', function (event) {
+                const file = event.target.files[0];
+                if (file) {
+                    picPreview.src = URL.createObjectURL(file);
+                    picPreview.classList.remove('d-none');
+                    iconsPlaceholder.classList.add('d-none');
+                }
+            });
+        });
+    </script>
 
     <!-- ========================================== -->
     <!-- POP-UP: Edit Recipe Details -->

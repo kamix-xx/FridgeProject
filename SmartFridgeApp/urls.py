@@ -32,10 +32,13 @@ urlpatterns = [
 
     path('recipes/<int:recipe_id>/', views.recipe_detail, name='recipe_detail'),
 
+    # Pamiętaj, że add_step przyjmuje recipe_id, a edit_step przyjmuje step_id
+    path('recipes/<int:recipe_id>/add-step/', views.add_step, name='add_step'),
+    path('steps/<int:step_id>/edit/', views.edit_step, name='edit_step'),
+
     path('recipes/create/', views.create_recipe, name='create_recipe'),
     path('recipes/<int:recipe_id>/', views.recipe_detail, name='recipe_detail'),
 
-    path('admin-panel/', views.admin_panel_view, name='admin-panel'),
     path('admin-panel/', views.admin_panel_view, name='admin-panel'),
 
     path('my-products/', views.my_products_view, name='my-products'),
