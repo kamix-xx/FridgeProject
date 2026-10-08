@@ -1,11 +1,11 @@
 from django.contrib.auth import login, logout, get_user_model, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from datetime import date, datetime, timedelta
 from types import SimpleNamespace
 from django.utils.html import json_script
-from .models import ProductDictionary, Recipe, RecipeProduct, Unit
+from .models import ProductDictionary, Recipe, RecipeProduct, Unit, Step
 from .forms import CustomUserCreationForm
 import json
 
@@ -213,6 +213,7 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 
+@login_required(login_url='login')
 def areas(request):
     display_name = request.user.username if request.user.is_authenticated else "You"
 
@@ -269,6 +270,7 @@ def areas(request):
 
     return render(request, 'areas/areas.html', context)
 
+@login_required(login_url='login')
 def shopping_list_view(request):
     mock_shopping_list = {
         "id": 1,
@@ -308,10 +310,12 @@ def shopping_list_view(request):
     return render(request, 'shopping_list/shopping_list.html', context)
 
 
+@login_required(login_url='login')
 def expenses(request):
     return render(request, 'expense-tracker/expense-tracker.html')
 
 
+@login_required(login_url='login')
 def expense_details(request):
     return render(request, 'expense-tracker/expense-details.html')
 
@@ -413,6 +417,7 @@ def change_password_view(request):
     return redirect('profile')
 
 
+@login_required(login_url='login')
 def my_products_view(request):
     mock_my_products = [
         {
@@ -447,6 +452,7 @@ def my_products_view(request):
 
     return render(request, 'my-products/my_products.html', {'my_products': mock_my_products})
 
+@login_required(login_url='login')
 def recipes(request):
     # recipes = Recipe.objects.all()
     # Pobieramy przepisy użytkownika (najnowsze na górze)
@@ -458,6 +464,7 @@ def recipes(request):
     return render(request, 'recipes/recipes.html', context)
 
 
+@login_required(login_url='login')
 def recipe_detail(request, recipe_id):
     # Pobieramy obiekt z bazy
     recipe_obj = get_object_or_404(Recipe, id=recipe_id)
@@ -568,6 +575,7 @@ def create_recipe(request):
     return redirect('recipes')
 
 
+@login_required(login_url='login')
 def admin_panel_view(request):
 
     all_users = User.objects.all().exclude(role='ADMIN')
