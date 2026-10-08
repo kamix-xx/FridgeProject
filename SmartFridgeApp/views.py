@@ -519,6 +519,68 @@ def recipe_detail(request, recipe_id):
 
 
 @login_required(login_url='login')
+def create_recipe(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        prep_time = request.POST.get('prep_time')
+        thumbnail = request.FILES.get('thumbnail')
+        ingredients_json = request.POST.get('ingredients_data')
+
+        # 1. Zapis Przepisu
+        recipe = Recipe.objects.create(
+            name=name,
+            description=description,
+            prep_time=prep_time,
+            thumbnail=thumbnail,
+            user=request.user,
+            calories=1,  # Validator wymusza wartość >= 1
+            is_global=False  # Przepis dodany przez użytkownika jest prywatny
+        )
+
+        # 2. Przetworzenie składników i zapis do tabeli pośredniej (RecipeProduct)
+        if ingredients_json:
+            print(f"--- DANE SKŁADNIKÓW Z FORMULARZA: {ingredients_json} ---")  # LOG DO KONSOLI
+            ingredients = json.loads(ingredients_json)
+
+            for item in ingredients:
+                ing_name = item.get('name')
+                ing_qty = item.get('quantity')
+                ing_unit_symbol = item.get('unit')
+
+                # Znajdź lub stwórz jednostkę
+                unit_obj, _ = Unit.objects.get_or_create(
+                    symbol=ing_unit_symbol,
+                    defaults={'user': request.user, 'is_global': False}
+                )
+
+                # Znajdź lub stwórz produkt w słowniku
+                product_obj, _ = ProductDictionary.objects.get_or_create(
+                    name=ing_name,
+                    defaults={
+                        'user': request.user,
+                        'is_global': False,
+                        'icon_number': 1,  # Wymagane przez model (null=False)
+                        'nutriscore': 'X'  # Wymagane przez model (max_length=1)
+                    }
+                )
+
+                # Utworzenie relacji z użyciem prawidłowej nazwy modelu (RecipeProduct)
+                RecipeProduct.objects.create(
+                    quantity=ing_qty,
+                    unit=unit_obj,
+                    recipe=recipe,
+                    product=product_obj
+                )
+        else:
+            print("--- UWAGA: Otrzymano pustą listę składników (None lub '') ---")
+
+        messages.success(request, 'Recipe created successfully.')
+
+    return redirect('recipes')
+
+
+@login_required(login_url='login')
 def add_step(request, recipe_id):
     if request.method == 'POST':
         # 1. Pobieramy przepis, do którego chcemy dodać krok
@@ -579,64 +641,31 @@ def edit_step(request, step_id):
 
 
 @login_required(login_url='login')
-def create_recipe(request):
+def delete_recipe(request, recipe_id):
     if request.method == 'POST':
-        name = request.POST.get('name')
-        description = request.POST.get('description')
-        prep_time = request.POST.get('prep_time')
-        thumbnail = request.FILES.get('thumbnail')
-        ingredients_json = request.POST.get('ingredients_data')
-
-        # 1. Zapis Przepisu
-        recipe = Recipe.objects.create(
-            name=name,
-            description=description,
-            prep_time=prep_time,
-            thumbnail=thumbnail,
-            user=request.user,
-            calories=1,  # Validator wymusza wartość >= 1
-            is_global=False  # Przepis dodany przez użytkownika jest prywatny
-        )
-
-        # 2. Przetworzenie składników i zapis do tabeli pośredniej (RecipeProduct)
-        if ingredients_json:
-            print(f"--- DANE SKŁADNIKÓW Z FORMULARZA: {ingredients_json} ---")  # LOG DO KONSOLI
-            ingredients = json.loads(ingredients_json)
-
-            for item in ingredients:
-                ing_name = item.get('name')
-                ing_qty = item.get('quantity')
-                ing_unit_symbol = item.get('unit')
-
-                # Znajdź lub stwórz jednostkę
-                unit_obj, _ = Unit.objects.get_or_create(
-                    symbol=ing_unit_symbol,
-                    defaults={'user': request.user, 'is_global': False}
-                )
-
-                # Znajdź lub stwórz produkt w słowniku
-                product_obj, _ = ProductDictionary.objects.get_or_create(
-                    name=ing_name,
-                    defaults={
-                        'user': request.user,
-                        'is_global': False,
-                        'icon_number': 1,  # Wymagane przez model (null=False)
-                        'nutriscore': 'X'  # Wymagane przez model (max_length=1)
-                    }
-                )
-
-                # Utworzenie relacji z użyciem prawidłowej nazwy modelu (RecipeProduct)
-                RecipeProduct.objects.create(
-                    quantity=ing_qty,
-                    unit=unit_obj,
-                    recipe=recipe,
-                    product=product_obj
-                )
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+        if recipe.user == request.user:
+            recipe.delete()
+            messages.success(request, 'Recipe deleted successfully.')
         else:
-            print("--- UWAGA: Otrzymano pustą listę składników (None lub '') ---")
+            messages.error(request, 'You cannot delete this recipe.')
+    return redirect('recipes')  # Przekierowanie do ogólnej listy
 
-        messages.success(request, 'Recipe created successfully.')
 
+@login_required(login_url='login')
+def delete_step(request, step_id):
+    if request.method == 'POST':
+        step = get_object_or_404(Step, id=step_id)
+        recipe_id = step.recipe.id
+
+        if step.recipe.user == request.user:
+            step.delete()
+            messages.success(request, 'Step deleted successfully.')
+        else:
+            messages.error(request, 'You cannot delete this step.')
+
+        # Przekierowanie z powrotem do detali tego samego przepisu
+        return redirect('recipe_detail', recipe_id=recipe_id)
     return redirect('recipes')
 
 
