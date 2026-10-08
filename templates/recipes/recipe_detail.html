@@ -226,7 +226,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="deleteStepModal" tabindex="-1" aria-hidden="true">
+    {% comment %}<div class="modal fade" id="deleteStepModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
             <div class="modal-content custom-popup t-modal border-0 text-center p-4 p-md-5">
 
@@ -250,7 +250,7 @@
 
             </div>
         </div>
-    </div>
+    </div>{% endcomment %}
 
     <!-- ========================================== -->
     <!-- UNIWERSALNY POP-UP: Add / Edit Step -->
@@ -325,34 +325,41 @@
                         class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
                         data-bs-dismiss="modal" aria-label="Close"></button>
 
-                <div class="modal-body p-4">
+                <form method="post" action="{% url 'edit_recipe' recipe.id %}" enctype="multipart/form-data"
+                      id="editRecipeForm" class="modal-body p-4">
+                    {% csrf_token %}
                     <h3 class="popup-title text-center mb-3 mt-1">Edit recipe</h3>
 
                     <div class="row g-3 mb-4">
                         <div class="col-sm-5">
                             <label class="form-label popup-label d-none d-sm-block">&nbsp;</label>
 
-                            <div class="recipe-img-upload position-relative overflow-hidden p-0 border-0" role="button"
-                                 tabindex="0" aria-label="Change recipe image">
-                                <img src="{{ recipe.image_url }}" alt="Recipe cover"
+                            <label for="editRecipePicInput"
+                                   class="recipe-img-upload position-relative overflow-hidden p-0 border-0"
+                                   style="cursor: pointer; display: block;" aria-label="Change recipe image">
+                                <!-- Ukryty input, którego szuka Twój plik JS -->
+                                <input type="file" name="thumbnail" id="editRecipePicInput" class="d-none"
+                                       accept="image/*">
+                                <!-- Podgląd zdjęcia, którego id też jest w JS -->
+                                <img src="{{ recipe.image_url }}" alt="Recipe cover" id="editRecipePicPreview"
                                      class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
                                 <div class="position-absolute bottom-0 end-0 p-2 z-2">
                                     <i class="bi bi-box-arrow-up text-white"
                                        style="font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));"></i>
                                 </div>
-                            </div>
+                            </label>
                         </div>
 
                         <div class="col-sm-7 d-flex flex-column justify-content-between">
                             <div class="mb-2">
                                 <label for="editRecipeName" class="form-label popup-label">Recipe name</label>
                                 <input type="text" class="form-control popup-input shadow-none w-100"
-                                       id="editRecipeName" value="{{ recipe.title|striptags }}">
+                                       id="editRecipeName" name="name" value="{{ recipe.title|striptags }}">
                             </div>
                             <div>
                                 <label for="editRecipeTime" class="form-label popup-label">Preparation time</label>
                                 <input type="text" class="form-control popup-input shadow-none w-100"
-                                       id="editRecipeTime" value="{{ recipe.est_time }}">
+                                       id="editRecipeTime" name="prep_time" value="{{ recipe.est_time }}">
                             </div>
                         </div>
                     </div>
@@ -362,7 +369,7 @@
                             description:</label>
                         <div class="form-control popup-input shadow-none p-0 overflow-hidden d-flex">
                             <textarea class="w-100 border-0 bg-transparent shadow-none p-2 m-1" id="editRecipeDesc"
-                                      rows="2"
+                                      name="description" rows=" 2"
                                       style="resize: none; outline: none;">{{ recipe.description_short }}</textarea>
                         </div>
                     </div>
@@ -416,11 +423,15 @@
                         </div>
                     </div>
 
-                    <button type="button" class="popup-circular-btn mx-auto">
+                    <!-- Ukryte pole na zserializowaną listę składników z edycji -->
+                    <input type="hidden" name="ingredients_data" id="editIngredientsData">
+
+                    <button type="submit" class="popup-circular-btn mx-auto">
                         <i class="bi bi-floppy"></i>
                     </button>
 
-                </div>
+
+                </form>
             </div>
         </div>
     </div>
