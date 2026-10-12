@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{% static 'css/editAreaModal.css' %}">
     <script src="{% static 'js/gooeyMenu.js' %}?v=2" defer></script>
     <script src="{% static 'js/menuMorph.js' %}?v=2" defer></script>
-    <script src="{% static 'js/areas.js' %}?v=4" defer></script>
+    <script src="{% static 'js/areas.js' %}" defer></script>
     <script src="{% static 'js/modals.js' %}?v=3" defer></script>
     <script src="{% static 'js/editAreaModal.js' %}" defer></script>
 {% endblock %}
@@ -134,7 +134,8 @@
                                             </button>
 
                                             <button class="gooey-item item-delete" aria-label="Delete"
-                                                    data-bs-toggle="modal" data-bs-target="#deleteAreaModal">
+                                                    data-bs-toggle="modal" data-bs-target="#deleteAreaModal"
+                                                    data-area-id="{{ area.id }}">
                                                 <i class="bi bi-trash"></i>
                                             </button>
 
@@ -167,17 +168,24 @@
     <div class="modal fade" id="deleteAreaModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content custom-popup t-modal">
-                <div class="modal-body text-center p-4 p-md-5">
-                    <h3 class="popup-title mb-5">Are you sure you want to delete the ...?</h3>
-                    <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
-                            data-bs-dismiss="modal">
-                        Nah, just kidding
-                    </button>
-                    <hr class="popup-divider mx-auto mb-4">
-                    <button type="button" class="btn btn-link text-decoration-none popup-btn-danger">
-                        Yes, destroy the ...!
-                    </button>
-                </div>
+
+                <form method="POST" action="{% url 'delete_area' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="area_id" id="deleteAreaId">
+
+                    <div class="modal-body text-center p-4 p-md-5">
+                        <h3 class="popup-title mb-5">Are you sure you want to delete / leave this area?</h3>
+                        <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                                data-bs-dismiss="modal">
+                            Nah, just kidding
+                        </button>
+                        <hr class="popup-divider mx-auto mb-4">
+                        <button type="submit" class="btn btn-link text-decoration-none popup-btn-danger">
+                            Yes, I'm sure!
+                        </button>
+                    </div>
+                </form>
+
             </div>
         </div>
     </div>

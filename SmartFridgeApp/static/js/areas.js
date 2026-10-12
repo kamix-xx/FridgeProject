@@ -54,16 +54,47 @@ document.addEventListener('DOMContentLoaded', function () {
             btnCopy.addEventListener('click', function () {
                 if (!shareCodeInput.value) return;
 
-                navigator.clipboard.writeText(shareCodeInput.value).then(function() {
+                navigator.clipboard.writeText(shareCodeInput.value).then(function () {
                     btnCopy.innerHTML = '<i class="bi bi-check-lg text-success"></i>';
 
-                    setTimeout(function() {
+                    setTimeout(function () {
                         btnCopy.innerHTML = '<i class="bi bi-copy"></i>';
                     }, 2000);
-                }).catch(function(err) {
+                }).catch(function (err) {
                     console.error('Failed to copy text: ', err);
                 });
             });
         }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const deleteModal = document.getElementById('deleteAreaModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const areaId = button.getAttribute('data-area-id');
+            const hiddenInput = document.getElementById('deleteAreaId');
+            if (hiddenInput && areaId) {
+                hiddenInput.value = areaId;
+            }
+        });
+    }
+
+    // przypisanie ID + dotychczasowej nazwy
+    const editModal = document.getElementById('editAreaModal');
+    if (editModal) {
+        editModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const areaId = button.getAttribute('data-area-id');
+            const areaName = button.getAttribute('data-area-name');
+
+            const hiddenInput = document.getElementById('editAreaIdHidden');
+            const nameInput = document.getElementById('editAreaName');
+
+            if (hiddenInput && areaId) hiddenInput.value = areaId;
+            if (nameInput && areaName) nameInput.value = areaName;
+        });
     }
 });

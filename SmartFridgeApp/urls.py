@@ -9,43 +9,33 @@ urlpatterns = [
     path('password_reset/',
          auth_views.PasswordResetView.as_view(template_name='regain-access/password_reset.html'),
          name='password_reset'),
-
     path('password_reset/done/',
          auth_views.PasswordResetDoneView.as_view(template_name='regain-access/password_reset_done.html'),
          name='password_reset_done'),
-
     path('reset/<uidb64>/<token>/',
          auth_views.PasswordResetConfirmView.as_view(template_name='regain-access/password_reset_confirm.html'),
          name='password_reset_confirm'),
-
     path('reset/done/',
          auth_views.PasswordResetCompleteView.as_view(template_name='regain-access/password_reset_complete.html'),
          name='password_reset_complete'),
     path('home', views.home, name='home'),
     path('', views.landing, name='landing'),
-
     # Login:
     path('login/', auth_views.LoginView.as_view(redirect_authenticated_user=True), name='login'),
     path('', include('django.contrib.auth.urls')),
     path('register', views.register, name='register'),
-
     # Profile:
     path('profile', views.profile, name='profile'),
     path('profile/edit/', views.edit_profile_view, name='edit_profile'),
     path('profile/change-password/', views.change_password_view, name='change_password'),
-
     path('areas', views.areas, name='areas'),
-
     path('areas/create/', views.create_area, name='create_area'),
-
     path('areas/join/', views.join_area, name='join_area'),
-
+    path('areas/edit/', views.edit_area, name='edit_area'),
+    path('areas/delete/', views.delete_area, name='delete_area'),
     path('profile/delete', views.delete_account, name='delete_account'),
-
     path('areas', views.areas, name='areas'),
-
     path('expenses', views.expenses, name='expenses'),
-
     path('expenses/details/', views.expense_details, name='expense_details'),
     path('shopping-list/', views.shopping_list_view, name='shopping_list'),
     path('shopping-list/create/', views.create_shopping_list, name='create_shopping_list'),
@@ -62,10 +52,8 @@ urlpatterns = [
     path('recipes/<int:recipe_id>/', views.recipe_detail, name='recipe_detail'),
     path('recipes/<int:recipe_id>/delete/', views.delete_recipe, name='delete_recipe'),
     path('steps/<int:step_id>/delete/', views.delete_step, name='delete_step'),
-
     # Admin-panel:
     path('admin-panel/', views.admin_panel_view, name='admin-panel'),
-
     path('my-products/', views.my_products_view, name='my-products'),
 ]
 

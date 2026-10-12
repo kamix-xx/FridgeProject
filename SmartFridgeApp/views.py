@@ -286,6 +286,45 @@ def join_area(request):
 
 
 @login_required(login_url='login')
+def edit_area(request):
+    if request.method == 'POST':
+        area_id = request.POST.get('area_id')
+        new_name = request.POST.get('area_name')
+
+        if area_id and new_name:
+            area = get_object_or_404(Area, id=area_id)
+
+            if area.owner == request.user:
+                area.name = new_name
+                area.save()
+                messages.success(request, 'Area name updated successfully.')
+            else:
+                messages.error(request, 'Only the owner can rename this area.')
+
+    return redirect('areas')
+
+
+@login_required(login_url='login')
+def delete_area(request):
+    if request.method == 'POST':
+        area_id = request.POST.get('area_id')
+
+        if area_id:
+            area = get_object_or_404(Area, id=area_id)
+
+            if area.owner == request.user:
+                # Właściciel usuwa cały obszar ze wszystkim
+                area.delete()
+                messages.success(request, 'Area deleted successfully.')
+            else:
+                # Gość opuszcza obszar, ale nie usuwa go z bazy danych
+                area.users.remove(request.user)
+                messages.success(request, f'You have left the area "{area.name}".')
+
+    return redirect('areas')
+
+
+@login_required(login_url='login')
 def shopping_list_view(request):
     # Pobieramy wszystkie listy zakupowe użytkownika
     user_lists = ShoppingList.objects.filter(user=request.user).order_by('id')
