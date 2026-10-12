@@ -182,75 +182,74 @@
                             class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
                             data-bs-dismiss="modal" aria-label="Close"></button>
 
-                    <div class="modal-body text-center p-4 p-md-5">
-                        <h3 class="popup-title mb-4 mt-2">Edit shopping list</h3>
-
-                        <div class="text-start mb-5">
-                            <label for="editShoppingListName" class="form-label popup-label">Shopping list name</label>
-                            <input type="text" class="form-control popup-input shadow-none"
-                                   id="editShoppingListName"
-                                   value="{{ shopping_list.name|default:'Shopping list #1' }}">
-                        </div>
-
-                        <button type="button" class="popup-circular-btn mx-auto" data-bs-dismiss="modal"
-                                id="saveShoppingListNameBtn">
-                            <i class="bi bi-check-lg"></i>
-                        </button>
-                    </div>
+                    {% if shopping_list %}
+                        <form method="POST" action="{% url 'edit_shopping_list' shopping_list.id %}">
+                            {% csrf_token %}
+                            <div class="modal-body text-center p-4 p-md-5">
+                                <h3 class="popup-title mb-4 mt-2">Edit shopping list</h3>
+                                <div class="text-start mb-5">
+                                    <label for="editShoppingListName" class="form-label popup-label">Shopping list
+                                        name</label>
+                                    <input type="text" name="name" class="form-control popup-input shadow-none"
+                                           id="editShoppingListName" value="{{ shopping_list.name }}" required>
+                                </div>
+                                <button type="submit" class="popup-circular-btn mx-auto" id="saveShoppingListNameBtn">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                            </div>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
         <div class="modal fade" id="createShoppingListModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-
                 <div class="modal-content custom-popup position-relative border-0">
-
                     <button type="button"
                             class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
                             data-bs-dismiss="modal" aria-label="Close"></button>
 
-                    <div class="modal-body text-center p-4 p-md-5">
-                        <h3 class="popup-title mb-4 mt-2">Create shopping list</h3>
-
-                        <div class="text-start mb-5">
-                            <label for="newShoppingListName" class="form-label popup-label">Shopping list
-                                name</label>
-                            <input type="text" class="form-control popup-input shadow-none"
-                                   id="newShoppingListName">
+                    <form method="POST" action="{% url 'create_shopping_list' %}">
+                        {% csrf_token %}
+                        <div class="modal-body text-center p-4 p-md-5">
+                            <h3 class="popup-title mb-4 mt-2">Create shopping list</h3>
+                            <div class="text-start mb-5">
+                                <label for="newShoppingListName" class="form-label popup-label">Shopping list
+                                    name</label>
+                                <input type="text" name="name" class="form-control popup-input shadow-none"
+                                       id="newShoppingListName" required>
+                            </div>
+                            <button type="submit" class="popup-circular-btn mx-auto">
+                                <i class="bi bi-plus"></i>
+                            </button>
                         </div>
-
-                        <button type="button" class="popup-circular-btn mx-auto">
-                            <i class="bi bi-plus"></i>
-                        </button>
-
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
 
         <div class="modal fade" id="deleteShoppingListModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-
                 <div class="modal-content custom-popup border-0">
-
                     <div class="modal-body text-center p-4 p-md-5">
-
                         <h3 class="popup-title mb-2">Are you sure to delete this list?</h3>
                         <p class="popup-subtitle-light mb-5">All items there will be lost!</p>
-
                         <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
                                 data-bs-dismiss="modal">
                             Nah, just kidding
                         </button>
-
                         <hr class="popup-divider mx-auto mb-4">
 
-                        <!-- W przyszłości owinąć to w <form method="POST"> do Django -->
-                        <button type="button" class="btn btn-link text-decoration-none popup-btn-danger">
-                            Do it!
-                        </button>
-
+                        {% if shopping_list %}
+                            <form method="POST" action="{% url 'delete_shopping_list' shopping_list.id %}"
+                                  class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-link text-decoration-none popup-btn-danger">
+                                    Do it!
+                                </button>
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
             </div>
