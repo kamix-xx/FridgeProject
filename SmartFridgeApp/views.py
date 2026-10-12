@@ -5,7 +5,7 @@ from django.contrib import messages
 from datetime import date, datetime, timedelta
 from types import SimpleNamespace
 from django.utils.html import json_script
-from .models import ProductDictionary, Recipe, RecipeProduct, Unit, Step, Area
+from .models import ProductDictionary, Recipe, RecipeProduct, Unit, Step, Area, ShoppingList, ShoppingListItem
 from .forms import CustomUserCreationForm
 import json
 import uuid
@@ -284,44 +284,91 @@ def join_area(request):
 
     return redirect('areas')
 
+
 @login_required(login_url='login')
 def shopping_list_view(request):
-    mock_shopping_list = {
-        "id": 1,
-        "name": "Shopping list #1"
-    }
+    # Pobieramy wszystkie listy zakupowe użytkownika
+    user_lists = ShoppingList.objects.filter(user=request.user).order_by('id')
 
-    mock_items = [
-        {
-            "id": 1,
-            "name": "Milk",
-            "quantity": 1.0,
-            "unit": "L",
-            "is_done": True
-        },
-        {
-            "id": 2,
-            "name": "Cottage cheese",
-            "quantity": 2.0,
-            "unit": "PCK",
-            "is_done": False
-        },
-        {
-            "id": 3,
-            "name": "Pasta",
-            "quantity": 400.0,
-            "unit": "g",
-            "is_done": False
-        },
-    ]
+    # Jeśli użytkownik nie ma ŻADNEJ listy, automatycznie tworzymy domyślną
+    if not user_lists.exists():
+        ShoppingList.objects.create(name="My First List", user=request.user)
+        # Odświeżamy zapytanie, żeby pobrać nowo utworzoną listę
+        user_lists = ShoppingList.objects.filter(user=request.user).order_by('id')
+
+    active_list = None
+    items = []
+    prev_list_id = None
+    next_list_id = None
+
+    if user_lists.exists():
+        # Umożliwiamy przełączanie się między listami parametrem w URL: ?list_id=X
+        list_id = request.GET.get('list_id')
+
+        if list_id:
+            active_list = get_object_or_404(ShoppingList, id=list_id, user=request.user)
+        else:
+            active_list = user_lists.first()
+
+        # Pobieramy produkty tylko z aktywnej listy
+        items = ShoppingListItem.objects.filter(shoppingList=active_list).select_related('product', 'unit')
+
+        # Logika do nawigacji między listami
+        lists_list = list(user_lists)
+        current_index = lists_list.index(active_list)
+        if current_index > 0:
+            prev_list_id = lists_list[current_index - 1].id
+        if current_index < len(lists_list) - 1:
+            next_list_id = lists_list[current_index + 1].id
 
     context = {
-        'shopping_list': mock_shopping_list,
-        'shopping_lists': [mock_shopping_list],
-        'shopping_items': mock_items
+        'shopping_list': active_list,
+        'shopping_lists': user_lists,
+        'shopping_items': items,
+        'prev_list_id': prev_list_id,
+        'next_list_id': next_list_id,
     }
 
     return render(request, 'shopping_list/shopping_list.html', context)
+
+
+@login_required(login_url='login')
+def create_shopping_list(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        if name:
+            new_list = ShoppingList.objects.create(name=name, user=request.user)
+            messages.success(request, f'Shopping list "{name}" created!')
+
+            return redirect(f"/shopping-list/?list_id={new_list.id}")
+
+    return redirect('shopping_list')
+
+
+@login_required(login_url='login')
+def edit_shopping_list(request, list_id):
+    if request.method == 'POST':
+        shopping_list = get_object_or_404(ShoppingList, id=list_id, user=request.user)
+        new_name = request.POST.get('name')
+
+        if new_name:
+            shopping_list.name = new_name
+            shopping_list.save()
+            messages.success(request, 'Shopping list updated successfully!')
+
+        return redirect(f"/shopping-list/?list_id={shopping_list.id}")
+
+    return redirect('shopping_list')
+
+
+@login_required(login_url='login')
+def delete_shopping_list(request, list_id):
+    if request.method == 'POST':
+        shopping_list = get_object_or_404(ShoppingList, id=list_id, user=request.user)
+        shopping_list.delete()
+        messages.success(request, 'Shopping list deleted successfully!')
+
+    return redirect('shopping_list')
 
 
 @login_required(login_url='login')
