@@ -31,12 +31,12 @@
                 class="shopping-panel d-flex justify-content-center align-items-center gap-3 w-100 position-relative z-2 px-2 px-md-5"
                 style="max-width: 1400px;">
 
-            <button type="button"
-                    class="btn-scroll-down carousel-arrow shopping-arrow-prev d-none d-md-flex align-items-center justify-content-center"
-                    aria-label="Previous list"
-                    {% if not shopping_lists or shopping_lists|length < 2 %}disabled{% endif %}>
+            <a href="{% if prev_list_id %}?list_id={{ prev_list_id }}{% else %}#{% endif %}"
+               class="btn-scroll-down carousel-arrow shopping-arrow-prev d-none d-md-flex align-items-center justify-content-center text-decoration-none"
+               aria-label="Previous list"
+               {% if not prev_list_id %}style="pointer-events: none; opacity: 0.5;"{% endif %}>
                 <i class="bi bi-chevron-left"></i>
-            </button>
+            </a>
 
 
             <div class="glass-card p-4 p-md-5 mt-4 position-relative flex-grow-1 w-100"
@@ -46,7 +46,8 @@
                 <header class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-dark border-opacity-25 shopping-list-header">
                     <div class="header-spacer d-none d-sm-block" style="width: 42px;"></div>
                     <div class="flex-grow-1 text-center">
-                        <h2 class="expense-title m-0" id="shoppingListTitle">{{ shopping_list.name|default:"Shopping list #1" }}</h2>
+                        <h2 class="expense-title m-0"
+                            id="shoppingListTitle">{{ shopping_list.name|default:"Shopping list #1" }}</h2>
                     </div>
 
                     <!-- Shopping List Actions Gooey Menu -->
@@ -98,9 +99,9 @@
                                 </span>
 
                                 <div class="product-info shopping-product-info">
-                                    <span class="product-name fw-medium">{{ item.name }}</span>
+                                    <span class="product-name fw-medium">{{ item.product.name }}</span>
                                     <div class="shopping-divider"></div>
-                                    <span class="product-qty text-nowrap">{{ item.quantity }} {{ item.unit }}</span>
+                                    <span class="product-qty text-nowrap">{{ item.quantity|floatformat:-2 }} {{ item.unit.symbol }}</span>
                                 </div>
 
                                 <div class="product-row-actions">
@@ -120,7 +121,8 @@
                                         <i class="bi bi-trash"></i>
                                     </a>
 
-                                    <label class="shopping-checkbox-wrapper mb-0" aria-label="Mark {{ item.name }} as bought">
+                                    <label class="shopping-checkbox-wrapper mb-0"
+                                           aria-label="Mark {{ item.name }} as bought">
                                         <input type="checkbox" class="shopping-checkbox"
                                                {% if item.is_bought or item.is_done %}checked{% endif %}>
                                         <span class="shopping-checkmark"></span>
@@ -161,12 +163,12 @@
 
             </div>
 
-            <button type="button"
-                    class="btn-scroll-down carousel-arrow shopping-arrow-next d-none d-md-flex align-items-center justify-content-center"
-                    aria-label="Next list"
-                    {% if not shopping_lists or shopping_lists|length < 2 %}disabled{% endif %}>
+            <a href="{% if next_list_id %}?list_id={{ next_list_id }}{% else %}#{% endif %}"
+               class="btn-scroll-down carousel-arrow shopping-arrow-next d-none d-md-flex align-items-center justify-content-center text-decoration-none"
+               aria-label="Next list"
+               {% if not next_list_id %}style="pointer-events: none; opacity: 0.5;"{% endif %}>
                 <i class="bi bi-chevron-right"></i>
-            </button>
+            </a>
 
         </section>
 
@@ -186,10 +188,12 @@
                         <div class="text-start mb-5">
                             <label for="editShoppingListName" class="form-label popup-label">Shopping list name</label>
                             <input type="text" class="form-control popup-input shadow-none"
-                                   id="editShoppingListName" value="{{ shopping_list.name|default:'Shopping list #1' }}">
+                                   id="editShoppingListName"
+                                   value="{{ shopping_list.name|default:'Shopping list #1' }}">
                         </div>
 
-                        <button type="button" class="popup-circular-btn mx-auto" data-bs-dismiss="modal" id="saveShoppingListNameBtn">
+                        <button type="button" class="popup-circular-btn mx-auto" data-bs-dismiss="modal"
+                                id="saveShoppingListNameBtn">
                             <i class="bi bi-check-lg"></i>
                         </button>
                     </div>
