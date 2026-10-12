@@ -284,10 +284,17 @@ def join_area(request):
 
     return redirect('areas')
 
+
 @login_required(login_url='login')
 def shopping_list_view(request):
-
+    # Pobieramy wszystkie listy zakupowe użytkownika
     user_lists = ShoppingList.objects.filter(user=request.user).order_by('id')
+
+    # Jeśli użytkownik nie ma ŻADNEJ listy, automatycznie tworzymy domyślną
+    if not user_lists.exists():
+        ShoppingList.objects.create(name="My First List", user=request.user)
+        # Odświeżamy zapytanie, żeby pobrać nowo utworzoną listę
+        user_lists = ShoppingList.objects.filter(user=request.user).order_by('id')
 
     active_list = None
     items = []
@@ -303,10 +310,10 @@ def shopping_list_view(request):
         else:
             active_list = user_lists.first()
 
-        # Pobieramy produkty tylko z aktywnej listy i od razu dołączamy tabele powiązane, żeby zoptymalizować zapytanie
+        # Pobieramy produkty tylko z aktywnej listy
         items = ShoppingListItem.objects.filter(shoppingList=active_list).select_related('product', 'unit')
 
-        # Przełączanie się strzałkami między listami
+        # Logika do nawigacji między listami
         lists_list = list(user_lists)
         current_index = lists_list.index(active_list)
         if current_index > 0:
