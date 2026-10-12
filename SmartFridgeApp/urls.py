@@ -47,9 +47,10 @@ urlpatterns = [
     path('expenses', views.expenses, name='expenses'),
 
     path('expenses/details/', views.expense_details, name='expense_details'),
-
     path('shopping-list/', views.shopping_list_view, name='shopping_list'),
-
+    path('shopping-list/create/', views.create_shopping_list, name='create_shopping_list'),
+    path('shopping-list/<int:list_id>/edit/', views.edit_shopping_list, name='edit_shopping_list'),
+    path('shopping-list/<int:list_id>/delete/', views.delete_shopping_list, name='delete_shopping_list'),
     # Recipes:
     path('recipes/', views.recipes, name='recipes'),
     path('recipes/<int:recipe_id>/', views.recipe_detail, name='recipe_detail'),
