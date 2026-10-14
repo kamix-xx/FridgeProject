@@ -860,6 +860,25 @@ def delete_step(request, step_id):
 
 
 @login_required(login_url='login')
+def send_recipe_for_verification(request, recipe_id):
+    if request.method == 'POST':
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+
+        # Upewniamy się, że tylko właściciel przepisu może go wysłać do weryfikacji
+        if recipe.user == request.user:
+            # Ustawienie statusu (upewnij się, czy w Twoim modelu pole nazywa się 'item_status' czy 'status')
+            recipe.item_status = 'pending'
+            recipe.save()
+            messages.success(request, 'Recipe submitted for verification successfully.')
+        else:
+            messages.error(request, 'You cannot send this recipe for verification.')
+
+        return redirect('recipe_detail', recipe_id=recipe.id)
+
+    return redirect('recipes')
+
+
+@login_required(login_url='login')
 def admin_panel_view(request):
     all_users = User.objects.all().exclude(role='ADMIN')
 
