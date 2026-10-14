@@ -8,8 +8,6 @@ from types import SimpleNamespace
 from django.utils.html import json_script
 from .models import ProductDictionary, Recipe, RecipeProduct, Unit, Step, Area, ShoppingList, ShoppingListItem, \
     ItemStatus
-from .models import ProductDictionary, Recipe, RecipeProduct, Unit, Step, Area, ShoppingList, ShoppingListItem, \
-    ItemStatus
 from django.db.models import Q, RestrictedError
 from .forms import CustomUserCreationForm
 import json
