@@ -56,6 +56,9 @@ urlpatterns = [
     path('recipes/<int:recipe_id>/', views.recipe_detail, name='recipe_detail'),
     path('recipes/<int:recipe_id>/delete/', views.delete_recipe, name='delete_recipe'),
     path('steps/<int:step_id>/delete/', views.delete_step, name='delete_step'),
+    path('recipes/<int:recipe_id>/send-to-verify/', views.send_recipe_for_verification,
+         name='send_recipe_for_verification'),
+
     # Admin-panel:
     path('admin-panel/', views.admin_panel_view, name='admin-panel'),
     path('my-products/', views.my_products_view, name='my-products'),
