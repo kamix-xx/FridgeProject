@@ -60,9 +60,23 @@ class Unit(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
 class ItemStatus(models.TextChoices):
-    GLOBAL = "GLOBAL", "GLOBAL"
-    PRIVATE = "PRIVATE", "PRIVATE"
+    # ENUM_KEY = "DataBase", "display"
+    GLOBAL = "OFFICIAL", "OFFICIAL"
+    PRIVATE = "UNOFFICIAL", "UNOFFICIAL"
     PENDING = "PENDING", "PENDING"
+
+    # How it works:
+    # is_global: visibility public/creator
+    # item_status: PENDING, OFFICIAL (admin/staff), UNOFFICIAL (standard user)
+
+    # Official - official recipe (made by Admin)
+    # Private - private user's recipe
+    # User's - published user's recipe
+    # Pending - user's recipe send for verification
+
+    # Option 2:
+    # 1. Rename is_global to is_official (official recipes made by admin and staff)
+    # 2. Item status: PRIVATE, PENDING, PUBLIC
 
 class ProductDictionary(models.Model):
     id = models.AutoField(primary_key=True)

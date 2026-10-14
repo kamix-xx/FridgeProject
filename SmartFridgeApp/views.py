@@ -603,7 +603,8 @@ def recipe_detail(request, recipe_id):
         "id": recipe_obj.id,
         "title": recipe_obj.name,
         "est_time": recipe_obj.prep_time.strftime("%H:%M") if recipe_obj.prep_time else "N/A",
-        "status": "official" if recipe_obj.is_global else "private",
+        # "status": "official" if recipe_obj.is_global else "private",
+        'status': "pending" if recipe_obj.item_status else "private",
         "image_url": recipe_obj.thumbnail.url if recipe_obj.thumbnail else "https://i.imgur.com/2SjgpvQ.jpeg",
         "description_short": recipe_obj.description,
         "description_long": "",  # Jeśli masz osobne pole, możesz tu przekazać
@@ -867,7 +868,7 @@ def send_recipe_for_verification(request, recipe_id):
         # Upewniamy się, że tylko właściciel przepisu może go wysłać do weryfikacji
         if recipe.user == request.user:
             # Ustawienie statusu (upewnij się, czy w Twoim modelu pole nazywa się 'item_status' czy 'status')
-            recipe.item_status = 'pending'
+            recipe.item_status = 'PENDING'
             recipe.save()
             messages.success(request, 'Recipe submitted for verification successfully.')
         else:
