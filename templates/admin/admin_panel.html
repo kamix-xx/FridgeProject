@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{% static 'css/modals.css' %}?v=2">
     <script src="{% static 'js/modals.js' %}" defer></script>
     <script src="{% static 'js/admin_edit_user.js' %}" defer></script>
+    <script src="{% static 'js/admin_units.js' %}" defer></script>
 {% endblock %}
 
 {% block title %}SmartFridge+ — Administrator Panel{% endblock %}
@@ -51,6 +52,8 @@
                                                     data-status="{{ user_item.status }}"
                                                     data-date="{{ user_item.date_joined|date:'d.m.Y' }}"
                                                     data-avatar="
+
+
 
 
                                                             {% if user_item.avatar %}{{ user_item.avatar.url }}{% endif %}">
@@ -182,40 +185,45 @@
                         <div class="admin-scroll-container mb-4" style="max-height: 35vh;">
                             <ul class="admin-list">
                                 {% for unit in global_units %}
-
                                     <li class="admin-list-item admin-item-peach shadow-sm">
-                                        <span class="admin-item-name text-dark">{{ unit.name }}</span>
+                                        <!-- Prawdziwa nazwa symbolu -->
+                                        <span class="admin-item-name text-dark">{{ unit.symbol }}</span>
                                         <div class="admin-item-actions text-dark">
 
-                                            <button class="admin-icon-btn text-dark" aria-label="Edit unit"
-                                                    title="Edit">
+                                            <!-- Przycisk Edycji -->
+                                            <button class="admin-icon-btn text-dark" aria-label="Edit unit" title="Edit"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editGlobalUnitModal"
+                                                    data-unit-id="{{ unit.id }}"
+                                                    data-unit-symbol="{{ unit.symbol }}">
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
 
+                                            <!-- Przycisk Usuwania -->
                                             <button class="admin-icon-btn text-dark" aria-label="Remove unit"
                                                     title="Remove"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#universalConfirmModal"
                                                     data-title="Delete unit?"
-                                                    data-desc="Are you sure you want to permanently delete this unit? This might affect existing recipes and products."
+                                                    data-desc="Are you sure you want to permanently delete this unit?"
                                                     data-btn-text="Yes, delete it"
                                                     data-btn-class="popup-btn-danger"
                                                     data-item-id="{{ unit.id }}"
-                                                    data-action="delete_global_unit">
+                                                    data-action="{% url 'admin_delete_unit' %}">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </div>
                                     </li>
                                 {% empty %}
-                                    <li class="text-center text-muted py-4">
-                                        No global units found.
-                                    </li>
+                                    <li class="text-center text-muted py-4">No global units found.</li>
                                 {% endfor %}
                             </ul>
                         </div>
 
                         <div class="d-flex justify-content-center mt-auto">
-                            <button class="admin-add-btn shadow-sm" aria-label="Add new global unit" title="Add unit">
+                            <!-- Przycisk Dodawania -->
+                            <button class="admin-add-btn shadow-sm" aria-label="Add new global unit" title="Add unit"
+                                    data-bs-toggle="modal" data-bs-target="#addGlobalUnitModal">
                                 <i class="bi bi-plus-lg"></i>
                             </button>
                         </div>
@@ -372,6 +380,52 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+    </div>
+    <!-- Modal: Add Global Unit -->
+    <div class="modal fade" id="addGlobalUnitModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup border-0">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                <form method="POST" action="{% url 'admin_add_unit' %}">
+                    {% csrf_token %}
+                    <div class="modal-body text-center p-4 p-md-5">
+                        <h3 class="popup-title mb-4">Add Global Unit</h3>
+                        <div class="text-start mb-4">
+                            <label class="form-label popup-label">Unit symbol</label>
+                            <input type="text" name="symbol" class="form-control popup-input shadow-none" required
+                                   maxlength="10">
+                        </div>
+                        <button type="submit" class="popup-circular-btn mx-auto"><i class="bi bi-plus"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Edit Global Unit -->
+    <div class="modal fade" id="editGlobalUnitModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup border-0">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                <form method="POST" action="{% url 'admin_edit_unit' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="unit_id" id="editGlobalUnitId">
+                    <div class="modal-body text-center p-4 p-md-5">
+                        <h3 class="popup-title mb-4">Edit Global Unit</h3>
+                        <div class="text-start mb-4">
+                            <label class="form-label popup-label">Unit symbol</label>
+                            <input type="text" name="symbol" id="editGlobalUnitSymbol"
+                                   class="form-control popup-input shadow-none" required maxlength="10">
+                        </div>
+                        <button type="submit" class="popup-circular-btn mx-auto"><i class="bi bi-check-lg"></i></button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

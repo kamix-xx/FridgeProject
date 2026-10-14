@@ -45,6 +45,7 @@ urlpatterns = [
     path('shopping-list/item/toggle/<int:item_id>/', views.toggle_shopping_item, name='toggle_shopping_item'),
     path('shopping-list/item/edit/', views.edit_shopping_item, name='edit_shopping_item'),
     path('shopping-list/item/delete/', views.delete_shopping_item, name='delete_shopping_item'),
+    path('units/create/', views.create_unit, name='create_unit'),
     # Recipes:
     path('recipes/', views.recipes, name='recipes'),
     path('recipes/<int:recipe_id>/', views.recipe_detail, name='recipe_detail'),
@@ -60,7 +61,10 @@ urlpatterns = [
          name='send_recipe_for_verification'),
 
     # Admin-panel:
-    path('admin-panel/', views.admin_panel_view, name='admin-panel'),
+    path('admin-panel/', views.admin_panel_view, name='admin_panel'),
+    path('admin-panel/unit/add/', views.admin_add_unit, name='admin_add_unit'),
+    path('admin-panel/unit/edit/', views.admin_edit_unit, name='admin_edit_unit'),
+    path('admin-panel/unit/delete/', views.admin_delete_unit, name='admin_delete_unit'),
     path('my-products/', views.my_products_view, name='my-products'),
 ]
 

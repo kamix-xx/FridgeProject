@@ -339,22 +339,29 @@
                                                     <span id="selectedUnitText">psc</span>
                                                 </button>
 
-                                                <!-- To zaraz będzie wyciągane z bazy  -->
                                                 <ul class="dropdown-menu custom-dropdown-menu w-100">
-                                                    <li><a class="dropdown-item" href="#"
-                                                           onclick="document.getElementById('selectedUnitText').innerText='kg'; document.getElementById('hiddenUnitSymbol').value='kg'; return false;">kg</a>
+                                                    {% for unit in available_units %}
+                                                        <li>
+                                                            <a class="dropdown-item" href="#"
+                                                               onclick="document.getElementById('selectedUnitText').innerText='{{ unit.symbol }}'; document.getElementById('hiddenUnitSymbol').value='{{ unit.symbol }}'; return false;">
+                                                                {{ unit.symbol }}
+                                                                {% if unit.is_global %}
+                                                                    <small class="text-muted opacity-50 ms-1">(Global)</small>{% endif %}
+                                                            </a>
+                                                        </li>
+                                                    {% endfor %}
+
+                                                    <li>
+                                                        <hr class="dropdown-divider">
                                                     </li>
-                                                    <li><a class="dropdown-item" href="#"
-                                                           onclick="document.getElementById('selectedUnitText').innerText='g'; document.getElementById('hiddenUnitSymbol').value='g'; return false;">g</a>
-                                                    </li>
-                                                    <li><a class="dropdown-item" href="#"
-                                                           onclick="document.getElementById('selectedUnitText').innerText='l'; document.getElementById('hiddenUnitSymbol').value='L'; return false;">L</a>
-                                                    </li>
-                                                    <li><a class="dropdown-item" href="#"
-                                                           onclick="document.getElementById('selectedUnitText').innerText='PCK'; document.getElementById('hiddenUnitSymbol').value='PCK'; return false;">PCK</a>
-                                                    </li>
-                                                    <li><a class="dropdown-item" href="#"
-                                                           onclick="document.getElementById('selectedUnitText').innerText='psc'; document.getElementById('hiddenUnitSymbol').value='psc'; return false;">szt</a>
+
+                                                    <!-- Link wywołujący modal do stworzenia własnej jednostki -->
+                                                    <li>
+                                                        <a class="dropdown-item text-primary fw-medium" href="#"
+                                                           data-bs-toggle="modal" data-bs-target="#createUnitModal">
+                                                            <i class="bi bi-plus-circle me-1"></i> Don't see your unit?
+                                                            Create it!
+                                                        </a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -409,21 +416,26 @@
                                                 <span id="editSelectedUnitText">szt</span>
                                             </button>
                                             <ul class="dropdown-menu custom-dropdown-menu w-100">
-                                                <!-- Opcje wyboru -->
-                                                <li><a class="dropdown-item" href="#"
-                                                       onclick="document.getElementById('editSelectedUnitText').innerText='kg'; document.getElementById('editHiddenUnitSymbol').value='kg'; return false;">kg</a>
+                                                {% for unit in available_units %}
+                                                    <li>
+                                                        <a class="dropdown-item" href="#"
+                                                           onclick="document.getElementById('selectedUnitText').innerText='{{ unit.symbol }}'; document.getElementById('hiddenUnitSymbol').value='{{ unit.symbol }}'; return false;">
+                                                            {{ unit.symbol }}
+                                                            {% if unit.is_global %}
+                                                                <small class="text-muted opacity-50 ms-1">(Global)</small>{% endif %}
+                                                        </a>
+                                                    </li>
+                                                {% endfor %}
+
+                                                <li>
+                                                    <hr class="dropdown-divider">
                                                 </li>
-                                                <li><a class="dropdown-item" href="#"
-                                                       onclick="document.getElementById('editSelectedUnitText').innerText='g'; document.getElementById('editHiddenUnitSymbol').value='g'; return false;">g</a>
-                                                </li>
-                                                <li><a class="dropdown-item" href="#"
-                                                       onclick="document.getElementById('editSelectedUnitText').innerText='L'; document.getElementById('editHiddenUnitSymbol').value='L'; return false;">L</a>
-                                                </li>
-                                                <li><a class="dropdown-item" href="#"
-                                                       onclick="document.getElementById('editSelectedUnitText').innerText='PCK'; document.getElementById('editHiddenUnitSymbol').value='PCK'; return false;">PCK</a>
-                                                </li>
-                                                <li><a class="dropdown-item" href="#"
-                                                       onclick="document.getElementById('editSelectedUnitText').innerText='szt'; document.getElementById('editHiddenUnitSymbol').value='szt'; return false;">szt</a>
+                                                <li>
+                                                    <a class="dropdown-item text-primary fw-medium" href="#"
+                                                       data-bs-toggle="modal" data-bs-target="#createUnitModal">
+                                                        <i class="bi bi-plus-circle me-1"></i> Don't see your unit?
+                                                        Create it!
+                                                    </a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -431,6 +443,44 @@
                                 </div>
                             </div>
                             <button type="submit" class="popup-circular-btn mx-auto"><i class="bi bi-check-lg"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- POP-UP: Create Custom Unit -->
+        <!-- ========================================== -->
+        <div class="modal fade" id="createUnitModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content custom-popup position-relative border-0">
+                    <button type="button"
+                            class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    <form method="POST" action="{% url 'create_unit' %}">
+                        {% csrf_token %}
+                        <div class="modal-body text-center p-4 p-md-5">
+                            <h3 class="popup-title mb-4 mt-2">Create New Unit</h3>
+
+                            <div class="text-start mb-5">
+                                <label for="newUnitSymbol" class="form-label popup-label">Unit symbol</label>
+                                <input type="text" name="symbol" class="form-control popup-input shadow-none"
+                                       id="newUnitSymbol" placeholder="e.g. piece, jar, box" required maxlength="10">
+
+                                <div class="form-text mt-2 text-muted" style="font-size: 0.8rem;">
+                                    {% if request.user.role == 'ADMIN' %}
+                                        You are an ADMIN. This unit will be <b class="text-primary">GLOBAL</b>.
+                                    {% else %}
+                                        This unit will be private and visible only to you.
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <button type="submit" class="popup-circular-btn mx-auto" aria-label="Create Unit">
+                                <i class="bi bi-check-lg"></i>
                             </button>
                         </div>
                     </form>

@@ -8,6 +8,9 @@ from types import SimpleNamespace
 from django.utils.html import json_script
 from .models import ProductDictionary, Recipe, RecipeProduct, Unit, Step, Area, ShoppingList, ShoppingListItem, \
     ItemStatus
+from .models import ProductDictionary, Recipe, RecipeProduct, Unit, Step, Area, ShoppingList, ShoppingListItem, \
+    ItemStatus
+from django.db.models import Q, RestrictedError
 from .forms import CustomUserCreationForm
 import json
 import uuid
@@ -362,13 +365,17 @@ def shopping_list_view(request):
         if current_index < len(lists_list) - 1:
             next_list_id = lists_list[current_index + 1].id
 
-    context = {
-        'shopping_list': active_list,
-        'shopping_lists': user_lists,
-        'shopping_items': items,
-        'prev_list_id': prev_list_id,
-        'next_list_id': next_list_id,
-    }
+        # Jednostki (Globalne + Prywatne użytkownika)
+        available_units = Unit.objects.filter(Q(is_global=True) | Q(user=request.user)).order_by('-is_global', 'symbol')
+
+        context = {
+            'shopping_list': active_list,
+            'shopping_lists': user_lists,
+            'shopping_items': items,
+            'prev_list_id': prev_list_id,
+            'next_list_id': next_list_id,
+            'available_units': available_units,
+        }
 
     return render(request, 'shopping_list/shopping_list.html', context)
 
@@ -423,7 +430,8 @@ def add_shopping_item(request, list_id):
                     'user': request.user,
                     'is_global': False,
                     'icon_number': 1,  # Domyślna ikonka
-                    'nutriscore': 'X'
+                    'nutriscore': 'X',
+                    'status': ItemStatus.UNOFFICIAL
                 }
             )
 
@@ -475,7 +483,8 @@ def edit_shopping_item(request):
                     'user': request.user,
                     'is_global': False,
                     'icon_number': 1,
-                    'nutriscore': 'X'
+                    'nutriscore': 'X',
+                    'status': ItemStatus.UNOFFICIAL
                 }
             )
 
@@ -513,6 +522,29 @@ def delete_shopping_list(request, list_id):
         messages.success(request, 'Shopping list deleted successfully!')
 
     return redirect('shopping_list')
+
+
+@login_required(login_url='login')
+def create_unit(request):
+    if request.method == 'POST':
+        symbol = request.POST.get('symbol', '').strip()
+
+        if symbol:
+            exists = Unit.objects.filter(Q(symbol__iexact=symbol) & (Q(is_global=True) | Q(user=request.user))).exists()
+
+            if not exists:
+                is_global = (request.user.role == 'ADMIN')
+
+                Unit.objects.create(
+                    symbol=symbol,
+                    is_global=is_global,
+                    user=request.user if not is_global else None
+                )
+                messages.success(request, f'Unit "{symbol}" created successfully!')
+            else:
+                messages.warning(request, f'Unit "{symbol}" already exists.')
+
+    return redirect(request.META.get('HTTP_REFERER', 'shopping_list'))
 
 
 @login_required(login_url='login')
@@ -783,7 +815,7 @@ def create_recipe(request):
             user=request.user,
             item_status=status,
             calories=1,  # Validator wymusza wartość >= 1
-            is_global=False  # Przepis dodany przez użytkownika jest prywatny
+            is_global=False,  # Przepis dodany przez użytkownika jest prywatny
         )
 
         # 2. Przetworzenie składników i zapis do tabeli pośredniej (RecipeProduct)
@@ -1008,33 +1040,73 @@ def send_recipe_for_verification(request, recipe_id):
 
 @login_required(login_url='login')
 def admin_panel_view(request):
-    all_users = User.objects.all().exclude(role='ADMIN')
+    if request.user.role != 'ADMIN':
+        messages.error(request, 'Access denied. Administrator privileges required.')
+        return redirect('home')
 
-    mock_pending_recipes = [
-        {'id': 1, 'name': 'Recipe 1'},
-        {'id': 2, 'name': 'Recipe 2'},
-        {'id': 3, 'name': 'Spicy Tomato Soup'},
-    ]
+    all_users = User.objects.exclude(role='ADMIN')
 
-    mock_public_recipes = [
-        {'id': 101, 'name': 'Classic Caesar Salad'},
-        {'id': 102, 'name': 'The "Midnight in Seville" Oranges'},
-        {'id': 103, 'name': 'The "Vampire\'s Orchard" Oranges'},
-    ]
-
-    mock_global_units = [
-        {'id': 1, 'name': 'Kilogram (kg)'},
-        {'id': 2, 'name': 'Liter (L)'},
-        {'id': 3, 'name': 'Piece (pcs)'},
-        {'id': 4, 'name': 'Gram (g)'},
-        {'id': 5, 'name': 'Milliliter (ml)'},
-    ]
+    pending_recipes = Recipe.objects.filter(item_status=ItemStatus.PENDING)
+    public_recipes = Recipe.objects.filter(item_status=ItemStatus.OFFICIAL)
+    global_units = Unit.objects.filter(is_global=True).order_by('symbol')
 
     context = {
         'db_users': all_users,
-        'pending_recipes': mock_pending_recipes,
-        'public_recipes': mock_public_recipes,
-        'global_units': mock_global_units,
+        'pending_recipes': pending_recipes,
+        'public_recipes': public_recipes,
+        'global_units': global_units,
     }
 
     return render(request, 'admin/admin_panel.html', context)
+
+
+@login_required(login_url='login')
+def admin_add_unit(request):
+    if request.user.role == 'ADMIN' and request.method == 'POST':
+        symbol = request.POST.get('symbol', '').strip()
+        if symbol:
+            if not Unit.objects.filter(symbol__iexact=symbol, is_global=True).exists():
+                Unit.objects.create(symbol=symbol, is_global=True)
+                messages.success(request, f'Global unit "{symbol}" added successfully.')
+            else:
+                messages.error(request, 'This global unit already exists.')
+    return redirect('admin_panel')
+
+
+@login_required(login_url='login')
+def admin_edit_unit(request):
+    if request.user.role == 'ADMIN' and request.method == 'POST':
+        unit_id = request.POST.get('unit_id')
+        new_symbol = request.POST.get('symbol', '').strip()
+
+        if unit_id and new_symbol:
+            unit = get_object_or_404(Unit, id=unit_id, is_global=True)
+
+            if not Unit.objects.filter(symbol__iexact=new_symbol, is_global=True).exclude(id=unit_id).exists():
+                unit.symbol = new_symbol
+                unit.save()
+                messages.success(request, 'Unit updated successfully.')
+            else:
+                messages.error(request, 'A global unit with this symbol already exists.')
+
+    return redirect('admin_panel')
+
+
+@login_required(login_url='login')
+def admin_delete_unit(request):
+    if request.user.role == 'ADMIN' and request.method == 'POST':
+        unit_id = request.POST.get('item_id')
+
+        if unit_id:
+            unit = get_object_or_404(Unit, id=unit_id, is_global=True)
+            try:
+                # Sprawdzamy relacje 'RESTRICT'
+                unit.delete()
+                messages.success(request, 'Global unit deleted successfully.')
+            except RestrictedError:
+                # "Złapanie" błędu bazy danych
+                messages.error(
+                    request,
+                    f'Cannot delete "{unit.symbol}". It is currently used by users in their recipes or shopping lists.'
+                )
+    return redirect('admin_panel')
