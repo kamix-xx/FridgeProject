@@ -41,6 +41,10 @@ urlpatterns = [
     path('shopping-list/create/', views.create_shopping_list, name='create_shopping_list'),
     path('shopping-list/<int:list_id>/edit/', views.edit_shopping_list, name='edit_shopping_list'),
     path('shopping-list/<int:list_id>/delete/', views.delete_shopping_list, name='delete_shopping_list'),
+    path('shopping-list/<int:list_id>/add-item/', views.add_shopping_item, name='add_shopping_item'),
+    path('shopping-list/item/toggle/<int:item_id>/', views.toggle_shopping_item, name='toggle_shopping_item'),
+    path('shopping-list/item/edit/', views.edit_shopping_item, name='edit_shopping_item'),
+    path('shopping-list/item/delete/', views.delete_shopping_item, name='delete_shopping_item'),
     # Recipes:
     path('recipes/', views.recipes, name='recipes'),
     path('recipes/<int:recipe_id>/', views.recipe_detail, name='recipe_detail'),

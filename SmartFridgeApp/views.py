@@ -2,6 +2,7 @@ from django.contrib.auth import login, logout, get_user_model, update_session_au
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.http import JsonResponse
 from datetime import date, datetime, timedelta
 from types import SimpleNamespace
 from django.utils.html import json_script
@@ -396,6 +397,109 @@ def edit_shopping_list(request, list_id):
             messages.success(request, 'Shopping list updated successfully!')
 
         return redirect(f"/shopping-list/?list_id={shopping_list.id}")
+
+    return redirect('shopping_list')
+
+
+@login_required(login_url='login')
+def add_shopping_item(request, list_id):
+    if request.method == 'POST':
+        shopping_list = get_object_or_404(ShoppingList, id=list_id, user=request.user)
+
+        product_name = request.POST.get('product_name')
+        quantity = request.POST.get('quantity')
+        unit_symbol = request.POST.get('unit_symbol', 'psc')
+
+        if product_name and quantity:
+            unit_obj, _ = Unit.objects.get_or_create(
+                symbol=unit_symbol,
+                defaults={'user': request.user, 'is_global': False}
+            )
+
+            product_obj, _ = ProductDictionary.objects.get_or_create(
+                name=product_name,
+                defaults={
+                    'user': request.user,
+                    'is_global': False,
+                    'icon_number': 1,  # Domyślna ikonka
+                    'nutriscore': 'X'
+                }
+            )
+
+            ShoppingListItem.objects.create(
+                shoppingList=shopping_list,
+                product=product_obj,
+                quantity=float(quantity),
+                unit=unit_obj
+            )
+
+            messages.success(request, f'Added "{product_name}" to the list.')
+
+    return redirect(f"/shopping-list/?list_id={list_id}")
+
+
+@login_required(login_url='login')
+def toggle_shopping_item(request, item_id):
+    if request.method == 'POST':
+        item = get_object_or_404(ShoppingListItem, id=item_id, shoppingList__user=request.user)
+        try:
+            data = json.loads(request.body)
+            item.is_done = data.get('is_done', item.is_done)
+            item.save()
+            return JsonResponse({'status': 'success', 'is_done': item.is_done})
+        except json.JSONDecodeError:
+            pass
+    return JsonResponse({'status': 'error'}, status=400)
+
+
+@login_required(login_url='login')
+def edit_shopping_item(request):
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+        product_name = request.POST.get('product_name')
+        quantity = request.POST.get('quantity')
+        unit_symbol = request.POST.get('unit_symbol', 'szt')
+
+        if item_id and product_name and quantity:
+            item = get_object_or_404(ShoppingListItem, id=item_id, shoppingList__user=request.user)
+
+            unit_obj, _ = Unit.objects.get_or_create(
+                symbol=unit_symbol,
+                defaults={'user': request.user, 'is_global': False}
+            )
+
+            product_obj, _ = ProductDictionary.objects.get_or_create(
+                name=product_name,
+                defaults={
+                    'user': request.user,
+                    'is_global': False,
+                    'icon_number': 1,
+                    'nutriscore': 'X'
+                }
+            )
+
+            item.product = product_obj
+            item.quantity = float(quantity)
+            item.unit = unit_obj
+            item.save()
+
+            messages.success(request, 'Product updated successfully.')
+            return redirect(f"/shopping-list/?list_id={item.shoppingList.id}")
+
+    return redirect('shopping_list')
+
+
+@login_required(login_url='login')
+def delete_shopping_item(request):
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+        if item_id:
+            item = get_object_or_404(ShoppingListItem, id=item_id, shoppingList__user=request.user)
+            list_id = item.shoppingList.id
+            item.delete()
+
+            messages.success(request, 'Product deleted.')
+            return redirect(f"/shopping-list/?list_id={list_id}")
 
     return redirect('shopping_list')
 

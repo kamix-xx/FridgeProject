@@ -282,3 +282,75 @@
         }
     });
 })();
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Obsługa ukrytego zapisu Checkboxów (AJAX / Fetch)
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    document.querySelectorAll('.shopping-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const itemId = this.getAttribute('data-item-id');
+            const isDone = this.checked;
+
+            fetch(`/shopping-list/item/toggle/${itemId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ is_done: isDone })
+            }).then(response => {
+                if (response.ok) {
+                    const row = this.closest('.product-row');
+                    if (isDone) row.classList.add('is-completed');
+                    else row.classList.remove('is-completed');
+                } else {
+                    this.checked = !isDone;
+                }
+            }).catch(error => {
+                console.error("Błąd przy zapisie stanu:", error);
+                this.checked = !isDone;
+            });
+        });
+    });
+
+    // Wstrzykiwanie danych do modala Edycji
+    const editModal = document.getElementById('editProductModal');
+    if (editModal) {
+        editModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+
+            document.getElementById('editItemIdHidden').value = button.getAttribute('data-item-id');
+            document.getElementById('editProductName').value = button.getAttribute('data-item-name');
+            document.getElementById('editProductQty').value = button.getAttribute('data-item-quantity');
+
+            const unit = button.getAttribute('data-item-unit');
+            document.getElementById('editHiddenUnitSymbol').value = unit;
+            document.getElementById('editSelectedUnitText').innerText = unit;
+        });
+    }
+
+    // Wstrzykiwanie danych do modala Usuwania
+    const deleteModal = document.getElementById('deleteProductModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            document.getElementById('deleteItemIdHidden').value = button.getAttribute('data-item-id');
+            document.getElementById('deleteItemNameDisplay').innerText = button.getAttribute('data-item-name');
+        });
+    }
+});
