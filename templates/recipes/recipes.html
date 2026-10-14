@@ -50,7 +50,7 @@
                             <h3 class="recipe-title mb-0">{{ recipe.name }}</h3>
                             <div class="recipe-meta text-end mt-1 mt-sm-0">
                                 <span class="me-3">est. time: {{ recipe.prep_time|time:"H:i" }}</span>
-                                <span>Status: {% if recipe.is_global %}Global{% else %}Private{% endif %}</span>
+                                <span>Status: {{recipe.status_display}}</span>
                             </div>
                         </div>
                         <!-- Skrócenie długiego opisu do max 100 znaków za pomocą filtra truncatechars -->

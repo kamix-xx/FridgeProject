@@ -61,8 +61,8 @@ class Unit(models.Model):
 
 class ItemStatus(models.TextChoices):
     # ENUM_KEY = "DataBase", "display"
-    GLOBAL = "OFFICIAL", "OFFICIAL"
-    PRIVATE = "UNOFFICIAL", "UNOFFICIAL"
+    OFFICIAL = "OFFICIAL", "OFFICIAL"
+    UNOFFICIAL = "UNOFFICIAL", "UNOFFICIAL"
     PENDING = "PENDING", "PENDING"
 
     # How it works:
@@ -92,7 +92,7 @@ class ProductDictionary(models.Model):
     status = models.CharField(
         max_length=15,
         choices=ItemStatus.choices,
-        default=ItemStatus.GLOBAL
+        default=ItemStatus.UNOFFICIAL
     )
 
 class UserProduct(models.Model):
@@ -130,7 +130,7 @@ class Recipe(models.Model):
     item_status = models.CharField(
         max_length=15,
         choices=ItemStatus.choices,
-        default=ItemStatus.GLOBAL
+        default=ItemStatus.UNOFFICIAL
     )
 
 class Step(models.Model):

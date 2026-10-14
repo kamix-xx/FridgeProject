@@ -6,7 +6,8 @@ from django.http import JsonResponse
 from datetime import date, datetime, timedelta
 from types import SimpleNamespace
 from django.utils.html import json_script
-from .models import ProductDictionary, Recipe, RecipeProduct, Unit, Step, Area, ShoppingList, ShoppingListItem
+from .models import ProductDictionary, Recipe, RecipeProduct, Unit, Step, Area, ShoppingList, ShoppingListItem, \
+    ItemStatus
 from .forms import CustomUserCreationForm
 import json
 import uuid
@@ -679,11 +680,28 @@ def my_products_view(request):
     return render(request, 'my-products/my_products.html', {'my_products': mock_my_products})
 
 
+def get_recipe_status(obj):
+    # Check the status:
+    status = "not suppose to happen :)"
+    if obj.item_status == "OFFICIAL":
+        status = "Official recipe"
+    else:
+        if obj.item_status == "PENDING":
+            status = "Pending"
+        else:
+            status = "Private"
+    return status
+
+
 @login_required(login_url='login')
 def recipes(request):
     # recipes = Recipe.objects.all()
     # Pobieramy przepisy użytkownika (najnowsze na górze)
     user_recipes = Recipe.objects.filter(user=request.user).order_by('-id')
+
+    for user_recipe in user_recipes:
+        # noinspection unresolved-references
+        user_recipe.status_display = get_recipe_status(user_recipe)
 
     context = {
         'user_recipes': user_recipes
@@ -702,13 +720,15 @@ def recipe_detail(request, recipe_id):
     # Pobieramy kroki
     steps_qs = Step.objects.filter(recipe=recipe_obj).order_by('order')
 
+    # Check the status:
+    status = get_recipe_status(recipe_obj)
+
     # Formatujemy dane dokładnie pod Twój istniejący szkielet HTML
     recipe = {
         "id": recipe_obj.id,
         "title": recipe_obj.name,
         "est_time": recipe_obj.prep_time.strftime("%H:%M") if recipe_obj.prep_time else "N/A",
-        # "status": "official" if recipe_obj.is_global else "private",
-        'status': "pending" if recipe_obj.item_status else "private",
+        'status': status,
         "image_url": recipe_obj.thumbnail.url if recipe_obj.thumbnail else "https://i.imgur.com/2SjgpvQ.jpeg",
         "description_short": recipe_obj.description,
         "description_long": "",  # Jeśli masz osobne pole, możesz tu przekazać
@@ -752,6 +772,8 @@ def create_recipe(request):
         thumbnail = request.FILES.get('thumbnail')
         ingredients_json = request.POST.get('ingredients_data')
 
+        status = ItemStatus.OFFICIAL if request.user.is_staff else ItemStatus.UNOFFICIAL
+
         # 1. Zapis Przepisu
         recipe = Recipe.objects.create(
             name=name,
@@ -759,6 +781,7 @@ def create_recipe(request):
             prep_time=prep_time,
             thumbnail=thumbnail,
             user=request.user,
+            item_status=status,
             calories=1,  # Validator wymusza wartość >= 1
             is_global=False  # Przepis dodany przez użytkownika jest prywatny
         )
