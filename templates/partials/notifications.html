@@ -1,0 +1,39 @@
+{% if messages %}
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-4"
+         style="z-index: 1070; margin-top: 60px;">
+        {% for message in messages %}
+
+            <!-- Toast alert -->
+            <div class="toast align-items-center text-bg-{% if 'error' in message.tags %}danger{% else %}success{% endif %} border-0 show shadow-lg"
+                 role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body fs-6 fw-medium">
+                        {{ message }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                </div>
+            </div>
+
+            <!-- Jeśli błąd dotyczy zmiany hasła w profilu, otwórz modal -->
+            {% if 'password_error' in message.tags %}
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const changePassModal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+                        if (changePassModal) {
+                            changePassModal.show();
+                        }
+                    });
+                </script>
+            {% endif %}
+
+        {% endfor %}
+    </div>
+
+    <script>
+        // Automatyczne ukrywanie tostów po 5 sekundach
+        setTimeout(() => {
+            document.querySelectorAll('.toast').forEach(t => t.classList.remove('show'));
+        }, 5000);
+    </script>
+{% endif %}

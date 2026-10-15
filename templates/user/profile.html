@@ -14,7 +14,7 @@
     {% include "partials/no_page_transition_panel.html" %}
 
     <!-- Errors and notifications -->
-    {% if messages %}
+    {% comment %}{% if messages %}
         <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-4"
              style="z-index: 1070; margin-top: 60px;">
             {% for message in messages %}
@@ -51,7 +51,7 @@
                 document.querySelectorAll('.toast').forEach(t => t.classList.remove('show'));
             }, 5000);
         </script>
-    {% endif %}
+    {% endif %}{% endcomment %}
 
     <div class="container-fluid p-0 login-wrapper profile-bg">
         <div class="row g-0 h-100 min-vh-100">
