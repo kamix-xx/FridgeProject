@@ -373,3 +373,88 @@ document.addEventListener('DOMContentLoaded', () => {
         activeRow = null;
     });
 });
+
+// =========================================
+// Universal Image Upload & Remove Handler
+// =========================================
+document.addEventListener('DOMContentLoaded', function () {
+    // Pobieramy wszystkie kontenery obsługujące wgrywanie obrazków
+    const imageUploadContainers = document.querySelectorAll('.universal-image-upload');
+
+    imageUploadContainers.forEach(container => {
+        const fileInput = container.querySelector('.img-upload-input');
+        const previewImg = container.querySelector('.img-preview');
+        const placeholder = container.querySelector('.img-placeholder');
+        const removeBtn = container.querySelector('.img-remove-btn');
+        const removeFlag = container.querySelector('.img-remove-flag');
+
+        // Zapisujemy stan początkowy, aby móc go zresetować przy anulowaniu (zamknięciu modala)
+        const originalSrc = previewImg ? previewImg.getAttribute('src') : null;
+        const hadImageInitially = previewImg && !previewImg.classList.contains('d-none') && originalSrc;
+
+        // 1. PODGLĄD WGRANEGO PLIKU
+        if (fileInput) {
+            fileInput.addEventListener('change', function (event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const objectUrl = URL.createObjectURL(file);
+
+                    if (previewImg) {
+                        previewImg.src = objectUrl;
+                        previewImg.classList.remove('d-none');
+                    }
+                    if (placeholder) placeholder.classList.add('d-none');
+                    if (removeBtn) {
+                        removeBtn.classList.remove('d-none');
+                        removeBtn.classList.add('d-flex');
+                    }
+                    if (removeFlag) removeFlag.value = 'false';
+                }
+            });
+        }
+
+        // 2. USUWANIE ZDJĘCIA (KOSZ)
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function () {
+                if (removeFlag) removeFlag.value = 'true'; // Informacja dla backendu
+                if (fileInput) fileInput.value = '';       // Czyszczenie inputu
+
+                if (previewImg) previewImg.classList.add('d-none');
+                if (placeholder) placeholder.classList.remove('d-none');
+
+                removeBtn.classList.add('d-none');
+                removeBtn.classList.remove('d-flex');
+            });
+        }
+
+        // 3. RESETOWANIE PO ZAMKNIĘCIU MODALA
+        const parentModal = container.closest('.modal');
+        if (parentModal) {
+            parentModal.addEventListener('hidden.bs.modal', function () {
+                if (fileInput) fileInput.value = '';
+
+                // Przywracanie do stanu pierwotnego
+                if (hadImageInitially) {
+                    if (previewImg) {
+                        previewImg.src = originalSrc;
+                        previewImg.classList.remove('d-none');
+                    }
+                    if (placeholder) placeholder.classList.add('d-none');
+                    if (removeBtn) {
+                        removeBtn.classList.remove('d-none');
+                        removeBtn.classList.add('d-flex');
+                    }
+                    if (removeFlag) removeFlag.value = 'false';
+                } else {
+                    if (previewImg) previewImg.classList.add('d-none');
+                    if (placeholder) placeholder.classList.remove('d-none');
+                    if (removeBtn) {
+                        removeBtn.classList.add('d-none');
+                        removeBtn.classList.remove('d-flex');
+                    }
+                    if (removeFlag) removeFlag.value = 'false';
+                }
+            });
+        }
+    });
+});

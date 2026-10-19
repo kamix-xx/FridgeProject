@@ -870,6 +870,9 @@ def edit_recipe(request, recipe_id):
         thumbnail = request.FILES.get('thumbnail')
         ingredients_json = request.POST.get('ingredients_data')
 
+        # Pobieramy flagę usunięcia miniatury z formularza (domyślnie 'false')
+        remove_thumb_flag = request.POST.get('remove_thumbnail', 'false')
+
         # 1. Aktualizacja podstawowych danych przepisu
         if name:
             recipe.name = name
@@ -879,6 +882,11 @@ def edit_recipe(request, recipe_id):
             recipe.prep_time = prep_time
         if thumbnail:
             recipe.thumbnail = thumbnail
+        elif remove_thumb_flag == 'true':
+            # Jeśli nie wgrano nowego zdjęcia, a flaga wynosi 'true', usuń obrazek z bazy
+            if recipe.thumbnail:
+                recipe.thumbnail.delete(save=False)  # Usuwa plik z dysku (opcjonalnie)
+            recipe.thumbnail = None  # Resetuje pole w bazie danych
 
         recipe.save()
 
@@ -970,16 +978,24 @@ def edit_step(request, step_id):
         return redirect('recipe_detail', recipe_id=recipe_id)
 
     if request.method == 'POST':
-        title = request.POST.get('name')  # w formularzu HTML pole tytułu kroku ma name="name"
+        name = request.POST.get('name')  # w formularzu HTML pole tytułu kroku ma name = "name"
         description = request.POST.get('description')
         picture = request.FILES.get('picture')
 
-        if title:
-            step.title = title
+        # Pobieramy flagę usunięcia miniatury z formularza (domyślnie 'false')
+        remove_pict_flag = request.POST.get('remove_picture', 'false')
+
+        if name:
+            step.name = name
         if description:
             step.description = description
         if picture:
             step.picture = picture  # Zależnie od nazwy pola w modelu Step (np. image lub picture)
+        elif remove_pict_flag == 'true':
+            # Jeśli nie wgrano nowego zdjęcia, a flaga wynosi 'true', usuń obrazek z bazy
+            if step.picture:
+                step.picture.delete(save=False)  # Usuwa plik z dysku (opcjonalnie)
+            step.picture = None  # Resetuje pole w bazie danych
 
         step.save()
         messages.success(request, 'Step updated successfully.')

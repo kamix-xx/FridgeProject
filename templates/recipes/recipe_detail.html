@@ -244,21 +244,37 @@
                     <h3 class="popup-title text-center mb-4" id="stepModalTitle">Add step</h3>
 
                     <div class="row g-4 mb-4">
-                        <div class="col-sm-5 col-md-4">
+                        <!-- Dodano klasę kontenera: universal-image-upload -->
+                        <div class="col-sm-5 col-md-4 universal-image-upload">
                             <label for="stepPictureInput"
                                    class="recipe-img-upload h-100 m-0 d-flex justify-content-center align-items-center position-relative overflow-hidden"
                                    style="min-height: 140px; cursor: pointer;" aria-label="Upload step image">
-                                <input type="file" name="picture" id="stepPictureInput" class="d-none" accept="image/*">
 
-                                <div id="stepIconsPlaceholder" class="text-center">
+                                <!-- Klasa: img-upload-input -->
+                                <input type="file" name="picture" id="stepPictureInput" class="d-none img-upload-input"
+                                       accept="image/*">
+
+                                <!-- Klasa: img-placeholder -->
+                                <div id="stepIconsPlaceholder" class="text-center img-placeholder">
                                     <i class="bi bi-image upload-main-icon"></i>
                                     <i class="bi bi-box-arrow-up upload-corner-icon"></i>
                                 </div>
 
+                                <!-- Klasa: img-preview -->
                                 <img id="stepPicturePreview"
-                                     class="d-none w-100 h-100 object-fit-cover position-absolute top-0 start-0"
+                                     class="d-none w-100 h-100 object-fit-cover position-absolute top-0 start-0 img-preview"
                                      alt="Step preview">
                             </label>
+
+                            <!-- FLAG: Ukryty input informujący backend o usunięciu -->
+                            <input type="hidden" name="remove_picture" class="img-remove-flag" value="false">
+
+                            <!-- PRZYCISK: img-remove-btn -->
+                            <button type="button"
+                                    class="btn btn-link text-danger text-decoration-none p-0 align-items-center gap-1 mt-1 d-none img-remove-btn"
+                                    style="font-size: 0.95rem; font-weight: 500; border: none; background: transparent;">
+                                <i class="bi bi-trash"></i> Remove image
+                            </button>
                         </div>
 
                         <div class="col-sm-7 col-md-8 d-flex flex-column justify-content-end">
@@ -304,26 +320,46 @@
                     {% csrf_token %}
                     <h3 class="popup-title text-center mb-3 mt-1">Edit recipe</h3>
 
-                    <div class="row g-3 mb-4">
-                        <div class="col-sm-5">
+                    <!-- Krok 1: W tej sekcji zmień mb-4 na mb-5, aby odsunąć opis niżej od całego wiersza -->
+                    <div class="row g-3 mb-5">
+
+                        <!-- Lewa kolumna: ZDJĘCIE -->
+                        <div class="col-sm-5 universal-image-upload d-flex flex-column mb-3 mb-sm-0">
                             <label class="form-label popup-label d-none d-sm-block">&nbsp;</label>
 
+                            <!-- Wymuszamy flex-grow-1, aby kontener wypełnił wysokość,
+                                 a min-height zapobiega zapadaniu się obrazka -->
                             <label for="editRecipePicInput"
-                                   class="recipe-img-upload position-relative overflow-hidden p-0 border-0"
-                                   style="cursor: pointer; display: block;" aria-label="Change recipe image">
-                                <!-- Ukryty input, którego szuka Twój plik JS -->
-                                <input type="file" name="thumbnail" id="editRecipePicInput" class="d-none"
-                                       accept="image/*">
-                                <!-- Podgląd zdjęcia, którego id też jest w JS -->
+                                   class="recipe-img-upload position-relative overflow-hidden p-0 border-0 d-flex justify-content-center align-items-center flex-grow-1"
+                                   style="cursor: pointer; min-height: 150px;" aria-label="Change recipe image">
+
+                                <input type="file" name="thumbnail" id="editRecipePicInput"
+                                       class="d-none img-upload-input" accept="image/*">
+
+                                <div class="text-center img-placeholder {% if recipe.image_url %}d-none{% endif %}">
+                                    <i class="bi bi-image" style="font-size: 2rem; color: rgba(255,255,255,0.6);"></i>
+                                </div>
+
                                 <img src="{{ recipe.image_url }}" alt="Recipe cover" id="editRecipePicPreview"
-                                     class="w-100 h-100 object-fit-cover position-absolute top-0 start-0">
+                                     class="w-100 h-100 object-fit-cover position-absolute top-0 start-0 img-preview {% if not recipe.image_url %}d-none{% endif %}">
+
                                 <div class="position-absolute bottom-0 end-0 p-2 z-2">
                                     <i class="bi bi-box-arrow-up text-white"
                                        style="font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));"></i>
                                 </div>
                             </label>
+
+                            <input type="hidden" name="remove_thumbnail" class="img-remove-flag" value="false">
+
+                            <!-- mt-2 zamiast mt-1 i dodane align-self-start -->
+                            <button type="button"
+                                    class="btn btn-link text-danger text-decoration-none p-0 align-items-center gap-1 mt-2 align-self-start img-remove-btn {% if recipe.image_url %}d-flex{% else %}d-none{% endif %}"
+                                    style="font-size: 0.95rem; font-weight: 500; border: none; background: transparent;">
+                                <i class="bi bi-trash"></i> Remove image
+                            </button>
                         </div>
 
+                        <!-- Prawa kolumna: DANE PODSTAWOWE -->
                         <div class="col-sm-7 d-flex flex-column justify-content-between">
                             <div class="mb-2">
                                 <label for="editRecipeName" class="form-label popup-label">Recipe name</label>
@@ -338,13 +374,15 @@
                         </div>
                     </div>
 
+                    <!-- Krok 2: Sekcja Short description jest poniżej row -->
                     <div class="mb-3">
-                        <label for="editRecipeDesc" class="form-label popup-label" style="margin-top: 10px">Short
-                            description:</label>
+                        <!-- Usunąłem zbedny style="margin-top: 10px", używamy klas Bootstrapa -->
+                        <label for="editRecipeDesc" class="form-label popup-label">Short description:</label>
                         <div class="form-control popup-input shadow-none p-0 overflow-hidden d-flex">
                             <textarea class="w-100 border-0 bg-transparent shadow-none p-2 m-1" id="editRecipeDesc"
-                                      name="description" rows=" 2"
-                                      style="resize: none; outline: none;">{{ recipe.description_short }}</textarea>
+                                      name="description" rows="2" style="resize: none; outline: none;">
+                                {{ recipe.description_short }}
+                            </textarea>
                         </div>
                     </div>
 
