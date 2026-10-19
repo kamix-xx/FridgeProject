@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- ZMIENNE DLA AWATARA ---
     const editModal = document.getElementById('editAccountModal');
-    const avatarUploadInput = document.getElementById('avatarUpload');
+    /*const avatarUploadInput = document.getElementById('avatarUpload');
     const avatarFrame = document.querySelector('.edit-avatar-frame');
 
     const removeAvatarBtn = document.getElementById('removeAvatarBtn');
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
             removeAvatarBtn.classList.add('d-none');
             removeAvatarBtn.classList.remove('d-flex');
         });
-    }
+    }*/
 
     // 3. RESETOWANIE MODALA EDYCJI KONTA PO ZAMKNIĘCIU "X"
     if (editModal) {
@@ -66,10 +66,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const form = editModal.querySelector('form');
             if (form) form.reset();
 
-            let img = avatarFrame.querySelector('.profile-avatar-img');
-            const svg = avatarFrame.querySelector('.edit-avatar-svg');
+            /*let img = avatarFrame.querySelector('.profile-avatar-img');
+            const svg = avatarFrame.querySelector('.edit-avatar-svg');*/
 
-            if (originalAvatarSrc) {
+            /*if (originalAvatarSrc) {
                 if (img) {
                     img.src = originalAvatarSrc;
                     img.classList.remove('d-none');
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     removeAvatarBtn.classList.remove('d-flex');
                 }
                 if (removeAvatarFlag) removeAvatarFlag.value = 'false';
-            }
+            }*/
         });
     }
 

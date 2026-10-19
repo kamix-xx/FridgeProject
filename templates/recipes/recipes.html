@@ -50,7 +50,7 @@
                             <h3 class="recipe-title mb-0">{{ recipe.name }}</h3>
                             <div class="recipe-meta text-end mt-1 mt-sm-0">
                                 <span class="me-3">est. time: {{ recipe.prep_time|time:"H:i" }}</span>
-                                <span>Status: {{recipe.status_display}}</span>
+                                <span>Status: {{ recipe.status_display }}</span>
                             </div>
                         </div>
                         <!-- Skrócenie długiego opisu do max 100 znaków za pomocą filtra truncatechars -->
@@ -116,28 +116,38 @@
 
                     <div class="row g-3 mb-5">
 
-                        <!-- UPLOAD ZDJĘCIA (Na wzór awatara z profilu) -->
-                        <div class="col-sm-5">
+                        <!-- Kontener: universal-image-upload -->
+                        <div class="col-sm-5 universal-image-upload">
                             <label class="form-label popup-label d-none d-sm-block">&nbsp;</label>
                             <label for="recipeThumbnail"
                                    class="recipe-img-upload m-0 d-flex justify-content-center align-items-center position-relative overflow-hidden"
                                    style="cursor: pointer;">
 
-                                <!-- Ukryty input pliku -->
-                                <input type="file" name="thumbnail" id="recipeThumbnail" class="d-none"
+                                <!-- INPUT: img-upload-input -->
+                                <input type="file" name="thumbnail" id="recipeThumbnail" class="d-none img-upload-input"
                                        accept="image/*">
 
-                                <!-- Ikony widoczne przed wgraniem -->
-                                <div id="thumbnailIconsPlaceholder" class="text-center">
+                                <!-- PLACEHOLDER: img-placeholder -->
+                                <div id="thumbnailIconsPlaceholder" class="text-center img-placeholder">
                                     <i class="bi bi-image upload-main-icon d-block"></i>
                                     <i class="bi bi-box-arrow-up upload-corner-icon position-absolute top-0 end-0 m-2"></i>
                                 </div>
 
-                                <!-- Podgląd zdjęcia -->
+                                <!-- PREVIEW: img-preview -->
                                 <img id="recipeThumbnailPreview"
-                                     class="d-none w-100 h-100 object-fit-cover position-absolute top-0 start-0"
+                                     class="d-none w-100 h-100 object-fit-cover position-absolute top-0 start-0 img-preview"
                                      alt="Preview">
                             </label>
+
+                            <!-- FLAG: Jeśli backend obsługuje usuwanie miniatury, dodaj ten ukryty input -->
+                            <input type="hidden" name="remove_thumbnail" class="img-remove-flag" value="false">
+
+                            <!-- PRZYCISK: img-remove-btn -->
+                            <button type="button"
+                                    class="btn btn-link text-danger text-decoration-none p-0 align-items-center gap-1 mt-1 d-none img-remove-btn"
+                                    style="font-size: 0.95rem; font-weight: 500; border: none; background: transparent;">
+                                <i class="bi bi-trash"></i> Remove image
+                            </button>
                         </div>
 
                         <!-- DANE PODSTAWOWE -->

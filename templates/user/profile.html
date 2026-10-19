@@ -168,13 +168,14 @@
                         <div class="col-md-6 d-flex flex-column gap-4">
 
                             <!-- Avatar -->
-                            <div class="d-flex flex-column align-items-start align-items-md-center pe-md-4 gap-2">
+                            <div class="d-flex flex-column align-items-start align-items-md-center pe-md-4 gap-2 universal-image-upload">
 
                                 <!-- Label: Upload file -->
                                 <label for="avatarUpload" class="edit-avatar-frame m-0" style="cursor: pointer;">
 
                                     <!-- Hidden file input -->
-                                    <input type="file" name="avatar" id="avatarUpload" class="d-none" accept="image/*">
+                                    <input type="file" name="avatar" id="avatarUpload" class="d-none img-upload-input"
+                                           accept="image/*">
 
                                     <!-- Upload Icon -->
                                     <div class="edit-avatar-upload-icon">
@@ -187,31 +188,26 @@
                                         </svg>
                                     </div>
 
-                                    <!-- Avatar -->
-                                    {% if user.avatar %}
-                                        <img src="{{ user.avatar.url }}" alt="{{ user.username }}"
-                                             class="profile-avatar-img">
-                                        <!-- Schowane SVG, przydaje się skryptowi JS -->
-                                        <svg class="edit-avatar-svg d-none" viewBox="0 0 100 100" fill="none"
-                                             stroke="currentColor" stroke-width="3.5" stroke-linecap="round">
-                                            <circle cx="50" cy="36" r="16"></circle>
-                                            <path d="M 20 82 A 30 30 0 0 1 80 82"></path>
-                                        </svg>
-                                    {% else %}
-                                        <svg class="edit-avatar-svg" viewBox="0 0 100 100" fill="none"
-                                             stroke="currentColor" stroke-width="3.5" stroke-linecap="round">
-                                            <circle cx="50" cy="36" r="16"></circle>
-                                            <path d="M 20 82 A 30 30 0 0 1 80 82"></path>
-                                        </svg>
-                                    {% endif %}
+                                    <!-- PREVIEW: img-preview. Zawsze renderuj img, ale ukrywaj, gdy nie ma obrazka -->
+                                    <img src="{% if user.avatar %}{{ user.avatar.url }}{% endif %}"
+                                         alt="{{ user.username }}"
+                                         class="profile-avatar-img img-preview {% if not user.avatar %}d-none{% endif %}">
+
+                                    <!-- PLACEHOLDER: img-placeholder -->
+                                    <svg class="edit-avatar-svg img-placeholder {% if user.avatar %}d-none{% endif %}"
+                                         viewBox="0 0 100 100" fill="none"
+                                         stroke="currentColor" stroke-width="3.5" stroke-linecap="round">
+                                        <circle cx="50" cy="36" r="16"></circle>
+                                        <path d="M 20 82 A 30 30 0 0 1 80 82"></path>
+                                    </svg>
                                 </label>
 
-                                <!-- Hidden input -->
-                                <input type="hidden" name="remove_avatar" id="removeAvatarFlag" value="false">
+                                <!-- FLAG: img-remove-flag -->
+                                <input type="hidden" name="remove_avatar" class="img-remove-flag" value="false">
 
-                                <!-- Avatar remove button -->
-                                <button type="button" id="removeAvatarBtn"
-                                        class="btn btn-link text-danger text-decoration-none p-0 align-items-center gap-1 mt-1 {% if user.avatar %}d-flex{% else %}d-none{% endif %}"
+                                <!-- PRZYCISK: img-remove-btn (zmieniono ID na klasę, by uniknąć duplikatów) -->
+                                <button type="button"
+                                        class="btn btn-link text-danger text-decoration-none p-0 align-items-center gap-1 mt-1 img-remove-btn {% if user.avatar %}d-flex{% else %}d-none{% endif %}"
                                         style="font-size: 0.95rem; font-weight: 500; border: none; background: transparent;">
                                     <i class="bi bi-trash"></i> Remove avatar
                                 </button>

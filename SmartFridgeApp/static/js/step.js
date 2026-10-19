@@ -7,25 +7,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const nameInput = document.getElementById('stepNameInput');
     const descInput = document.getElementById('stepDescInput');
     const picInput = document.getElementById('stepPictureInput');
-    const picPreview = document.getElementById('stepPicturePreview');
-    const iconsPlaceholder = document.getElementById('stepIconsPlaceholder');
     const submitIcon = document.getElementById('stepSubmitIcon');
 
-    const deleteModal = document.getElementById('universalDeleteModal');
-    if (!deleteModal) return;
-
-    const deleteForm = document.getElementById('deleteModalForm');
-    const deleteTitle = document.getElementById('deleteModalTitle');
-
-    // Obsługa wywołania modala
+    // Obsługa wywołania modala (Dynamiczne ładowanie danych kroku)
     stepModal.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
-
         const mode = button.getAttribute('data-mode');
         const actionUrl = button.getAttribute('data-action-url');
 
         form.setAttribute('action', actionUrl);
-        picInput.value = '';
+        if (picInput) picInput.value = '';
+
+        // Pobieramy elementy uniwersalnego wgrywania dla tego modala
+        const uploadContainer = stepModal.querySelector('.universal-image-upload');
+        const previewImg = uploadContainer ? uploadContainer.querySelector('.img-preview') : null;
+        const placeholder = uploadContainer ? uploadContainer.querySelector('.img-placeholder') : null;
+        const removeBtn = uploadContainer ? uploadContainer.querySelector('.img-remove-btn') : null;
+        const removeFlag = uploadContainer ? uploadContainer.querySelector('.img-remove-flag') : null;
 
         if (mode === 'edit') {
             modalTitle.textContent = 'Edit step';
@@ -35,54 +33,50 @@ document.addEventListener('DOMContentLoaded', function () {
             descInput.value = button.getAttribute('data-desc');
 
             const imgUrl = button.getAttribute('data-img');
+
             if (imgUrl) {
-                picPreview.src = imgUrl;
-                picPreview.classList.remove('d-none');
-                iconsPlaceholder.classList.add('d-none');
+                if (previewImg) {
+                    previewImg.src = imgUrl;
+                    previewImg.classList.remove('d-none');
+                }
+                if (placeholder) placeholder.classList.add('d-none');
+                if (removeBtn) {
+                    removeBtn.classList.remove('d-none');
+                    removeBtn.classList.add('d-flex');
+                }
             } else {
-                picPreview.src = '';
-                picPreview.classList.add('d-none');
-                iconsPlaceholder.classList.remove('d-none');
+                if (previewImg) {
+                    previewImg.src = '';
+                    previewImg.classList.add('d-none');
+                }
+                if (placeholder) placeholder.classList.remove('d-none');
+                if (removeBtn) {
+                    removeBtn.classList.add('d-none');
+                    removeBtn.classList.remove('d-flex');
+                }
             }
+            if (removeFlag) removeFlag.value = 'false';
+
         } else {
             // Tryb ADD - czyszczenie pól
             modalTitle.textContent = 'Add step';
             submitIcon.className = 'bi bi-plus';
             form.reset();
-            picPreview.src = '';
-            picPreview.classList.add('d-none');
-            iconsPlaceholder.classList.remove('d-none');
+
+            if (previewImg) {
+                previewImg.src = '';
+                previewImg.classList.add('d-none');
+            }
+            if (placeholder) placeholder.classList.remove('d-none');
+            if (removeBtn) {
+                removeBtn.classList.add('d-none');
+                removeBtn.classList.remove('d-flex');
+            }
+            if (removeFlag) removeFlag.value = 'false';
         }
     });
 
-    // Podgląd zdjęcia kroku w locie (Add / Edit step)
-    if (picInput && picPreview) {
-        picInput.addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            if (file) {
-                picPreview.src = URL.createObjectURL(file);
-                picPreview.classList.remove('d-none');
-                if (iconsPlaceholder) {
-                    iconsPlaceholder.classList.add('d-none');
-                }
-            }
-        });
-    }
-
-    // 1. Podgląd zdjęcia w locie
-    const editRecipePicInput = document.getElementById('editRecipePicInput');
-    const editRecipePicPreview = document.getElementById('editRecipePicPreview');
-
-    if (editRecipePicInput && editRecipePicPreview) {
-        editRecipePicInput.addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            if (file) {
-                editRecipePicPreview.src = URL.createObjectURL(file);
-            }
-        });
-    }
-
-    // 2. Dynamiczna lista składników (Dodawanie / Usuwanie) w trybie Edycji
+    // 2. Dynamiczna lista składników (Dodawanie / Usuwanie) w trybie Edycji Przepisu
     const editAddIngBtn = document.getElementById('editAddIngBtn');
     const editIngList = document.getElementById('editRecipeIngredientsList');
 
@@ -130,12 +124,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 3. Budowanie JSONa ze zaktualizowanymi składnikami przy zapisie
+    // 3. Budowanie JSONa ze zaktualizowanymi składnikami przy zapisie przepisu
     const editForm = document.getElementById('editRecipeForm');
 
     if (editForm) {
-        // Upewnijmy się, że w HTML modala edycji istnieje ten input.
-        // Jeśli nie, dodaj go przed </form>: <input type="hidden" name="ingredients_data" id="editIngredientsData">
         const editIngredientsDataInput = document.getElementById('editIngredientsData');
 
         editForm.addEventListener('submit', function (e) {
