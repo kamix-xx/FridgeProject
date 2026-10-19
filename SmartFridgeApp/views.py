@@ -219,6 +219,45 @@ def register(request):
 
 
 @login_required(login_url='login')
+def my_products_view(request):
+    mock_my_products = [
+        {
+            'name': 'Milk',
+            'exp_date': '01.04.27',
+            'area': 'Fridge',
+            'freshness_percent': 100,
+            'freshness_level': 'fresh'
+        },
+        {
+            'name': 'Cottage cheese',
+            'exp_date': '01.12.26',
+            'area': 'Fridge',
+            'freshness_percent': 65,
+            'freshness_level': 'warning'
+        },
+        {
+            'name': 'Mozarella',
+            'exp_date': '12.06.26',
+            'area': 'Fridge',
+            'freshness_percent': 25,
+            'freshness_level': 'critical'
+        },
+        {
+            'name': 'Orange juice',
+            'exp_date': '01.04.28',
+            'area': 'Pantry',
+            'freshness_percent': 100,
+            'freshness_level': 'fresh'
+        },
+    ]
+
+    return render(request, 'my-products/my_products.html', {'my_products': mock_my_products})
+
+
+# -------------------- #
+# ------ Areas: ------ #
+# -------------------- #
+@login_required(login_url='login')
 def areas(request):
     display_name = request.user.username
     user_avatar = request.user.avatar.url if request.user.avatar else None
@@ -261,6 +300,28 @@ def areas(request):
     }
 
     return render(request, 'areas/areas.html', context)
+
+
+@login_required(login_url='login')
+def create_area(request):
+    if request.method == 'POST':
+        area_name = request.POST.get('area_name')
+
+        if area_name:
+            # invitation code (12 chars)
+            unique_key = uuid.uuid4().hex[:12].upper()
+
+            new_area = Area.objects.create(
+                name=area_name,
+                key=unique_key,
+                owner=request.user
+            )
+
+            new_area.users.add(request.user)
+
+            messages.success(request, f'Area "{area_name}" created successfully!')
+
+    return redirect('areas')
 
 
 @login_required(login_url='login')
@@ -327,6 +388,9 @@ def delete_area(request):
     return redirect('areas')
 
 
+# ----------------------------- #
+# ------ Shopping lists: ------ #
+# ----------------------------- #
 @login_required(login_url='login')
 def shopping_list_view(request):
     # Pobieramy wszystkie listy zakupowe użytkownika
@@ -522,6 +586,9 @@ def delete_shopping_list(request, list_id):
     return redirect('shopping_list')
 
 
+# -------------------- #
+# ------ Units: ------ #
+# -------------------- #
 @login_required(login_url='login')
 def create_unit(request):
     if request.method == 'POST':
@@ -545,6 +612,9 @@ def create_unit(request):
     return redirect(request.META.get('HTTP_REFERER', 'shopping_list'))
 
 
+# ----------------------- #
+# ------ Expenses: ------ #
+# ----------------------- #
 @login_required(login_url='login')
 def expenses(request):
     return render(request, 'expense-tracker/expense-tracker.html')
@@ -555,6 +625,9 @@ def expense_details(request):
     return render(request, 'expense-tracker/expense-details.html')
 
 
+# ---------------------- #
+# ------ Profile: ------ #
+# ---------------------- #
 @login_required(login_url='login')
 # If a user is logged-in, Django automatically passes 'request.user' object to every template as 'user'
 def profile(request):
@@ -652,64 +725,11 @@ def change_password_view(request):
     return redirect('profile')
 
 
-@login_required(login_url='login')
-def create_area(request):
-    if request.method == 'POST':
-        area_name = request.POST.get('area_name')
-
-        if area_name:
-            # invitation code (12 chars)
-            unique_key = uuid.uuid4().hex[:12].upper()
-
-            new_area = Area.objects.create(
-                name=area_name,
-                key=unique_key,
-                owner=request.user
-            )
-
-            new_area.users.add(request.user)
-
-            messages.success(request, f'Area "{area_name}" created successfully!')
-
-    return redirect('areas')
-
+# ---------------------- #
+# ------ Recipes: ------ #
+# ---------------------- #
 
 @login_required(login_url='login')
-def my_products_view(request):
-    mock_my_products = [
-        {
-            'name': 'Milk',
-            'exp_date': '01.04.27',
-            'area': 'Fridge',
-            'freshness_percent': 100,
-            'freshness_level': 'fresh'
-        },
-        {
-            'name': 'Cottage cheese',
-            'exp_date': '01.12.26',
-            'area': 'Fridge',
-            'freshness_percent': 65,
-            'freshness_level': 'warning'
-        },
-        {
-            'name': 'Mozarella',
-            'exp_date': '12.06.26',
-            'area': 'Fridge',
-            'freshness_percent': 25,
-            'freshness_level': 'critical'
-        },
-        {
-            'name': 'Orange juice',
-            'exp_date': '01.04.28',
-            'area': 'Pantry',
-            'freshness_percent': 100,
-            'freshness_level': 'fresh'
-        },
-    ]
-
-    return render(request, 'my-products/my_products.html', {'my_products': mock_my_products})
-
-
 def get_recipe_status(obj):
     # Check the status:
     status = "not suppose to happen :)"
@@ -1052,6 +1072,9 @@ def send_recipe_for_verification(request, recipe_id):
     return redirect('recipes')
 
 
+# -------------------------- #
+# ------ Admin panel: ------ #
+# -------------------------- #
 @login_required(login_url='login')
 def admin_panel_view(request):
     if request.user.role != 'ADMIN':
