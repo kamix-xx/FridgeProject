@@ -20,14 +20,18 @@ urlpatterns = [
          name='password_reset_complete'),
     path('home', views.home, name='home'),
     path('', views.landing, name='landing'),
+
     # Login:
     path('login/', auth_views.LoginView.as_view(redirect_authenticated_user=True), name='login'),
     path('', include('django.contrib.auth.urls')),
     path('register', views.register, name='register'),
+
     # Profile:
     path('profile', views.profile, name='profile'),
     path('profile/edit/', views.edit_profile_view, name='edit_profile'),
     path('profile/change-password/', views.change_password_view, name='change_password'),
+
+    # Areas:
     path('areas', views.areas, name='areas'),
     path('areas/create/', views.create_area, name='create_area'),
     path('areas/join/', views.join_area, name='join_area'),
@@ -35,8 +39,12 @@ urlpatterns = [
     path('areas/delete/', views.delete_area, name='delete_area'),
     path('profile/delete', views.delete_account, name='delete_account'),
     path('areas', views.areas, name='areas'),
+
+    # Expenses:
     path('expenses', views.expenses, name='expenses'),
     path('expenses/details/', views.expense_details, name='expense_details'),
+
+    # Shopping lists:
     path('shopping-list/', views.shopping_list_view, name='shopping_list'),
     path('shopping-list/create/', views.create_shopping_list, name='create_shopping_list'),
     path('shopping-list/<int:list_id>/edit/', views.edit_shopping_list, name='edit_shopping_list'),
@@ -46,6 +54,7 @@ urlpatterns = [
     path('shopping-list/item/edit/', views.edit_shopping_item, name='edit_shopping_item'),
     path('shopping-list/item/delete/', views.delete_shopping_item, name='delete_shopping_item'),
     path('units/create/', views.create_unit, name='create_unit'),
+
     # Recipes:
     path('recipes/', views.recipes, name='recipes'),
     path('recipes/<int:recipe_id>/', views.recipe_detail, name='recipe_detail'),
