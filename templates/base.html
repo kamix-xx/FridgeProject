@@ -159,15 +159,17 @@
     </div>
 {% endif %}
 
+{% if user.is_authenticated %}
+
 <!-- GLOBALNE TOASTY / POWIADOMIENIA -->
-{% include "partials/notifications.html" %}
+    {% include "partials/notifications.html" %}
+
+{% endif %}
 
 {% block content %}
-
 {% endblock %}
 
 <!-- Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

@@ -50,7 +50,6 @@ body {
 }
 
 
-
 /* =========================================
    Dashboard Layout
    ========================================= */
@@ -72,8 +71,8 @@ body {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
-    width: 100%;             /* Changed from width: min(100%, 1200px) */
-    max-width: 1200px;       /* Changed from 1600px to act as standard desktop max */
+    width: 100%; /* Changed from width: min(100%, 1200px) */
+    max-width: 1200px; /* Changed from 1600px to act as standard desktop max */
     min-width: 0;
     min-height: 0;
     margin: 0 auto;
@@ -593,9 +592,8 @@ body {
     transform: translate3d(0, 0, 0) scale(1);
     opacity: 1;
 
-    transition:
-        transform var(--title-morph-in-dur) var(--title-morph-ease),
-        opacity var(--title-morph-in-dur) var(--title-morph-ease);
+    transition: transform var(--title-morph-in-dur) var(--title-morph-ease),
+    opacity var(--title-morph-in-dur) var(--title-morph-ease);
 }
 
 
@@ -1335,9 +1333,35 @@ body {
 
 @media (max-width: 900px) {
 
-    .fridge-panel-title {
-        font-size: 1.5rem !important;
-    }
+    /*.fridge-panel-title {*/
+    /*    font-size: 1.5rem !important;*/
+    /*    padding-right: 56px !important;*/
+    /*    overflow-x: auto !important;*/
+    /*    overflow-y: hidden !important;*/
+    /*    -webkit-overflow-scrolling: touch !important;*/
+    /*    scrollbar-width: none !important;*/
+    /*}*/
+
+    /*.fridge-panel-title::-webkit-scrollbar {*/
+    /*    display: none !important;*/
+    /*}*/
+
+    /*.area-title-text {*/
+    /*    overflow-x: auto !important;*/
+    /*    overflow-y: hidden !important;*/
+    /*    -webkit-overflow-scrolling: touch !important;*/
+    /*    white-space: nowrap !important;*/
+    /*    scrollbar-width: none !important;*/
+    /*    max-width: 100% !important;*/
+    /*}*/
+
+    /*.area-title-text::-webkit-scrollbar {*/
+    /*    display: none !important;*/
+    /*}*/
+
+    /*.area-edit-btn {*/
+    /*    right: 0 !important;*/
+    /*}*/
 
     /*
        Mobile layout is now a single 100dvh flex column: search bar and
@@ -1346,7 +1370,7 @@ body {
        guarantees "taller panel, no page scroll" — no more guessing a
        fixed px budget to subtract from 100dvh.
     */
-.dashboard-page {
+    .dashboard-page {
         display: flex;
         flex-direction: column;
         height: 100dvh;
@@ -1393,7 +1417,7 @@ body {
        panel's own bottom corners — same idea as the areas page's gooey
        button — so the panel doesn't lose a whole row to them.
     */
-.fridge-panel {
+    .fridge-panel {
         display: block;
         position: relative;
         flex: 1 1 auto;
@@ -1552,8 +1576,6 @@ body {
         width: 190px;
     }
 }
-
-
 
 
 /* =========================================

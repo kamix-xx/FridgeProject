@@ -18,3 +18,64 @@
 [data-bs-theme="dark"] .my-products-wrapper::before {
     background: rgba(9, 10, 12, 0.85);
 }
+
+/* Quick-add morph sizing for 2-item menus */
+.fridge-panel-header .t-morph {
+    width: 48px;
+    height: 48px;
+}
+
+.fridge-panel-header .t-morph[data-open="true"] {
+    width: 200px;
+    height: 92px; /* Fixes the menu height perfectly for 2 items */
+}
+
+.fridge-panel-header .t-morph-menu {
+    padding: 0.4rem;
+    gap: 0.15rem;
+}
+
+.fridge-panel-header .t-morph-menu-item {
+    min-height: 36px;
+    padding: 0.4rem 0.75rem;
+    gap: 0.6rem;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 575px) {
+    .fridge-panel-header .t-morph[data-open="true"] {
+        width: min(200px, calc(100vw - 2.5rem));
+    }
+}
+
+/* =========================================
+   Mobile Overrides for My Products
+   ========================================= */
+
+@media (max-width: 900px) {
+    /* Lift the panel to mimic the missing dashboard action buttons */
+    .fridge-panel {
+        margin-bottom: 3.5rem !important;
+    }
+
+    /* Lock arrows to the exact same position as the dashboard */
+    #areaPrev, #areaNext {
+        bottom: -18px !important;
+    }
+
+    #areaPrev { left: 14px; }
+    #areaNext { right: 14px; }
+}
+
+@media (max-width: 480px) {
+    .fridge-panel {
+        margin-bottom: 3rem !important;
+    }
+
+    #areaPrev, #areaNext {
+        bottom: -16px !important;
+    }
+
+    #areaPrev { left: 10px; }
+    #areaNext { right: 10px; }
+}

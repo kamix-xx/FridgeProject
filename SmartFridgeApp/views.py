@@ -13,7 +13,7 @@ from .forms import CustomUserCreationForm
 import json
 import uuid
 
-USE_FAKE_DASHBOARD_DATA = True
+USE_FAKE_DASHBOARD_DATA = False
 
 
 def _with_freshness(user_product):
@@ -161,23 +161,20 @@ def _fake_dashboard_areas(user=None):
     return [fridge, pantry, freezer, attic, room_fridge, kitchen_cabinet]
 
 
+@login_required(login_url='login')
 def home(request):
-    if not request.user.is_authenticated:
-        return redirect('landing')
-
     if USE_FAKE_DASHBOARD_DATA:
         areas = _fake_dashboard_areas(request.user)
     else:
-        areas = list(
-            request.user.areas
-            .prefetch_related(
-                'users',
-                'userproduct_set__product',
-                'userproduct_set__unit',
-            )
-            .order_by('name')
-        )
+        user_areas = Area.objects.filter(
+            Q(owner=request.user) | Q(users=request.user)
+        ).distinct().prefetch_related(
+            'users',
+            'userproduct_set__product',
+            'userproduct_set__unit',
+        ).order_by('name')
 
+        areas = list(user_areas)
         for area in areas:
             area.products = [_with_freshness(up) for up in area.userproduct_set.all()]
             area.is_owner = (getattr(area, 'owner', None) == request.user)
@@ -191,8 +188,12 @@ def home(request):
                 ]
                 area.shared_users_script = json_script(members, f"area-users-{area.id}")
 
+    # ADD THIS QUERY SO THE DASHBOARD KNOWS ABOUT UNITS
+    available_units = Unit.objects.filter(Q(is_global=True) | Q(user=request.user)).order_by('-is_global', 'symbol')
+
     return render(request, 'dashboard/dashboard.html', {
         'areas': areas,
+        'available_units': available_units, # PASS IT TO THE TEMPLATE
     })
 
 
@@ -220,38 +221,21 @@ def register(request):
 
 @login_required(login_url='login')
 def my_products_view(request):
-    mock_my_products = [
-        {
-            'name': 'Milk',
-            'exp_date': '01.04.27',
-            'area': 'Fridge',
-            'freshness_percent': 100,
-            'freshness_level': 'fresh'
-        },
-        {
-            'name': 'Cottage cheese',
-            'exp_date': '01.12.26',
-            'area': 'Fridge',
-            'freshness_percent': 65,
-            'freshness_level': 'warning'
-        },
-        {
-            'name': 'Mozarella',
-            'exp_date': '12.06.26',
-            'area': 'Fridge',
-            'freshness_percent': 25,
-            'freshness_level': 'critical'
-        },
-        {
-            'name': 'Orange juice',
-            'exp_date': '01.04.28',
-            'area': 'Pantry',
-            'freshness_percent': 100,
-            'freshness_level': 'fresh'
-        },
-    ]
+    if USE_FAKE_DASHBOARD_DATA:
+        areas = _fake_dashboard_areas(request.user)
+    else:
+        user_areas = Area.objects.filter(
+            Q(owner=request.user) | Q(users=request.user)
+        ).distinct().prefetch_related(
+            'userproduct_set__product',
+            'userproduct_set__unit',
+        ).order_by('name')
 
-    return render(request, 'my-products/my_products.html', {'my_products': mock_my_products})
+        areas = list(user_areas)
+        for area in areas:
+            area.products = [_with_freshness(up) for up in area.userproduct_set.all()]
+
+    return render(request, 'my-products/my_products.html', {'areas': areas})
 
 
 # -------------------- #
@@ -391,55 +375,63 @@ def delete_area(request):
 # ----------------------------- #
 # ------ Shopping lists: ------ #
 # ----------------------------- #
+def _fake_shopping_lists():
+    """Generates mock shopping lists for dashboard demonstration mode."""
+    list1 = SimpleNamespace(
+        id=1,
+        name="Weekly Groceries",
+        items=[
+            SimpleNamespace(id=101, product=SimpleNamespace(name="Whole Milk"), quantity=2, unit=SimpleNamespace(symbol="l"), is_done=False),
+            SimpleNamespace(id=102, product=SimpleNamespace(name="Free-range Eggs"), quantity=12, unit=SimpleNamespace(symbol="pcs"), is_done=True),
+            SimpleNamespace(id=103, product=SimpleNamespace(name="Sourdough Bread"), quantity=1, unit=SimpleNamespace(symbol="loaf"), is_done=False),
+            SimpleNamespace(id=104, product=SimpleNamespace(name="Cheddar Cheese"), quantity=300, unit=SimpleNamespace(symbol="g"), is_done=False),
+        ]
+    )
+    list2 = SimpleNamespace(
+        id=2,
+        name="Party Supplies",
+        items=[
+            SimpleNamespace(id=201, product=SimpleNamespace(name="Sparkling Water"), quantity=6, unit=SimpleNamespace(symbol="bottle"), is_done=False),
+            SimpleNamespace(id=202, product=SimpleNamespace(name="Tortilla Chips"), quantity=3, unit=SimpleNamespace(symbol="pack"), is_done=False),
+            SimpleNamespace(id=203, product=SimpleNamespace(name="Fresh Limes"), quantity=5, unit=SimpleNamespace(symbol="pcs"), is_done=True),
+        ]
+    )
+    list3 = SimpleNamespace(
+        id=3,
+        name="Home Essentials",
+        items=[
+            SimpleNamespace(id=301, product=SimpleNamespace(name="Paper Towels"), quantity=2, unit=SimpleNamespace(symbol="pack"), is_done=False),
+            SimpleNamespace(id=302, product=SimpleNamespace(name="Dish Soap"), quantity=1, unit=SimpleNamespace(symbol="bottle"), is_done=False),
+        ]
+    )
+    return [list1, list2, list3]
+
+
 @login_required(login_url='login')
 def shopping_list_view(request):
-    # Pobieramy wszystkie listy zakupowe użytkownika
-    user_lists = ShoppingList.objects.filter(user=request.user).order_by('id')
+    if USE_FAKE_DASHBOARD_DATA:
+        shopping_lists = _fake_shopping_lists()
+    else:
+        user_lists = ShoppingList.objects.filter(user=request.user).prefetch_related(
+            'shoppinglistitem_set__product', 'shoppinglistitem_set__unit'
+        ).order_by('id')
 
-    # Jeśli użytkownik nie ma ŻADNEJ listy, automatycznie tworzymy domyślną
-    if not user_lists.exists():
-        ShoppingList.objects.create(name="My First List", user=request.user)
-        # Odświeżamy zapytanie, żeby pobrać nowo utworzoną listę
-        user_lists = ShoppingList.objects.filter(user=request.user).order_by('id')
+        # Auto-create default list if the user has no shopping list
+        if not user_lists.exists():
+            first_list = ShoppingList.objects.create(name="My First List", user=request.user)
+            user_lists = ShoppingList.objects.filter(id=first_list.id)
 
-    active_list = None
-    items = []
-    prev_list_id = None
-    next_list_id = None
+        shopping_lists = []
+        for sl in user_lists:
+            sl.items = list(sl.shoppinglistitem_set.all())
+            shopping_lists.append(sl)
 
-    if user_lists.exists():
-        # Umożliwiamy przełączanie się między listami parametrem w URL: ?list_id=X
-        list_id = request.GET.get('list_id')
+    available_units = Unit.objects.filter(Q(is_global=True) | Q(user=request.user)).order_by('-is_global', 'symbol')
 
-        if list_id:
-            active_list = get_object_or_404(ShoppingList, id=list_id, user=request.user)
-        else:
-            active_list = user_lists.first()
-
-        # Pobieramy produkty tylko z aktywnej listy
-        items = ShoppingListItem.objects.filter(shoppingList=active_list).select_related('product', 'unit')
-
-        # Logika do nawigacji między listami
-        lists_list = list(user_lists)
-        current_index = lists_list.index(active_list)
-        if current_index > 0:
-            prev_list_id = lists_list[current_index - 1].id
-        if current_index < len(lists_list) - 1:
-            next_list_id = lists_list[current_index + 1].id
-
-        # Jednostki (Globalne + Prywatne użytkownika)
-        available_units = Unit.objects.filter(Q(is_global=True) | Q(user=request.user)).order_by('-is_global', 'symbol')
-
-        context = {
-            'shopping_list': active_list,
-            'shopping_lists': user_lists,
-            'shopping_items': items,
-            'prev_list_id': prev_list_id,
-            'next_list_id': next_list_id,
-            'available_units': available_units,
-        }
-
-    return render(request, 'shopping_list/shopping_list.html', context)
+    return render(request, 'shopping_list/shopping_list.html', {
+        'shopping_lists': shopping_lists,
+        'available_units': available_units,
+    })
 
 
 @login_required(login_url='login')
@@ -529,11 +521,12 @@ def edit_shopping_item(request):
         item_id = request.POST.get('item_id')
         product_name = request.POST.get('product_name')
         quantity = request.POST.get('quantity')
-        unit_symbol = request.POST.get('unit_symbol', 'szt')
+        unit_symbol = request.POST.get('unit_symbol', 'pcs').strip()
 
         if item_id and product_name and quantity:
             item = get_object_or_404(ShoppingListItem, id=item_id, shoppingList__user=request.user)
 
+            # Find or create the unit symbol safely
             unit_obj, _ = Unit.objects.get_or_create(
                 symbol=unit_symbol,
                 defaults={'user': request.user, 'is_global': False}

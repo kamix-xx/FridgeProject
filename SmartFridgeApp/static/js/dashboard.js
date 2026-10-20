@@ -17,304 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // =========================================
-    // Area carousel
-    // =========================================
-
-    const areaCarousel = document.getElementById('areaCarousel');
-
-    // The real, server-rendered panels — captured before any clones are
-    // added below, so this array always maps 1:1 to `areas` from the view.
-    const areaPanels = areaCarousel ? Array.from(areaCarousel.querySelectorAll('.area-panel')) : [];
-
-    const areaPrevBtn = document.getElementById('areaPrev');
-
-    const areaNextBtn = document.getElementById('areaNext');
-
-    const areaTitleTextEl = document.getElementById('areaTitleText');
-
-    const panelCount = areaPanels.length;
-
-    // True infinite wrap needs at least 2 real panels to clone from.
-    const infiniteEnabled = Boolean(areaCarousel) && panelCount > 1;
-
-    let currentAreaIndex = 0;
-
-    // trackPosition is the carousel's raw slide index along the (possibly
-    // clone-padded) track. currentAreaIndex is always the real, 0-based
-    // area index — the only one anything outside this block should care
-    // about.
-    let trackPosition = 0;
-
-    if (infiniteEnabled) {
-        /*
-         * Clone the last panel to the front and the first panel to the
-         * back. Wrapping from one end to the other then becomes a single
-         * real slide onto a look-alike clone — not a slide through every
-         * panel in between — and we silently snap back to the real panel
-         * the instant that slide finishes (see the transitionend handler
-         * below), with no visible jump.
-         */
-        const firstClone = areaPanels[0].cloneNode(true);
-        const lastClone = areaPanels[panelCount - 1].cloneNode(true);
-
-        [firstClone, lastClone].forEach((clone) => {
-            clone.setAttribute('aria-hidden', 'true');
-            clone.style.pointerEvents = 'none';
-            clone.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
-            clone.querySelectorAll('[tabindex]').forEach((el) => el.setAttribute('tabindex', '-1'));
-        });
-
-        areaCarousel.appendChild(firstClone);
-        areaCarousel.insertBefore(lastClone, areaPanels[0]);
-
-        trackPosition = 1; // real panel 0 now sits at track position 1
-        areaCarousel.style.transform = `translateX(-${trackPosition * 100}%)`;
-
-        areaCarousel.addEventListener('transitionend', (event) => {
-            if (event.target !== areaCarousel || event.propertyName !== 'transform') {
-                return;
-            }
-
-            if (trackPosition === 0) {
-                // Slid onto the cloned last panel -> silently snap to the real one.
-                trackPosition = panelCount;
-            } else if (trackPosition === panelCount + 1) {
-                // Slid onto the cloned first panel -> silently snap to the real one.
-                trackPosition = 1;
-            } else {
-                return;
-            }
-
-            areaCarousel.style.transition = 'none';
-            areaCarousel.style.transform = `translateX(-${trackPosition * 100}%)`;
-            void areaCarousel.offsetWidth; // flush, so the transition:none actually applies
-            areaCarousel.style.transition = '';
-        });
-    }
-
-    // -----------------------------------------
-    // Title word-swap animation
-    // -----------------------------------------
-    //
-    // Splits the title into words (the CSS nth-child rules on
-    // .area-title-word give them a light cascade) and crossfades the old
-    // set out before swapping in the new one.
-    //
-    // Rapid clicking is handled by redirecting rather than stacking: if a
-    // swap is already fading the old words out, a new call just updates
-    // titleMorphTarget instead of starting a second animation on top of
-    // it — so no matter how fast you click, only one exit/enter cycle is
-    // ever running, and it always lands on whichever area you actually
-    // stopped on.
-
-    function makeTitleWordSpan(text) {
-        const span = document.createElement('span');
-        span.className = 'area-title-word';
-        span.textContent = text;
-
-        return span;
-    }
-
-    function buildSharedIcon() {
-        const icon = document.createElement('span');
-        icon.className = 'area-shared-icon area-title-word';
-        icon.title = 'Shared area';
-        icon.setAttribute('aria-label', 'Shared area');
-
-        const iconGlyph = document.createElement('i');
-        iconGlyph.className = 'bi bi-people-fill';
-        iconGlyph.setAttribute('aria-hidden', 'true');
-
-        icon.appendChild(iconGlyph);
-
-        return icon;
-    }
-
-    // The icon shares the .area-title-word class, so it rides along in
-    // the same flex row and picks up the same fade/scale transition and
-    // nth-child stagger as the last word — no separate animation needed.
-    function renderTitleWords(container, text, isShared) {
-        container.innerHTML = '';
-
-        text
-            .split(/\s+/)
-            .filter(Boolean)
-            .forEach((word) => {
-                container.appendChild(makeTitleWordSpan(word));
-            });
-
-        if (isShared) {
-            container.appendChild(buildSharedIcon());
-        }
-    }
-
-    let titleMorphTimer = null;
-    let titleMorphTarget = null;
-    let titleMorphTargetShared = false;
-
-    function morphAreaTitle(container, newText, isShared) {
-        const reduceMotion = window.matchMedia
-            && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        if (reduceMotion) {
-            clearTimeout(titleMorphTimer);
-            titleMorphTimer = null;
-            renderTitleWords(container, newText, isShared);
-
-            return;
-        }
-
-        titleMorphTarget = newText;
-        titleMorphTargetShared = isShared;
-
-        // Already exiting toward some target — just redirect it.
-        if (titleMorphTimer) {
-            return;
-        }
-
-        Array.from(container.children).forEach((el) => el.classList.add('is-exiting'));
-
-        const outDuration = getCssNumber('--title-morph-out-dur', 160);
-
-        titleMorphTimer = window.setTimeout(() => {
-            renderTitleWords(container, titleMorphTarget, titleMorphTargetShared);
-
-            const enteringWords = Array.from(container.children);
-            enteringWords.forEach((el) => el.classList.add('is-entering'));
-
-            void container.offsetWidth; // flush, so the "from" state above actually paints
-
-            requestAnimationFrame(() => {
-                enteringWords.forEach((el) => el.classList.remove('is-entering'));
-            });
-
-            titleMorphTimer = null;
-        }, outDuration);
-    }
-
-    if (areaTitleTextEl) {
-        const initialShared = Boolean(areaTitleTextEl.querySelector('.area-shared-icon'));
-
-        renderTitleWords(areaTitleTextEl, areaTitleTextEl.textContent.trim(), initialShared);
-    }
-
-    function setAreaTitle(index, options) {
-        if (!areaTitleTextEl || !areaPanels[index]) {
-            return;
-        }
-
-        const instant = Boolean(options && options.instant);
-
-        const panel = areaPanels[index];
-        const areaName = panel.dataset.areaName || '';
-        const isShared = panel.dataset.isShared === 'true';
-        const areaId = panel.dataset.areaId || '';
-        const isOwner = panel.dataset.areaOwner === 'true';
-
-        // Update the edit button dataset to match the currently displayed area
-        const editBtn = document.getElementById('areaEditBtn');
-        if (editBtn) {
-            editBtn.dataset.areaId = areaId;
-            editBtn.dataset.areaName = areaName;
-            editBtn.dataset.areaShared = isShared ? 'true' : 'false';
-            editBtn.dataset.areaOwner = isOwner ? 'true' : 'false';
-        }
-
-        if (instant) {
-            clearTimeout(titleMorphTimer);
-            titleMorphTimer = null;
-            renderTitleWords(areaTitleTextEl, areaName, isShared);
-        } else {
-            morphAreaTitle(areaTitleTextEl, areaName, isShared);
-        }
-    }
-
-    /*
-     * Jump straight to a given real area index.
-     * options.instant skips the slide animation entirely (used when
-     * landing on the dashboard already pointed at a specific area).
-     */
-    function goToArea(index, options) {
-        if (!panelCount) {
-            return;
-        }
-
-        const instant = Boolean(options && options.instant);
-
-        currentAreaIndex = (index + panelCount) % panelCount;
-
-        setAreaTitle(currentAreaIndex, options);
-
-        if (!infiniteEnabled) {
-            areaCarousel.style.transform = `translateX(-${currentAreaIndex * 100}%)`;
-
-            return;
-        }
-
-        trackPosition = currentAreaIndex + 1;
-
-        if (instant) {
-            areaCarousel.style.transition = 'none';
-        }
-
-        areaCarousel.style.transform = `translateX(-${trackPosition * 100}%)`;
-
-        if (instant) {
-            void areaCarousel.offsetWidth; // flush before restoring the transition
-            areaCarousel.style.transition = '';
-        }
-    }
-
-    function stepArea(delta) {
-        if (!panelCount) {
-            return;
-        }
-
-        if (!infiniteEnabled) {
-            goToArea(currentAreaIndex + delta);
-
-            return;
-        }
-
-        /*
-         * If a previous rapid click already landed us on a clone (its
-         * transitionend snap-back hasn't run yet), resolve that first —
-         * instantly, no visible jump, since a clone looks identical to
-         * the real panel it stands in for — so stepping from here can
-         * never walk past the end of the track no matter how fast you
-         * click.
-         */
-        if (trackPosition <= 0 || trackPosition >= panelCount + 1) {
-            trackPosition = ((trackPosition - 1) % panelCount + panelCount) % panelCount + 1;
-            areaCarousel.style.transition = 'none';
-            areaCarousel.style.transform = `translateX(-${trackPosition * 100}%)`;
-            void areaCarousel.offsetWidth; // flush, so the transition:none actually applies
-            areaCarousel.style.transition = '';
-        }
-
-        trackPosition += delta;
-
-        currentAreaIndex = ((trackPosition - 1) % panelCount + panelCount) % panelCount;
-
-        setAreaTitle(currentAreaIndex);
-
-        areaCarousel.style.transform = `translateX(-${trackPosition * 100}%)`;
-    }
-
-    if (areaPrevBtn) {
-        areaPrevBtn.addEventListener('click', () => {
-            stepArea(-1);
-        });
-    }
-
-    if (areaNextBtn) {
-        areaNextBtn.addEventListener('click', () => {
-            stepArea(1);
-        });
-    }
-
-
-    // =========================================
     // Product search
     // =========================================
 
@@ -365,9 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const glow = searchWrap.querySelector('.t-clear-glow');
 
-        /*
-         * Make sure the required animation elements exist.
-         */
         if (mirror && placeholder && glow) {
 
             const root = document.documentElement;
@@ -376,13 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
             // -----------------------------------------
-            // Helpers
+            // Easing helper
             // -----------------------------------------
 
-            /*
-             * Convert cubic-bezier(x1,y1,x2,y2) to
-             * a JavaScript easing function.
-             */
             function cubicBezier(str) {
                 const match = String(str).match(/cubic-bezier\(\s*([-\d.]+)\s*,\s*([-\d.]+)\s*,\s*([-\d.]+)\s*,\s*([-\d.]+)\s*\)/);
 
@@ -469,9 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const inputStyles = getComputedStyle(productSearchInput);
 
-                /*
-                 * Match the real input's typography.
-                 */
                 context.font = inputStyles.font;
 
                 const letterSpacing = parseFloat(inputStyles.letterSpacing);
@@ -486,9 +178,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const paddingLeft = parseFloat(inputStyles.paddingLeft) || 0;
 
-                /*
-                 * Position relative to the search wrapper.
-                 */
                 const inputOffsetLeft = inputRect.left - wrapRect.left;
 
                 const isDark = root.getAttribute('data-bs-theme') === 'dark';
@@ -501,11 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 let x = 0;
 
-
-                /*
-                 * Preserve whitespace so the next word
-                 * has the same position as the original input.
-                 */
                 text
                     .split(/(\s+)/)
                     .forEach((segment) => {
@@ -520,20 +204,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         const segmentWidth = measured + (spacing * characterCount);
 
-                        /*
-                         * Ignore spaces when creating streaks.
-                         */
                         if (segment.trim()) {
 
                             const centerX = inputOffsetLeft + paddingLeft + x + segmentWidth / 2;
 
                             const halfWidth = Math.max(segmentWidth * 0.5, 10) * spread;
 
-                            /*
-                             * Multiple streaks per word.
-                             * This gives the dissolve its
-                             * soft, uneven appearance.
-                             */
                             const streaks = [{
                                 offset: 0, width: 1.00, height: 7, alpha: 0.24
                             }, {
@@ -582,10 +258,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const shouldRestoreFocus = document.activeElement === productSearchInput;
 
-
-                /*
-                 * Read the animation values dynamically.
-                 */
                 const totalDuration = getCssNumber('--clear-dur', 1000);
 
                 const outDuration = getCssNumber('--clear-out-dur', 400);
@@ -604,75 +276,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const glowOpacity = getCssNumber('--glow-opacity', 0.42);
 
-
-                /*
-                 * Read the same easing functions from CSS.
-                 */
                 const styles = getComputedStyle(root);
 
                 const easeOut = cubicBezier(styles.getPropertyValue('--clear-out-ease'));
 
                 const easeIn = cubicBezier(styles.getPropertyValue('--clear-in-ease'));
 
-
-                /*
-                 * Freeze the text into the mirror.
-                 */
                 mirror.textContent = text.replace(/ /g, '\u00A0');
 
-
-                /*
-                 * Build the streaks while the input
-                 * geometry is still available.
-                 */
                 glow.style.background = buildGlow(text);
 
                 glow.style.opacity = '0';
 
-
-                /*
-                 * Placeholder starts above the field,
-                 * blurred and slightly transparent.
-                 */
                 placeholder.style.transform = `translateY(-${inFly}px)`;
 
                 placeholder.style.opacity = '0';
 
                 placeholder.style.filter = `blur(${blur}px)`;
 
-
-                /*
-                 * Clear the actual input.
-                 */
                 productSearchInput.value = '';
 
-                /*
-                 * Keep the existing product filtering logic.
-                 */
                 filterProducts();
 
-                /*
-                 * The actual input now has no text,
-                 * but the mirror owns the disappearing text.
-                 */
                 searchWrap.classList.remove('has-value');
 
                 searchWrap.classList.add('is-clearing');
 
-
-                /*
-                 * Start animation.
-                 */
                 const start = performance.now();
-
 
                 function animate(now) {
                     const elapsed = now - start;
-
-
-                    // -----------------------------------------
-                    // Typed text: DOWN + BLUR + FADE
-                    // -----------------------------------------
 
                     const outProgress = Math.min(1, elapsed / outDuration);
 
@@ -684,26 +317,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     mirror.style.filter = `blur(${(outEased * blur).toFixed(2)}px)`;
 
-
-                    // -----------------------------------------
-                    // Placeholder: DOWN FROM ABOVE
-                    // -----------------------------------------
-
                     const inProgress = Math.min(1, elapsed / inDuration);
 
                     const inEased = easeIn(inProgress);
 
                     placeholder.style.transform = `translateY(${(-inFly + inEased * inFly).toFixed(2)}px)`;
 
-                    placeholder.style.opacity = (0.9 + inEased * 0.1)
-                        .toFixed(3);
+                    placeholder.style.opacity = (0.9 + inEased * 0.1).toFixed(3);
 
                     placeholder.style.filter = `blur(${(blur - inEased * blur).toFixed(2)}px)`;
-
-
-                    // -----------------------------------------
-                    // Dissolve streak envelope
-                    // -----------------------------------------
 
                     let glowProgress = 0;
 
@@ -723,17 +345,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     glow.style.opacity = (glowEnvelope * glowOpacity).toFixed(3);
 
-
                     if (elapsed < totalDuration) {
                         requestAnimationFrame(animate);
 
                         return;
                     }
-
-
-                    // -----------------------------------------
-                    // Reset
-                    // -----------------------------------------
 
                     searchWrap.classList.remove('is-clearing');
 
@@ -761,22 +377,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 requestAnimationFrame(animate);
             }
 
-
-            // -----------------------------------------
-            // Live input synchronisation
-            // -----------------------------------------
-
             productSearchInput.addEventListener('input', () => {
                 if (!clearing) {
                     syncSearchState();
                 }
             });
-
-
-            // -----------------------------------------
-            // Prevent the clear button from stealing
-            // focus before animation starts.
-            // -----------------------------------------
 
             searchClearBtn.addEventListener('pointerdown', (event) => {
                 if (document.activeElement === productSearchInput) {
@@ -790,38 +395,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-
             searchClearBtn.addEventListener('click', (event) => {
                 event.preventDefault();
                 clearSearch();
             });
 
-
-            /*
-             * Initial state.
-             */
             syncSearchState();
         }
     }
-
-
-    // =========================================
-    // Jump to a specific area on load
-    // =========================================
-    // If the dashboard was opened with a ?area=<name> query param (set by
-    // areaCardLink.js on the Areas page), land straight on that area's
-    // panel -- instantly, no slide-through -- instead of stepping the
-    // carousel forward one click at a time.
-
-    const targetArea = new URLSearchParams(window.location.search).get('area');
-
-    if (targetArea) {
-        const targetIndex = areaPanels.findIndex((panel) => panel.dataset.areaName === targetArea);
-
-        if (targetIndex > 0) {
-            goToArea(targetIndex, { instant: true });
-        }
-    }
-
 
 });

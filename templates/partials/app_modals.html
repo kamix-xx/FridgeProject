@@ -1,0 +1,852 @@
+<!-- =========================================================================
+     UNIFIED APPLICATION MODALS
+     Included once in base.html for universal access across the entire app.
+     ========================================================================= -->
+
+<!-- ========================================== -->
+<!-- 1. PRODUCT & AREA MODALS                   -->
+<!-- ========================================== -->
+
+<!-- Remove Product Confirmation Modal -->
+<div class="modal fade" id="deleteProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content custom-popup t-modal">
+            <div class="modal-body text-center p-4 p-md-5">
+                <h3 class="popup-title mb-5">
+                    Remove <span id="deleteProductName">this product</span>?
+                </h3>
+                <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                        data-bs-dismiss="modal">
+                    Nah, just kidding
+                </button>
+                <hr class="popup-divider mx-auto mb-4">
+                <form method="post" action="" id="deleteProductForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="product_id" id="deleteProductId">
+                    <button type="button" class="btn btn-link text-decoration-none popup-btn-danger" id="confirmDeleteProductBtn">
+                        Yes, remove it!
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Area Confirmation Modal -->
+<div class="modal fade" id="deleteAreaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content custom-popup t-modal">
+            <div class="modal-body text-center p-4 p-md-5">
+                <h3 class="popup-title mb-5">Are you sure you want to delete <span id="deleteAreaName">this area</span>?</h3>
+                <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                        data-bs-dismiss="modal">
+                    Nah, just kidding
+                </button>
+                <hr class="popup-divider mx-auto mb-4">
+                <form method="post" action="" id="deleteAreaForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="area_id" id="deleteAreaId">
+                    <button type="button" class="btn btn-link text-decoration-none popup-btn-danger" id="confirmDeleteAreaBtn">
+                        Yes, destroy it!
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Area / Add Shared Area with Code (Combined Sliding Modal) -->
+<div class="modal fade" id="addAreaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content custom-popup t-modal">
+            <button type="button"
+                    class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="add-area-slider-wrap">
+                <div class="add-area-slider-track">
+                    <!-- Panel: Add Area -->
+                    <div class="add-area-panel add-area-panel-create modal-body text-center p-4 p-md-5"
+                         data-panel="create">
+                        <h3 class="popup-title mb-4">Add Area</h3>
+                        <form method="post" action="{% url 'api_add_area' %}" id="addAreaForm">
+                            {% csrf_token %}
+                            <div class="text-start mb-2">
+                                <label for="newAreaName" class="form-label popup-label">Area Name</label>
+                                <input type="text" name="name" maxlength="10" class="form-control popup-input shadow-none"
+                                       id="newAreaName" required autocomplete="off">
+                            </div>
+                            <p class="custom-subtext mb-5">
+                                Add a shared area
+                                <button type="button"
+                                        class="custom-link custom-link-button add-area-switch-btn"
+                                        data-switch-to="code">
+                                    HERE
+                                </button>
+                            </p>
+                            <button type="submit" class="popup-circular-btn mx-auto" aria-label="Add Area" id="submitAddAreaBtn">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Panel: Add Shared Area with Code -->
+                    <div class="add-area-panel add-area-panel-code modal-body text-center p-4 p-md-5"
+                         data-panel="code" aria-hidden="true">
+                        <h3 class="popup-title mb-4">Add Shared Area</h3>
+                        <form method="post" action="{% url 'api_join_area' %}" id="joinAreaForm">
+                            {% csrf_token %}
+                            <div class="text-start mb-2">
+                                <label for="newAreaCode" class="form-label popup-label">Area Code</label>
+                                <input type="text" name="code" class="form-control popup-input shadow-none"
+                                       id="newAreaCode" required autocomplete="off">
+                            </div>
+                            <p class="custom-subtext mb-5">
+                                Add a new area
+                                <button type="button"
+                                        class="custom-link custom-link-button add-area-switch-btn"
+                                        data-switch-to="create">
+                                    HERE
+                                </button>
+                            </p>
+                            <button type="submit" class="popup-circular-btn mx-auto" aria-label="Add Shared Area" id="submitJoinAreaBtn">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Area Modal -->
+<div class="modal fade" id="editAreaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content custom-popup t-modal">
+            <button type="button"
+                    class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-body p-4 p-md-5">
+
+                <div class="edit-area-morph-wrap" id="editAreaMorphWrap">
+                    <!-- Panel: main -->
+                    <div class="edit-area-panel text-center" data-panel="main">
+                        <h3 class="popup-title mb-5">Edit Area</h3>
+                        <form method="post" action="" id="editAreaForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="area_id" id="editAreaId">
+                            <div class="text-start mb-5">
+                                <label for="editAreaName" class="form-label popup-label">Area Name</label>
+                                <input type="text" name="name" maxlength="10" class="form-control popup-input shadow-none" id="editAreaName" required>
+                            </div>
+                            <button type="submit" class="popup-circular-btn mx-auto" aria-label="Save Area" id="saveAreaBtn">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17 21V13H7V21M7 3V8H15M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </form>
+
+                        <!-- Owner + shared only section -->
+                        <div class="edit-area-people d-none" id="editAreaPeopleSection">
+                            <hr class="popup-divider mx-auto mt-5 mb-4">
+                            <p class="popup-label mb-3">Shared with</p>
+                            <div class="avatar-group" id="editAreaAvatarGroup"></div>
+                            <button type="button"
+                                    class="btn btn-link text-decoration-none popup-btn-danger mt-4"
+                                    id="stopSharingAreaBtn">
+                                Stop sharing this area
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Panel: full scrollable list -->
+                    <div class="edit-area-panel d-none" data-panel="list">
+                        <button type="button" class="edit-area-back-btn" id="editAreaListBack" aria-label="Back">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                 xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2.5"
+                                      stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                        </button>
+                        <h3 class="popup-title mb-4 text-center">Shared with</h3>
+                        <div class="edit-area-people-list" id="editAreaPeopleList"></div>
+                    </div>
+
+                    <!-- Panel: remove-person confirmation -->
+                    <div class="edit-area-panel d-none text-center" data-panel="confirm">
+                        <h3 class="popup-title mb-5">
+                            Are you sure you want to remove <span id="editAreaConfirmName"></span> from the area?
+                        </h3>
+                        <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                                id="editAreaConfirmCancel">
+                            Nah, just kidding
+                        </button>
+                        <hr class="popup-divider mx-auto mb-4">
+                        <button type="button" class="btn btn-link text-decoration-none popup-btn-danger"
+                                id="editAreaConfirmRemove">
+                            Yes, remove them!
+                        </button>
+                    </div>
+
+                    <!-- Panel: stop-sharing confirmation -->
+                    <div class="edit-area-panel d-none text-center" data-panel="confirm-stop">
+                        <h3 class="popup-title mb-5">
+                            Are you sure you want to stop sharing this area?
+                        </h3>
+                        <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                                id="editAreaStopCancel">
+                            Nah, just kidding
+                        </button>
+                        <hr class="popup-divider mx-auto mb-4">
+                        <button type="button" class="btn btn-link text-decoration-none popup-btn-danger"
+                                id="editAreaStopConfirm">
+                            Yes, stop sharing!
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Share Area Modal -->
+<div class="modal fade" id="shareAreaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content custom-popup t-modal">
+            <button type="button"
+                    class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-body p-4 p-md-5 text-center">
+                <h3 class="popup-title mb-5 d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-share fs-4"></i>Share <span id="shareAreaTitle">Area</span>
+                </h3>
+                <div class="d-flex flex-column flex-sm-row align-items-center justify-content-center gap-3 mb-5">
+                    <span class="popup-label mb-0 fs-6">Sharing code:</span>
+                    <div class="input-group popup-share-group">
+                        <span class="input-group-text"><i class="bi bi-key"></i></span>
+                        <input type="text" class="form-control shadow-none" value=""
+                               id="shareCodeInput" readonly>
+                        <button class="btn btn-copy" type="button" id="copyShareCodeBtn" aria-label="Copy code">
+                            <i class="bi bi-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center gap-4">
+                    <a href="#" class="share-social-icon" aria-label="Messenger"><i class="bi bi-messenger"></i></a>
+                    <a href="#" class="share-social-icon" aria-label="Chat"><i class="bi bi-chat-dots-fill"></i></a>
+                    <a href="#" class="share-social-icon" aria-label="Share"><i class="bi bi-send"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content custom-popup t-modal product-modal" id="addProductModalContent">
+            <button type="button"
+                    class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+
+            <div class="modal-body p-4 p-md-5">
+                <h3 class="popup-title text-center mb-4">Add Product</h3>
+
+                <!-- Barcode scan preview -->
+                <div class="product-scan-preview">
+                    <div class="product-scan-frame">
+                        <span class="product-scan-corner product-scan-corner-tl"></span>
+                        <span class="product-scan-corner product-scan-corner-tr"></span>
+                        <span class="product-scan-corner product-scan-corner-bl"></span>
+                        <span class="product-scan-corner product-scan-corner-br"></span>
+
+                        <video class="product-scan-video" id="addProductScanVideo"
+                               autoplay playsinline muted></video>
+
+                        <div class="product-scan-fallback" id="addProductScanFallback">
+                            <i class="bi bi-camera-video-off" aria-hidden="true"></i>
+                        </div>
+
+                        <button type="button" class="product-scan-badge" id="addProductScanBadge"
+                                title="Open camera" aria-label="Open camera">
+                            <i class="bi bi-camera-fill" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product code row -->
+                <div class="mb-2">
+                    <label for="addProductCode" class="form-label popup-label">Product code</label>
+                    <div class="product-code-row">
+                        <input type="text" class="form-control popup-input shadow-none"
+                               id="addProductCode" placeholder="Scan or type a barcode" autocomplete="off">
+                        <button type="button" class="product-code-enter" id="addProductCodeEnter"
+                                title="Enter" aria-label="Enter">
+                            <i class="bi bi-arrow-return-left" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <p class="custom-subtext product-scan-manual-link" id="addProductManualLink">
+                    Don't have a code?
+                    <button type="button" class="custom-link custom-link-button">CLICK HERE</button>
+                </p>
+
+                <!-- Manual fields -->
+                <div class="product-extra-fields" id="addProductExtraFields">
+                    <div class="product-extra-fields-inner" id="addProductExtraFieldsInner">
+                        <form method="post" action="{% url 'api_add_product' %}" id="addProductForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="barcode" id="addHiddenBarcode">
+                            {% include "partials/product_form_fields.html" with id_prefix="add" submit_icon="bi-plus" submit_label="Add product" %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content custom-popup t-modal product-modal" id="editProductModalContent">
+            <button type="button"
+                    class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+
+            <div class="modal-body p-4 p-md-5">
+                <h3 class="popup-title text-center mb-4">Edit Product</h3>
+
+                <form method="post" action="" id="editProductForm">
+                    {% csrf_token %}
+                    <div class="mb-2">
+                        <label for="editProductCode" class="form-label popup-label">Product code</label>
+                        <div class="product-code-row">
+                            <input type="text" name="barcode" class="form-control popup-input shadow-none"
+                                   id="editProductCode" placeholder="Scan or type a barcode" autocomplete="off">
+                            <button type="button" class="product-code-enter" id="editProductCodeEnter"
+                                    title="Enter" aria-label="Enter">
+                                <i class="bi bi-arrow-return-left" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    {% include "partials/product_form_fields.html" with id_prefix="edit" submit_icon="bi-floppy-fill" submit_label="Save changes" %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 2. SHOPPING LIST MODALS                    -->
+<!-- ========================================== -->
+
+<!-- Create Shopping List Modal -->
+<div class="modal fade" id="createShoppingListModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content custom-popup position-relative border-0">
+            <button type="button"
+                    class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+
+            <div class="modal-body text-center p-4 p-md-5">
+                <h3 class="popup-title mb-4 mt-2">Create shopping list</h3>
+                <form method="post" action="{% url 'api_create_shopping_list' %}" id="createShoppingListForm">
+                    {% csrf_token %}
+                    <div class="text-start mb-5">
+                        <label for="newShoppingListName" class="form-label popup-label">Shopping list name</label>
+                        <input type="text" name="name" class="form-control popup-input shadow-none"
+                               id="newShoppingListName" placeholder="e.g. Groceries" required autocomplete="off">
+                    </div>
+                    <button type="submit" class="popup-circular-btn mx-auto" aria-label="Create list">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Shopping List Modal -->
+<div class="modal fade" id="editShoppingListModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content custom-popup position-relative border-0">
+            <button type="button"
+                    class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+
+            <div class="modal-body text-center p-4 p-md-5">
+                <h3 class="popup-title mb-4 mt-2">Edit shopping list</h3>
+                <form method="post" action="" id="editShoppingListForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="list_id" id="editShoppingListId">
+                    <div class="text-start mb-5">
+                        <label for="editShoppingListName" class="form-label popup-label">Shopping list name</label>
+                        <input type="text" name="name" class="form-control popup-input shadow-none"
+                               id="editShoppingListName" required autocomplete="off">
+                    </div>
+                    <button type="submit" class="popup-circular-btn mx-auto" id="saveShoppingListNameBtn" aria-label="Save name">
+                        <i class="bi bi-check-lg"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Shopping List Modal -->
+<div class="modal fade" id="deleteShoppingListModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content custom-popup border-0">
+            <div class="modal-body text-center p-4 p-md-5">
+                <h3 class="popup-title mb-2">Are you sure to delete this list?</h3>
+                <p class="popup-subtitle-light mb-5">All items there will be lost!</p>
+                <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                        data-bs-dismiss="modal">
+                    Nah, just kidding
+                </button>
+                <hr class="popup-divider mx-auto mb-4">
+                <form method="post" action="" id="deleteShoppingListForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="list_id" id="deleteShoppingListId">
+                    <button type="submit" class="btn btn-link text-decoration-none popup-btn-danger" id="deleteShoppingListConfirmBtn">
+                        Do it!
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 3. RECIPE MODALS                           -->
+<!-- ========================================== -->
+
+<!-- Create Recipe Modal -->
+<div class="modal fade" id="createRecipeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content custom-popup t-modal border-0">
+            <button type="button"
+                    class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+
+            <form method="post" action="{% url 'create_recipe' %}" enctype="multipart/form-data"
+                  id="createRecipeForm" class="modal-body p-4">
+                {% csrf_token %}
+                <h3 class="popup-title text-center mb-3 mt-1">Create recipe</h3>
+
+                <div class="row g-3 mb-5">
+                    <div class="col-sm-5 universal-image-upload">
+                        <label class="form-label popup-label d-none d-sm-block">&nbsp;</label>
+                        <label for="recipeThumbnail"
+                               class="recipe-img-upload m-0 d-flex justify-content-center align-items-center position-relative overflow-hidden"
+                               style="cursor: pointer;">
+                            <input type="file" name="thumbnail" id="recipeThumbnail" class="d-none img-upload-input" accept="image/*">
+                            <div id="thumbnailIconsPlaceholder" class="text-center img-placeholder">
+                                <i class="bi bi-image upload-main-icon d-block"></i>
+                                <i class="bi bi-box-arrow-up upload-corner-icon position-absolute top-0 end-0 m-2"></i>
+                            </div>
+                            <img id="recipeThumbnailPreview" class="d-none w-100 h-100 object-fit-cover position-absolute top-0 start-0 img-preview" alt="Preview">
+                        </label>
+                        <input type="hidden" name="remove_thumbnail" class="img-remove-flag" value="false">
+                        <button type="button" class="btn btn-link text-danger text-decoration-none p-0 align-items-center gap-1 mt-1 d-none img-remove-btn"
+                                style="font-size: 0.95rem; font-weight: 500; border: none; background: transparent;">
+                            <i class="bi bi-trash"></i> Remove image
+                        </button>
+                    </div>
+
+                    <div class="col-sm-7 d-flex flex-column justify-content-between">
+                        <div class="mb-2">
+                            <label for="newRecipeName" class="form-label popup-label">Recipe name</label>
+                            <input type="text" name="name" class="form-control popup-input shadow-none w-100" id="newRecipeName" required>
+                        </div>
+                        <div>
+                            <label for="newRecipeTime" class="form-label popup-label">Preparation time</label>
+                            <input type="time" name="prep_time" class="form-control popup-input shadow-none w-100" id="newRecipeTime" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="newRecipeDesc" class="form-label popup-label">Short description:</label>
+                    <div class="form-control popup-input shadow-none p-0 overflow-hidden d-flex">
+                        <textarea name="description" class="w-100 border-0 bg-transparent shadow-none p-2 m-1"
+                                  id="newRecipeDesc" rows="2" style="resize: none; outline: none;" required></textarea>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label popup-label mb-2">Ingredients:</label>
+                    <div class="recipe-ingredient-grid header-row px-3 mb-1">
+                        <span class="popup-label fw-normal mb-0">Name</span>
+                        <span class="popup-label fw-normal mb-0 text-center">Quantity</span>
+                        <span class="popup-label fw-normal mb-0 text-center">Unit</span>
+                        <span></span>
+                    </div>
+
+                    <div id="recipeIngredientsList" class="ingredients-scroll-container mb-2" style="max-height: 150px; overflow-y: auto; overflow-x: hidden; display: block;"></div>
+
+                    <div class="recipe-ingredient-grid input-row mt-2">
+                        <input type="text" id="addIngName" class="form-control popup-input shadow-none" placeholder="Name">
+                        <input type="number" id="addIngQty" class="form-control popup-input shadow-none text-center" placeholder="0.0" step="0.1" min="0">
+                        <select id="addIngUnit" class="form-select popup-input shadow-none custom-select-style text-center">
+                            <option value="" selected disabled></option>
+                            <option value="kg">kg</option>
+                            <option value="g">g</option>
+                            <option value="L">L</option>
+                            <option value="pcs">pcs</option>
+                        </select>
+                        <button type="button" id="addIngBtn" class="btn btn-recipe-row-action btn-add shadow-none">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                <input type="hidden" name="ingredients_data" id="ingredientsData">
+                <button type="submit" class="popup-circular-btn mx-auto"><i class="bi bi-plus"></i></button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Recipe Details Modal -->
+<div class="modal fade" id="editRecipeDetailsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content custom-popup t-modal border-0">
+            <button type="button" class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+
+            <form method="post" action="{% url 'edit_recipe' recipe.id|default:0 %}" enctype="multipart/form-data" id="editRecipeForm" class="modal-body p-4">
+                {% csrf_token %}
+                <h3 class="popup-title text-center mb-3 mt-1">Edit recipe</h3>
+
+                <div class="row g-3 mb-5">
+                    <div class="col-sm-5 universal-image-upload d-flex flex-column mb-3 mb-sm-0">
+                        <label class="form-label popup-label d-none d-sm-block">&nbsp;</label>
+                        <label for="editRecipePicInput" class="recipe-img-upload position-relative overflow-hidden p-0 border-0 d-flex justify-content-center align-items-center flex-grow-1" style="cursor: pointer; min-height: 150px;" aria-label="Change recipe image">
+                            <input type="file" name="thumbnail" id="editRecipePicInput" class="d-none img-upload-input" accept="image/*">
+                            <div class="text-center img-placeholder {% if recipe and recipe.image_url %}d-none{% endif %}">
+                                <i class="bi bi-image" style="font-size: 2rem; color: rgba(255,255,255,0.6);"></i>
+                            </div>
+                            <img src="{{ recipe.image_url|default:'' }}" alt="Recipe cover" id="editRecipePicPreview" class="w-100 h-100 object-fit-cover position-absolute top-0 start-0 img-preview {% if not recipe or not recipe.image_url %}d-none{% endif %}">
+                            <div class="position-absolute bottom-0 end-0 p-2 z-2">
+                                <i class="bi bi-box-arrow-up text-white" style="font-size: 1.2rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));"></i>
+                            </div>
+                        </label>
+                        <input type="hidden" name="remove_thumbnail" class="img-remove-flag" value="false">
+                        <button type="button" class="btn btn-link text-danger text-decoration-none p-0 align-items-center gap-1 mt-2 align-self-start img-remove-btn {% if recipe and recipe.image_url %}d-flex{% else %}d-none{% endif %}" style="font-size: 0.95rem; font-weight: 500; border: none; background: transparent;">
+                            <i class="bi bi-trash"></i> Remove image
+                        </button>
+                    </div>
+
+                    <div class="col-sm-7 d-flex flex-column justify-content-between">
+                        <div class="mb-2">
+                            <label for="editRecipeName" class="form-label popup-label">Recipe name</label>
+                            <input type="text" class="form-control popup-input shadow-none w-100" id="editRecipeName" name="name" value="{{ recipe.title|striptags|default:'' }}">
+                        </div>
+                        <div>
+                            <label for="editRecipeTime" class="form-label popup-label">Preparation time</label>
+                            <input type="text" class="form-control popup-input shadow-none w-100" id="editRecipeTime" name="prep_time" value="{{ recipe.est_time|default:'' }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="editRecipeDesc" class="form-label popup-label">Short description:</label>
+                    <div class="form-control popup-input shadow-none p-0 overflow-hidden d-flex">
+                        <textarea class="w-100 border-0 bg-transparent shadow-none p-2 m-1" id="editRecipeDesc" name="description" rows="2" style="resize: none; outline: none;">{{ recipe.description_short|default:'' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label popup-label mb-2">Ingredients:</label>
+                    <div class="recipe-ingredient-grid header-row px-3 mb-1">
+                        <span class="popup-label fw-normal mb-0">Name</span>
+                        <span class="popup-label fw-normal mb-0 text-center">Quantity</span>
+                        <span class="popup-label fw-normal mb-0 text-center">Unit</span>
+                        <span></span>
+                    </div>
+
+                    <div id="editRecipeIngredientsList" class="ingredients-scroll-container mb-2" style="max-height: 140px; overflow-y: auto; overflow-x: hidden; display: block;">
+                        {% if recipe %}
+                            {% for ingredient in recipe.ingredients %}
+                                <div class="recipe-ingredient-grid existing-row align-items-center mb-2">
+                                    <div class="ingredient-text text-truncate px-1" title="{{ ingredient.name }}">{{ ingredient.name }}</div>
+                                    <div class="ingredient-text text-center">{{ ingredient.quantity }}</div>
+                                    <div class="ingredient-text text-center">{{ ingredient.unit }}</div>
+                                    <button type="button" class="btn btn-recipe-row-action btn-danger shadow-none delete-ing-btn"><i class="bi bi-trash"></i></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="recipe-ingredient-grid input-row mt-2">
+                        <input type="text" id="editAddIngName" class="form-control popup-input shadow-none" placeholder="Name">
+                        <input type="number" id="editAddIngQty" class="form-control popup-input shadow-none text-center" placeholder="0.0" step="0.1" min="0">
+                        <select id="editAddIngUnit" class="form-select popup-input shadow-none custom-select-style text-center">
+                            <option value="" selected disabled></option>
+                            <option value="kg">kg</option>
+                            <option value="g">g</option>
+                            <option value="L">L</option>
+                            <option value="pcs">pcs</option>
+                        </select>
+                        <button type="button" id="editAddIngBtn" class="btn btn-recipe-row-action btn-add shadow-none"><i class="bi bi-plus-lg"></i></button>
+                    </div>
+                </div>
+
+                <input type="hidden" name="ingredients_data" id="editIngredientsData">
+                <button type="submit" class="popup-circular-btn mx-auto"><i class="bi bi-floppy"></i></button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Step Modal (Add / Edit) -->
+<div class="modal fade" id="stepModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content custom-popup t-modal border-0">
+            <button type="button" class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+
+            <form method="post" action="" enctype="multipart/form-data" id="stepForm" class="modal-body p-4 p-md-5">
+                {% csrf_token %}
+                <h3 class="popup-title text-center mb-4" id="stepModalTitle">Add step</h3>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-sm-5 col-md-4 universal-image-upload">
+                        <label for="stepPictureInput" class="recipe-img-upload h-100 m-0 d-flex justify-content-center align-items-center position-relative overflow-hidden" style="min-height: 140px; cursor: pointer;" aria-label="Upload step image">
+                            <input type="file" name="picture" id="stepPictureInput" class="d-none img-upload-input" accept="image/*">
+                            <div id="stepIconsPlaceholder" class="text-center img-placeholder">
+                                <i class="bi bi-image upload-main-icon"></i>
+                                <i class="bi bi-box-arrow-up upload-corner-icon"></i>
+                            </div>
+                            <img id="stepPicturePreview" class="d-none w-100 h-100 object-fit-cover position-absolute top-0 start-0 img-preview" alt="Step preview">
+                        </label>
+                        <input type="hidden" name="remove_picture" class="img-remove-flag" value="false">
+                        <button type="button" class="btn btn-link text-danger text-decoration-none p-0 align-items-center gap-1 mt-1 d-none img-remove-btn" style="font-size: 0.95rem; font-weight: 500; border: none; background: transparent;">
+                            <i class="bi bi-trash"></i> Remove image
+                        </button>
+                    </div>
+
+                    <div class="col-sm-7 col-md-8 d-flex flex-column justify-content-end">
+                        <div>
+                            <label for="stepNameInput" class="form-label popup-label">Step title</label>
+                            <input type="text" name="name" class="form-control popup-input shadow-none w-100" id="stepNameInput" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4 mb-md-5">
+                    <label for="stepDescInput" class="form-label popup-label">Description</label>
+                    <div class="form-control popup-input shadow-none p-0 overflow-hidden d-flex">
+                        <textarea name="description" class="w-100 border-0 bg-transparent shadow-none p-2 m-1" id="stepDescInput" rows="7" style="resize: none; outline: none;" required></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="popup-circular-btn mx-auto d-block"><i class="bi bi-floppy" id="stepSubmitIcon"></i></button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Send Recipe for Verification Modal -->
+<div class="modal fade" id="verifyRecipeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+        <div class="modal-content custom-popup t-modal border-0 text-center p-4 p-md-5">
+            <div class="modal-body p-0">
+                <h3 class="popup-title mb-3">Send for verification?</h3>
+                <p class="mb-5 text-muted" style="font-size: 0.95rem;">
+                    Once verified, this recipe will become global and visible to all SmartFridge+ users.
+                </p>
+
+                <div class="d-flex flex-column align-items-center">
+                    <button type="button" class="btn custom-link-button popup-btn-text mb-4" data-bs-dismiss="modal">
+                        Not yet
+                    </button>
+                    <hr class="popup-divider mx-auto mb-4">
+                    <form method="POST" action="{% url 'send_recipe_for_verification' recipe.id|default:0 %}" class="w-100">
+                        {% csrf_token %}
+                        <button type="submit" class="btn custom-link-button popup-btn-confirm w-100">
+                            Yes, send it!
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Universal Delete Modal (Recipe / Steps) -->
+<div class="modal fade" id="universalDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+        <div class="modal-content custom-popup t-modal border-0 text-center p-4 p-md-5">
+            <div class="modal-body p-0">
+                <h3 class="popup-title mb-5" id="deleteModalTitle">Are you sure?</h3>
+                <div class="d-flex flex-column align-items-center">
+                    <button type="button" class="btn custom-link-button popup-btn-text mb-4" data-bs-dismiss="modal">
+                        Nah, just kidding
+                    </button>
+                    <hr class="popup-divider mx-auto mb-4">
+                    <form method="POST" action="" id="deleteModalForm" class="w-100">
+                        {% csrf_token %}
+                        <button type="submit" class="btn custom-link-button popup-btn-danger w-100">
+                            Do it!
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- 4. ADMIN PANEL MODALS                      -->
+<!-- ========================================== -->
+
+<!-- Admin: Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content admin-modal-card p-4 p-md-5 border-0 position-relative">
+            <button type="button" class="btn-close admin-modal-close position-absolute top-0 end-0 m-4 shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+
+            <h2 class="admin-modal-title mb-4">Account details</h2>
+
+            <form method="post" action="#" enctype="multipart/form-data" id="adminUserEditForm">
+                {% csrf_token %}
+                <input type="hidden" name="user_id" id="modalUserId">
+                <div class="row g-4 align-items-start">
+                    <div class="col-12 col-md-7">
+                        <div class="row g-3">
+                            <div class="col-6 mb-3">
+                                <label class="admin-field-label">Login</label>
+                                <div class="admin-underline-input-wrap d-flex align-items-center">
+                                    <input type="text" name="username" id="modalUserLogin" class="admin-underline-input" required>
+                                    <i class="bi bi-pencil ms-2 admin-edit-icon"></i>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="admin-field-label">Name</label>
+                                <div class="admin-underline-input-wrap d-flex align-items-center">
+                                    <input type="text" name="first_name" id="modalUserName" class="admin-underline-input">
+                                    <i class="bi bi-pencil ms-2 admin-edit-icon"></i>
+                                </div>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="admin-field-label">Email</label>
+                                <div class="admin-underline-input-wrap d-flex align-items-center">
+                                    <input type="email" name="email" id="modalUserEmail" class="admin-underline-input" required>
+                                    <i class="bi bi-pencil ms-2 admin-edit-icon"></i>
+                                </div>
+                            </div>
+                            <div class="col-12 d-flex flex-wrap align-items-center gap-3 my-2">
+                                <div class="admin-role-badge">Role — <span id="modalUserRole">USER</span></div>
+                                <div class="admin-custom-select-wrap position-relative">
+                                    <input type="hidden" name="status" id="modalUserStatus" value="ACTIVE">
+                                    <div class="admin-custom-select-trigger status-active shadow-sm d-flex justify-content-between align-items-center" id="customStatusTrigger">
+                                        <span id="customStatusText">Status — ACTIVE</span>
+                                        <i class="bi bi-chevron-down ms-2" style="font-size: 0.8rem;"></i>
+                                    </div>
+                                    <ul class="admin-custom-select-options shadow" id="customStatusOptions">
+                                        <li class="admin-custom-option" data-value="ACTIVE">Status — ACTIVE</li>
+                                        <li class="admin-custom-option" data-value="DELETED">Status — DELETED</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <label class="admin-field-label d-block">Password</label>
+                                <button type="button" class="btn admin-btn-outline d-inline-flex align-items-center gap-2">
+                                    <i class="bi bi-pencil"></i> Change password
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-5 d-flex flex-column align-items-center">
+                        <div class="admin-avatar-box position-relative mb-2">
+                            <img id="modalUserAvatarImg" src="" alt="User Avatar" class="w-100 h-100 object-fit-cover d-none">
+                            <div id="modalUserAvatarPlaceholder" class="w-100 h-100 d-flex align-items-center justify-content-center">
+                                <i class="bi bi-person admin-placeholder-icon"></i>
+                            </div>
+                            <label for="adminAvatarUpload" class="admin-avatar-upload-btn position-absolute top-0 end-0 m-2" title="Upload avatar">
+                                <i class="bi bi-upload"></i>
+                            </label>
+                            <input type="file" name="avatar" id="adminAvatarUpload" class="d-none" accept="image/*">
+                        </div>
+                        <span class="admin-creation-date">creation date: <span id="modalUserDate">01.01.2027</span></span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-custom-orange rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2">
+                        <i class="bi bi-floppy"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Admin: Universal Confirm Modal -->
+<div class="modal fade" id="universalConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+        <div class="modal-content custom-popup t-modal border-0 text-center p-4 p-md-5">
+            <div class="modal-body p-0">
+                <h3 class="popup-title mb-3" id="confirmModalTitle">Are you sure?</h3>
+                <p class="mb-5 text-muted d-none" style="font-size: 0.95rem;" id="confirmModalDesc"></p>
+                <div class="d-flex flex-column align-items-center mt-4">
+                    <button type="button" class="btn custom-link-button popup-btn-text mb-4" data-bs-dismiss="modal">
+                        No, cancel
+                    </button>
+                    <hr class="popup-divider mx-auto mb-4" style="width: 80%;">
+                    <form method="POST" id="confirmModalForm" action="">
+                        {% csrf_token %}
+                        <input type="hidden" name="item_id" id="confirmModalItemId">
+                        <input type="hidden" name="action_type" id="confirmModalActionType">
+                        <button type="submit" class="btn custom-link-button" id="confirmModalSubmitBtn">
+                            Yes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin: Add Global Unit Modal -->
+<div class="modal fade" id="addGlobalUnitModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content custom-popup border-0">
+            <button type="button" class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            <form method="POST" action="{% url 'admin_add_unit' %}">
+                {% csrf_token %}
+                <div class="modal-body text-center p-4 p-md-5">
+                    <h3 class="popup-title mb-4">Add Global Unit</h3>
+                    <div class="text-start mb-4">
+                        <label class="form-label popup-label">Unit symbol</label>
+                        <input type="text" name="symbol" class="form-control popup-input shadow-none" required maxlength="10">
+                    </div>
+                    <button type="submit" class="popup-circular-btn mx-auto"><i class="bi bi-plus"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Admin: Edit Global Unit Modal -->
+<div class="modal fade" id="editGlobalUnitModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content custom-popup border-0">
+            <button type="button" class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            <form method="POST" action="{% url 'admin_edit_unit' %}">
+                {% csrf_token %}
+                <input type="hidden" name="unit_id" id="editGlobalUnitId">
+                <div class="modal-body text-center p-4 p-md-5">
+                    <h3 class="popup-title mb-4">Edit Global Unit</h3>
+                    <div class="text-start mb-4">
+                        <label class="form-label popup-label">Unit symbol</label>
+                        <input type="text" name="symbol" id="editGlobalUnitSymbol" class="form-control popup-input shadow-none" required maxlength="10">
+                    </div>
+                    <button type="submit" class="popup-circular-btn mx-auto"><i class="bi bi-check-lg"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

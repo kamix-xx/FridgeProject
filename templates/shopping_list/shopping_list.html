@@ -2,453 +2,400 @@
 {% load static %}
 
 {% block head %}
-    <link rel="expect" href="#page-transition-panel" blocking="render">
-    <link rel="stylesheet" href="{% static 'css/shopping_list.css' %}?v=9">
-    <link rel="stylesheet" href="{% static 'css/modals.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}?v=5">
+    <link rel="stylesheet" href="{% static 'css/morphMenu.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modals.css' %}?v=3">
+    <link rel="stylesheet" href="{% static 'css/shopping_list.css' %}?v=4">
     <script src="{% static 'js/gooeyMenu.js' %}" defer></script>
+    <script src="{% static 'js/menuMorph.js' %}" defer></script>
+    <script src="{% static 'js/panelCarousel.js' %}" defer></script>
     <script src="{% static 'js/shopping_list.js' %}" defer></script>
-    <script src="{% static 'js/modals.js' %}?v=2" defer></script>
 {% endblock %}
 
-{% block title %}SmartFridge+ — Shopping List{% endblock %}
+{% block title %}SmartFridge+ — Shopping Lists{% endblock %}
 
 {% block content %}
     {% include "partials/background_images.html" %}
 
-    <main class="position-relative min-vh-100 d-flex flex-column align-items-center justify-content-center py-5">
-        <svg width="0" height="0" class="position-absolute" style="visibility: hidden;">
-            <defs>
-                <filter id="goo">
-                    <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"></feGaussianBlur>
-                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"
-                                   result="goo"></feColorMatrix>
-                    <feBlend in="SourceGraphic" in2="goo"></feBlend>
-                </filter>
-            </defs>
-        </svg>
-
-        <section
-                class="shopping-panel d-flex justify-content-center align-items-center gap-3 w-100 position-relative z-2 px-2 px-md-5"
-                style="max-width: 1400px;">
-
-            <a href="{% if prev_list_id %}?list_id={{ prev_list_id }}{% else %}#{% endif %}"
-               class="btn-scroll-down carousel-arrow shopping-arrow-prev d-none d-md-flex align-items-center justify-content-center text-decoration-none"
-               aria-label="Previous list"
-               {% if not prev_list_id %}style="pointer-events: none; opacity: 0.5;"{% endif %}>
-                <i class="bi bi-chevron-left"></i>
-            </a>
-
-
-            <div class="glass-card p-4 p-md-5 mt-4 position-relative flex-grow-1 w-100"
-                 id="page-transition-panel"
-                 style="max-width: 900px;">
-
-                <header class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-dark border-opacity-25 shopping-list-header">
-                    <div class="header-spacer d-none d-sm-block" style="width: 42px;"></div>
-                    <div class="flex-grow-1 text-center">
-                        <h2 class="expense-title m-0"
-                            id="shoppingListTitle">{{ shopping_list.name|default:"Shopping list #1" }}</h2>
-                    </div>
-
-                    <!-- Shopping List Actions Gooey Menu -->
-                    <div class="shopping-header-actions">
-                        <div class="gooey-menu shopping-card-gooey">
-                            <input type="checkbox" id="gooey-chk-header" class="gooey-chk d-none">
-                            <div class="gooey-container">
-                                <button type="button" class="gooey-item item-delete"
-                                        aria-label="Delete shopping list"
-                                        title="Delete list"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteShoppingListModal">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                                <button type="button" class="gooey-item item-edit"
-                                        aria-label="Edit shopping list"
-                                        title="Edit list"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#editShoppingListModal">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                                <label class="gooey-main-btn" for="gooey-chk-header"
-                                       title="List options"
-                                       aria-label="Shopping list actions">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </header>
-
-                <!-- Completion Celebration Banner -->
-                <div class="shopping-complete-banner d-none mb-3" id="shoppingCompleteBanner">
-                    <div class="d-flex align-items-center justify-content-center gap-2 py-2 px-3">
-                        <i class="bi bi-stars fs-5 text-warning"></i>
-                        <span class="fw-semibold">All products completed! 🎉</span>
-                        <i class="bi bi-stars fs-5 text-warning"></i>
-                    </div>
+    <!-- Floating Toast Notification -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
+        <div id="completionToast" class="toast align-items-center text-bg-success border-0 shadow-lg" role="alert"
+             aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fw-medium" style="font-size: 1.05rem;">🎉 All items in this list are completed!
                 </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
 
-                <div class="areas-scroll-container pe-1 pe-md-3">
-                    <ul class="product-list">
+    <main class="dashboard-page">
+        <div class="dashboard-inner">
+            <section class="fridge-panel">
+                <button type="button" class="btn-scroll-down carousel-arrow carousel-arrow-prev" id="listPrev"
+                        aria-label="Previous list">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
 
-                        {% for item in shopping_items %}
-                            <li class="product-row {% if item.is_bought or item.is_done %}is-completed{% endif %}">
+                <div class="fridge-panel-body" id="page-transition-panel">
+                    <header class="fridge-panel-header d-flex justify-content-between align-items-center">
+                        <h2 class="fridge-panel-title m-0" id="areaTitle">
+                            <span class="area-title-text panel-title-text" id="shoppingListTitle">
+                                {% if shopping_lists %}{{ shopping_lists.0.name }}{% else %}Shopping List{% endif %}
+                            </span>
+                        </h2>
 
-                                <span class="product-icon" aria-hidden="true">
-                                    <i class="bi bi-basket2-fill"></i>
-                                </span>
-
-                                <div class="product-info shopping-product-info">
-                                    <span class="product-name fw-medium">{{ item.product.name }}</span>
-                                    <div class="shopping-divider"></div>
-                                    <span class="product-qty text-nowrap">{{ item.quantity|floatformat:-2 }} {{ item.unit.symbol }}</span>
-                                </div>
-
-                                <div class="product-row-actions">
-
-                                    <a href="#" class="icon-btn" aria-label="Edit product"
-                                       data-bs-toggle="modal"
-                                       data-bs-target="#editProductModal"
-                                       data-item-id="{{ item.id }}"
-                                       data-item-name="{{ item.product.name }}"
-                                       data-item-quantity="{{ item.quantity|stringformat:'s' }}"
-                                       data-item-unit="{{ item.unit.symbol }}">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </a>
-
-                                    <a href="#" class="icon-btn icon-btn-danger" aria-label="Remove product"
-                                       data-bs-toggle="modal"
-                                       data-bs-target="#deleteProductModal"
-                                       data-item-id="{{ item.id }}"
-                                       data-item-name="{{ item.product.name }}">
+                        <!-- Action Menus Wrapper -->
+                        <div class="d-flex align-items-center gap-3 flex-shrink-0">
+                            <!-- Gooey Menu for the List -->
+                            <div class="product-row-actions gooey-menu" style="position: relative; z-index: 10;">
+                                <input type="checkbox" id="gooey-chk-list-main" class="gooey-chk d-none">
+                                <div class="gooey-container">
+                                    <button type="button" class="gooey-item item-remove" data-bs-toggle="modal"
+                                            data-bs-target="#deleteShoppingListModal" aria-label="Delete list">
                                         <i class="bi bi-trash"></i>
-                                    </a>
-
-                                    <label class="shopping-checkbox-wrapper mb-0"
-                                           aria-label="Mark {{ item.product.name }} as bought">
-                                        <input type="checkbox" class="shopping-checkbox" data-item-id="{{ item.id }}"
-                                               {% if item.is_done %}checked{% endif %}>
-                                        <span class="shopping-checkmark"></span>
+                                    </button>
+                                    <button type="button" class="gooey-item item-edit" data-bs-toggle="modal"
+                                            data-bs-target="#editShoppingListModal" aria-label="Edit list">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <label class="gooey-main-btn" for="gooey-chk-list-main"
+                                           style="background: rgba(0,0,0,0.08);">
+                                        <i class="bi bi-three-dots-vertical"></i>
                                     </label>
                                 </div>
-                            </li>
-                        {% endfor %}
+                            </div>
 
-                    </ul>
-                </div>
-
-
-                <div class="d-flex justify-content-center mt-auto pt-3 pb-2 position-relative shopping-bottom-actions">
-
-                    <div class="gooey-menu shopping-gooey-menu">
-                        <input type="checkbox" id="gooey-chk-main" class="gooey-chk d-none">
-
-                        <div class="gooey-container">
-                            <button class="gooey-item item-add-product" aria-label="Add Product" data-bs-toggle="modal"
-                                    data-bs-target="#addProductModal">
-                                <i class="bi bi-basket2-fill"></i>
-                            </button>
-
-                            <button class="gooey-item item-add-list" aria-label="Add List" data-bs-toggle="modal"
-                                    data-bs-target="#createShoppingListModal">
-                                <i class="bi bi-card-checklist"></i>
-                            </button>
-
-                            <label class="gooey-main-btn" for="gooey-chk-main">
-                                <i class="bi bi-plus"></i>
-                            </label>
+                            <!-- Morph Menu for Adding Items -->
+                            <div class="areas-morph-anchor">
+                                <div class="t-morph" data-open="false">
+                                    <button type="button" class="t-morph-plus" aria-expanded="false"
+                                            aria-label="Quick actions">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5"
+                                                  stroke-linecap="round"></path>
+                                        </svg>
+                                    </button>
+                                    <nav class="t-morph-menu">
+                                        <button type="button" class="t-morph-menu-item" data-bs-toggle="modal"
+                                                data-bs-target="#addShoppingItemModal">
+                                            <i class="bi bi-plus-circle"></i> <span>Add item</span>
+                                        </button>
+                                        <button type="button" class="t-morph-menu-item" data-bs-toggle="modal"
+                                                data-bs-target="#createShoppingListModal">
+                                            <i class="bi bi-folder-plus"></i> <span>Add list</span>
+                                        </button>
+                                    </nav>
+                                </div>
+                            </div>
                         </div>
+                    </header>
 
-                        <span class="gooey-label label-left">Add product</span>
-                        <span class="gooey-label label-right">Create list</span>
+                    <svg width="0" height="0" class="position-absolute" style="visibility: hidden;">
+                        <defs>
+                            <filter id="goo" x="-200%" y="-100%" width="400%" height="300%">
+                                <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+                                <feColorMatrix in="blur" mode="matrix"
+                                               values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo"/>
+                                <feBlend in="SourceGraphic" in2="goo"/>
+                            </filter>
+                        </defs>
+                    </svg>
+
+                    <div class="area-carousel-viewport">
+                        <div class="area-carousel" id="listCarousel">
+                            {% for list in shopping_lists %}
+                                <div class="area-panel" data-title="{{ list.name }}" data-list-id="{{ list.id }}">
+                                    {% if list.items %}
+                                        <ul class="product-list">
+                                            {% for item in list.items %}
+                                                <li class="product-row {% if item.is_done %}is-completed{% endif %}"
+                                                    data-item-id="{{ item.id }}">
+                                                    <div class="d-flex align-items-center gap-3 min-w-0 flex-grow-1">
+                                                        <label class="shopping-checkbox-wrapper mb-0">
+                                                            <input type="checkbox" class="shopping-checkbox"
+                                                                   data-item-id="{{ item.id }}"
+                                                                   {% if item.is_done %}checked{% endif %}>
+                                                            <span class="shopping-checkmark"></span>
+                                                        </label>
+                                                        <div class="product-info">
+                                                            <span class="product-name">
+                                                                {% if item.product %}{{ item.product.name }}{% else %}
+                                                                    {{ item.name }}{% endif %}
+                                                            </span>
+                                                            <span class="product-exp">Qty: {{ item.quantity }}
+                                                                {% if item.unit %}
+                                                                    {{ item.unit.symbol }}{% endif %}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="product-row-actions gooey-menu">
+                                                        <input type="checkbox"
+                                                               id="gooey-chk-shop-{{ list.id }}-{{ forloop.counter }}"
+                                                               class="gooey-chk d-none">
+                                                        <div class="gooey-container">
+                                                            <button type="button" class="gooey-item item-remove"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#deleteShoppingItemModal"
+                                                                    data-item-id="{{ item.id }}"
+                                                                    aria-label="Remove item">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                            <button type="button" class="gooey-item item-edit"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#editShoppingItemModal"
+                                                                    data-item-id="{{ item.id }}"
+                                                                    data-item-qty="{{ item.quantity }}" data-item-unit="
+                                                                    {% if item.unit %}{{ item.unit.symbol }}{% endif %}"
+                                                                    aria-label="Edit item">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <label class="gooey-main-btn"
+                                                                   for="gooey-chk-shop-{{ list.id }}-{{ forloop.counter }}">
+                                                                <i class="bi bi-three-dots"></i>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="dashboard-empty-state">No items in this list yet.</p>
+                                    {% endif %}
+                                </div>
+                            {% empty %}
+                                <div class="area-panel">
+                                    <p class="dashboard-empty-state">No shopping lists found.</p>
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
 
-            </div>
-
-            <a href="{% if next_list_id %}?list_id={{ next_list_id }}{% else %}#{% endif %}"
-               class="btn-scroll-down carousel-arrow shopping-arrow-next d-none d-md-flex align-items-center justify-content-center text-decoration-none"
-               aria-label="Next list"
-               {% if not next_list_id %}style="pointer-events: none; opacity: 0.5;"{% endif %}>
-                <i class="bi bi-chevron-right"></i>
-            </a>
-
-        </section>
-
-        <!-- ========================================== -->
-        <!-- POP-UP: Edit Shopping List Name -->
-        <!-- ========================================== -->
-        <div class="modal fade" id="editShoppingListModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content custom-popup position-relative border-0">
-                    <button type="button"
-                            class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
-                            data-bs-dismiss="modal" aria-label="Close"></button>
-
-                    {% if shopping_list %}
-                        <form method="POST" action="{% url 'edit_shopping_list' shopping_list.id %}">
-                            {% csrf_token %}
-                            <div class="modal-body text-center p-4 p-md-5">
-                                <h3 class="popup-title mb-4 mt-2">Edit shopping list</h3>
-                                <div class="text-start mb-5">
-                                    <label for="editShoppingListName" class="form-label popup-label">Shopping list
-                                        name</label>
-                                    <input type="text" name="name" class="form-control popup-input shadow-none"
-                                           id="editShoppingListName" value="{{ shopping_list.name }}" required>
-                                </div>
-                                <button type="submit" class="popup-circular-btn mx-auto" id="saveShoppingListNameBtn">
-                                    <i class="bi bi-check-lg"></i>
-                                </button>
-                            </div>
-                        </form>
-                    {% endif %}
-                </div>
-            </div>
+                <button type="button" class="btn-scroll-down carousel-arrow carousel-arrow-next" id="listNext"
+                        aria-label="Next list">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </section>
         </div>
+    </main>
 
-        <div class="modal fade" id="createShoppingListModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content custom-popup position-relative border-0">
-                    <button type="button"
-                            class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
-                            data-bs-dismiss="modal" aria-label="Close"></button>
-
-                    <form method="POST" action="{% url 'create_shopping_list' %}">
+    <!-- Create Shopping List Modal -->
+    <div class="modal fade" id="createShoppingListModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup position-relative border-0">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-body text-center p-4 p-md-5">
+                    <h3 class="popup-title mb-4 mt-2">Create shopping list</h3>
+                    <form method="post" action="{% url 'create_shopping_list' %}" id="createShoppingListForm">
                         {% csrf_token %}
-                        <div class="modal-body text-center p-4 p-md-5">
-                            <h3 class="popup-title mb-4 mt-2">Create shopping list</h3>
-                            <div class="text-start mb-5">
-                                <label for="newShoppingListName" class="form-label popup-label">Shopping list
-                                    name</label>
-                                <input type="text" name="name" class="form-control popup-input shadow-none"
-                                       id="newShoppingListName" required>
-                            </div>
-                            <button type="submit" class="popup-circular-btn mx-auto">
-                                <i class="bi bi-plus"></i>
-                            </button>
+                        <div class="text-start mb-5">
+                            <label for="newShoppingListName" class="form-label popup-label">Shopping list name</label>
+                            <input type="text" name="name" class="form-control popup-input shadow-none"
+                                   id="newShoppingListName" placeholder="e.g. Groceries" required autocomplete="off">
                         </div>
+                        <button type="submit" class="popup-circular-btn mx-auto" aria-label="Create list"><i
+                                class="bi bi-plus"></i></button>
                     </form>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="modal fade" id="deleteShoppingListModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content custom-popup border-0">
-                    <div class="modal-body text-center p-4 p-md-5">
-                        <h3 class="popup-title mb-2">Are you sure to delete this list?</h3>
-                        <p class="popup-subtitle-light mb-5">All items there will be lost!</p>
-                        <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
-                                data-bs-dismiss="modal">
-                            Nah, just kidding
-                        </button>
-                        <hr class="popup-divider mx-auto mb-4">
-
-                        {% if shopping_list %}
-                            <form method="POST" action="{% url 'delete_shopping_list' shopping_list.id %}"
-                                  class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-link text-decoration-none popup-btn-danger">
-                                    Do it!
-                                </button>
-                            </form>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="deleteProductModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content custom-popup border-0">
-                    <div class="modal-body text-center p-4 p-md-5">
-                        <h3 class="popup-title mb-5 mt-2">Are you sure to delete <span id="deleteItemNameDisplay"
-                                                                                       class="text-primary"></span>?
-                        </h3>
-                        <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
-                                data-bs-dismiss="modal">Nah, just kidding
-                        </button>
-                        <hr class="popup-divider mx-auto mb-4">
-
-                        <form method="POST" action="{% url 'delete_shopping_item' %}" class="d-inline">
-                            {% csrf_token %}
-                            <input type="hidden" name="item_id" id="deleteItemIdHidden">
-                            <button type="submit" class="btn btn-link text-decoration-none popup-btn-danger">Do it!
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========================================== -->
-        <!-- POP-UP: Add Product to List -->
-        <!-- ========================================== -->
-        <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content custom-popup position-relative border-0">
-
-                    <button type="button"
-                            class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
-                            data-bs-dismiss="modal" aria-label="Close"></button>
-
-                    {% if shopping_list %}
-                        <form method="POST" action="{% url 'add_shopping_item' shopping_list.id %}">
-                            {% csrf_token %}
-                            <div class="modal-body text-center p-4 p-md-5">
-                                <h3 class="popup-title mb-4 mt-2">Add Product</h3>
-
-                                <div class="text-start mb-4">
-                                    <label for="newProductName" class="form-label popup-label">Product name</label>
-                                    <input type="text" name="product_name" class="form-control popup-input shadow-none"
-                                           id="newProductName"
-                                           list="productOptions" placeholder="Type or select..." required>
-
-                                    <datalist id="productOptions">
-                                        <option value="Milk">
-                                        <option value="Cottage cheese">
-                                        <option value="Pasta">
-                                        <option value="Tomatoes">
-                                        <option value="Potatoes">
-                                    </datalist>
-                                </div>
-
-                                <div class="row g-2 mb-5">
-                                    <div class="col-6 text-start">
-                                        <label for="newProductQty" class="form-label popup-label">Quantity</label>
-                                    </div>
-                                    <div class="col-6 text-start">
-                                        <label for="newProductUnit" class="form-label popup-label">Unit</label>
-                                    </div>
-                                    <div class="col-12 mt-0">
-                                        <div class="fused-input-group d-flex align-items-stretch">
-                                            <input type="number" name="quantity" class="form-control shadow-none w-50"
-                                                   id="newProductQty"
-                                                   min="0.1" step="0.1" placeholder="0.0" required>
-
-                                            <div class="fused-input-divider"></div>
-
-                                            <div class="dropdown w-50">
-                                                <input type="hidden" name="unit_symbol" id="hiddenUnitSymbol"
-                                                       value="psc">
-
-                                                <button class="btn dropdown-toggle w-100 h-100 text-start d-flex justify-content-between align-items-center shadow-none fused-dropdown-btn"
-                                                        type="button"
-                                                        data-bs-toggle="dropdown"
-                                                        aria-expanded="false">
-                                                    <span id="selectedUnitText">psc</span>
-                                                </button>
-
-                                                <ul class="dropdown-menu custom-dropdown-menu w-100">
-                                                    {% for unit in available_units %}
-                                                        <li>
-                                                            <a class="dropdown-item" href="#"
-                                                               onclick="document.getElementById('selectedUnitText').innerText='{{ unit.symbol }}'; document.getElementById('hiddenUnitSymbol').value='{{ unit.symbol }}'; return false;">
-                                                                {{ unit.symbol }}
-                                                                {% if unit.is_global %}
-                                                                    <small class="text-muted opacity-50 ms-1">(Global)</small>{% endif %}
-                                                            </a>
-                                                        </li>
-                                                    {% endfor %}
-
-                                                    <li>
-                                                        <hr class="dropdown-divider">
-                                                    </li>
-
-                                                    <!-- Link wywołujący modal do stworzenia własnej jednostki -->
-                                                    <li>
-                                                        <a class="dropdown-item text-primary fw-medium" href="#"
-                                                           data-bs-toggle="modal" data-bs-target="#createUnitModal">
-                                                            <i class="bi bi-plus-circle me-1"></i> Don't see your unit?
-                                                            Create it!
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <button type="submit" class="popup-circular-btn mx-auto">
-                                    <i class="bi bi-plus"></i>
-                                </button>
-                            </div>
-                        </form>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content custom-popup position-relative border-0">
-                    <button type="button"
-                            class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
-                            data-bs-dismiss="modal" aria-label="Close"></button>
-
-                    <form method="POST" action="{% url 'edit_shopping_item' %}">
+    <!-- Edit Shopping List Modal -->
+    <div class="modal fade" id="editShoppingListModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup position-relative border-0">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-body text-center p-4 p-md-5">
+                    <h3 class="popup-title mb-4 mt-2">Edit shopping list</h3>
+                    <form method="post" action="{% url 'edit_shopping_list' 0 %}" id="editShoppingListForm">
                         {% csrf_token %}
-                        <input type="hidden" name="item_id" id="editItemIdHidden">
+                        <div class="text-start mb-5">
+                            <label for="editShoppingListName" class="form-label popup-label">New list name</label>
+                            <input type="text" name="name" class="form-control popup-input shadow-none"
+                                   id="editShoppingListName" required autocomplete="off">
+                        </div>
+                        <button type="submit" class="popup-circular-btn mx-auto" aria-label="Save name"><i
+                                class="bi bi-check-lg"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                        <div class="modal-body text-center p-4 p-md-5">
-                            <h3 class="popup-title mb-4 mt-2">Edit shopping list item</h3>
+    <!-- Delete Shopping List Modal -->
+    <div class="modal fade" id="deleteShoppingListModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup border-0">
+                <div class="modal-body text-center p-4 p-md-5">
+                    <h3 class="popup-title mb-2">Are you sure to delete this list?</h3>
+                    <p class="popup-subtitle-light mb-5">All items there will be lost!</p>
+                    <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                            data-bs-dismiss="modal">Nah, just kidding
+                    </button>
+                    <hr class="popup-divider mx-auto mb-4">
+                    <form method="post" action="{% url 'delete_shopping_list' 0 %}" id="deleteShoppingListForm">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link text-decoration-none popup-btn-danger">Do it!</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                            <div class="text-start mb-4">
-                                <label for="editProductName" class="form-label popup-label">Product name</label>
-                                <input type="text" name="product_name" class="form-control popup-input shadow-none"
-                                       id="editProductName" list="editProductOptions" required>
+    <!-- Add Shopping Item Modal -->
+    <div class="modal fade" id="addShoppingItemModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup position-relative border-0">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                <form method="POST" action="{% url 'add_shopping_item' 0 %}" id="addShoppingItemForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="list_id" id="activeListIdHidden">
+                    <div class="modal-body text-center p-4 p-md-5">
+                        <h3 class="popup-title mb-4 mt-2">Add Product</h3>
+                        <div class="text-start mb-4 px-1">
+                            <label for="newProductName" class="form-label popup-label">Product name</label>
+                            <input type="text" name="product_name" class="form-control popup-input shadow-none"
+                                   id="newProductName" list="productOptions" placeholder="Type or select..." required>
+                            <datalist id="productOptions">
+                                <option value="Milk">
+                                <option value="Cottage cheese">
+                                <option value="Pasta">
+                                <option value="Tomatoes">
+                                <option value="Potatoes">
+                            </datalist>
+                        </div>
+                        <div class="row g-2 mx-0 mb-5">
+                            <div class="col-6 text-start px-1">
+                                <label for="newProductQty" class="form-label popup-label">Quantity</label>
                             </div>
-
-                            <div class="row g-2 mb-5">
-                                <div class="col-6 text-start"><label for="editProductQty"
-                                                                     class="form-label popup-label">Quantity</label>
-                                </div>
-                                <div class="col-6 text-start"><label class="form-label popup-label">Unit</label></div>
-                                <div class="col-12 mt-0">
-                                    <div class="fused-input-group d-flex align-items-stretch">
-                                        <input type="number" name="quantity" class="form-control shadow-none w-50"
-                                               id="editProductQty" min="0.1" step="0.1" required>
-                                        <div class="fused-input-divider"></div>
-                                        <div class="dropdown w-50">
-                                            <input type="hidden" name="unit_symbol" id="editHiddenUnitSymbol">
-                                            <button class="btn dropdown-toggle w-100 h-100 text-start d-flex justify-content-between align-items-center shadow-none fused-dropdown-btn"
-                                                    type="button" data-bs-toggle="dropdown">
-                                                <span id="editSelectedUnitText">szt</span>
-                                            </button>
-                                            <ul class="dropdown-menu custom-dropdown-menu w-100">
-                                                {% for unit in available_units %}
-                                                    <li>
-                                                        <a class="dropdown-item" href="#"
-                                                           onclick="document.getElementById('selectedUnitText').innerText='{{ unit.symbol }}'; document.getElementById('hiddenUnitSymbol').value='{{ unit.symbol }}'; return false;">
-                                                            {{ unit.symbol }}
-                                                            {% if unit.is_global %}
-                                                                <small class="text-muted opacity-50 ms-1">(Global)</small>{% endif %}
-                                                        </a>
-                                                    </li>
-                                                {% endfor %}
-
+                            <div class="col-6 text-start px-1">
+                                <label class="form-label popup-label">Unit</label>
+                            </div>
+                            <div class="col-12 mt-0 px-1">
+                                <div class="fused-input-group d-flex align-items-stretch">
+                                    <input type="number" name="quantity" class="form-control shadow-none w-50"
+                                           id="newProductQty" min="0.1" step="0.1" placeholder="0.0" required>
+                                    <div class="fused-input-divider"></div>
+                                    <div class="dropdown w-50">
+                                        <input type="hidden" name="unit_symbol" id="hiddenUnitSymbol" value="psc">
+                                        <button class="btn dropdown-toggle w-100 h-100 text-start d-flex justify-content-between align-items-center shadow-none fused-dropdown-btn"
+                                                type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span id="selectedUnitText">psc</span>
+                                        </button>
+                                        <ul class="dropdown-menu custom-dropdown-menu w-100">
+                                            {% for unit in available_units %}
                                                 <li>
-                                                    <hr class="dropdown-divider">
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item text-primary fw-medium" href="#"
-                                                       data-bs-toggle="modal" data-bs-target="#createUnitModal">
-                                                        <i class="bi bi-plus-circle me-1"></i> Don't see your unit?
-                                                        Create it!
+                                                    <a class="dropdown-item" href="#"
+                                                       onclick="document.getElementById('selectedUnitText').innerText='{{ unit.symbol }}'; document.getElementById('hiddenUnitSymbol').value='{{ unit.symbol }}'; return false;">
+                                                        {{ unit.symbol }}
+                                                        {% if unit.is_global %}
+                                                            <small class="text-muted opacity-50 ms-1">(Global)</small>{% endif %}
                                                     </a>
                                                 </li>
-                                            </ul>
-                                        </div>
+                                            {% endfor %}
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item text-primary fw-medium" href="#"
+                                                   data-bs-toggle="modal" data-bs-target="#createUnitModal">
+                                                    <i class="bi bi-plus-circle me-1"></i> Create unit
+                                                </a>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="popup-circular-btn mx-auto"><i class="bi bi-check-lg"></i>
-                            </button>
                         </div>
+                        <button type="submit" class="popup-circular-btn mx-auto">
+                            <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+  <!-- Edit Shopping Item Modal -->
+<div class="modal fade" id="editShoppingItemModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content custom-popup position-relative border-0">
+            <button type="button" class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+            <form method="POST" action="{% url 'edit_shopping_item' %}" id="editShoppingItemForm">
+                {% csrf_token %}
+                <input type="hidden" name="item_id" id="editItemIdHidden">
+                <div class="modal-body text-center p-4 p-md-5">
+                    <h3 class="popup-title mb-4 mt-2">Edit shopping list item</h3>
+                    <div class="text-start mb-4 px-1">
+                        <label for="editProductName" class="form-label popup-label">Product name</label>
+                        <input type="text" name="product_name" class="form-control popup-input shadow-none" id="editProductName" required>
+                    </div>
+                    <div class="row g-2 mx-0 mb-5">
+                        <div class="col-6 text-start px-1"><label for="editProductQty" class="form-label popup-label">Quantity</label></div>
+                        <div class="col-6 text-start px-1"><label class="form-label popup-label">Unit</label></div>
+                        <div class="col-12 mt-0 px-1">
+                            <div class="fused-input-group d-flex align-items-stretch">
+                                <input type="number" name="quantity" class="form-control shadow-none w-50 border-0 bg-transparent" id="editProductQty" min="0.1" step="0.1" required style="padding: 0.5rem 1rem; color: inherit;">
+                                <div class="fused-input-divider my-2"></div>
+                                <div class="dropdown w-50">
+                                    <input type="hidden" name="unit_symbol" id="editHiddenUnitSymbol">
+                                    <button class="btn dropdown-toggle w-100 h-100 text-start d-flex justify-content-between align-items-center shadow-none fused-dropdown-btn border-0 bg-transparent" type="button" data-bs-toggle="dropdown" style="padding: 0.5rem 1rem; color: inherit;">
+                                        <span id="editSelectedUnitText">psc</span>
+                                    </button>
+                                    <ul class="dropdown-menu custom-dropdown-menu w-100">
+                                        {% for unit in available_units %}
+                                            <li>
+                                                <a class="dropdown-item" href="#" onclick="document.getElementById('editSelectedUnitText').innerText='{{ unit.symbol }}'; document.getElementById('editHiddenUnitSymbol').value='{{ unit.symbol }}'; return false;">
+                                                    {{ unit.symbol }}
+                                                </a>
+                                            </li>
+                                        {% endfor %}
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item text-primary fw-medium" href="#" data-bs-toggle="modal" data-bs-target="#createUnitModal">
+                                                <i class="bi bi-plus-circle me-1"></i> Create unit
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="popup-circular-btn mx-auto"><i class="bi bi-check-lg"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+    <!-- Delete Shopping Item Modal -->
+    <div class="modal fade" id="deleteShoppingItemModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup border-0">
+                <div class="modal-body text-center p-4 p-md-5">
+                    <h3 class="popup-title mb-5 mt-2">Are you sure to delete this item?</h3>
+                    <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                            data-bs-dismiss="modal">Nah, just kidding
+                    </button>
+                    <hr class="popup-divider mx-auto mb-4">
+                    <form method="POST" action="{% url 'delete_shopping_item' %}" class="d-inline"
+                          id="deleteShoppingItemForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="item_id" id="deleteItemIdHidden">
+                        <button type="submit" class="btn btn-link text-decoration-none popup-btn-danger">Do it!</button>
                     </form>
                 </div>
             </div>
         </div>
+    </div>
 
         <!-- ========================================== -->
         <!-- POP-UP: Create Custom Unit -->
@@ -488,4 +435,40 @@
             </div>
         </div>
     </main>
+    <!-- Dynamic List ID Fix for 404 Error -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const forms = ['addShoppingItemForm', 'editShoppingListForm', 'deleteShoppingListForm'];
+            forms.forEach(formId => {
+                const form = document.getElementById(formId);
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        // Find the currently active panel to grab its List ID
+                        const viewport = document.querySelector('.area-carousel-viewport');
+                        const panels = document.querySelectorAll('#listCarousel .area-panel');
+                        let activeListId = '0';
+
+                        if (panels.length > 0 && viewport) {
+                            const viewportCenter = viewport.getBoundingClientRect().left + (viewport.getBoundingClientRect().width / 2);
+                            let minDiff = Infinity;
+
+                            panels.forEach(p => {
+                                const rect = p.getBoundingClientRect();
+                                const center = rect.left + (rect.width / 2);
+                                const diff = Math.abs(viewportCenter - center);
+                                if (diff < minDiff) {
+                                    minDiff = diff;
+                                    activeListId = p.getAttribute('data-list-id');
+                                }
+                            });
+                        }
+                        // Swap out the '0' in the URL with the real active list ID
+                        if (activeListId !== '0') {
+                            this.action = this.action.replace('/0/', '/' + activeListId + '/');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 {% endblock %}

@@ -185,6 +185,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 panel.appendChild(item);
             });
+
+            if (isUnitPicker) {
+                const divider = document.createElement('div');
+                divider.className = 'picker-divider';
+                panel.appendChild(divider);
+
+                const customItem = document.createElement('button');
+                customItem.type = 'button';
+                customItem.className = 'picker-option picker-option-custom';
+                customItem.innerHTML = '<i class="bi bi-plus me-1"></i>Other unit...';
+                customItem.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const newUnit = prompt('Enter unit (e.g. pcs, jar, box, slice):');
+                    if (newUnit && newUnit.trim()) {
+                        const val = newUnit.trim();
+                        let existing = Array.from(selectEl.options).find(o => o.value.toLowerCase() === val.toLowerCase());
+                        if (!existing) {
+                            existing = document.createElement('option');
+                            existing.value = val;
+                            existing.textContent = val;
+                            selectEl.appendChild(existing);
+                        }
+                        selectEl.value = existing.value;
+                        selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+                        syncLabel();
+                        closePanel();
+                    }
+                });
+                panel.appendChild(customItem);
+            }
         }
 
         function openPanel() {

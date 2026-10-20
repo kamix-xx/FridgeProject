@@ -1,16 +1,7 @@
 /**
- * shopping_list.js
- *
- * Handles:
- * - Dynamic checkbox toggling with strikethrough & styling
- * - Per-item success pop/glow effect
- * - Full confetti celebration + banner when all items are checked
- * - Header gooey menu outside-click & edit/delete list modal wiring
- * - Row edit & delete modal pre-filling
+ * static/js/shopping_list.js
  */
-
-(function () {
-    'use strict';
+document.addEventListener('DOMContentLoaded', () => {
 
     /* =========================================================================
        1. Pure Canvas Confetti Engine
@@ -21,32 +12,19 @@
         let animationId = null;
         let particles = [];
 
-        const COLORS = [
-            '#ff9166', '#e0541d', '#ffd275', '#6fcf3d',
-            '#38bdf8', '#f43f5e', '#a855f7', '#ffffff'
-        ];
+        const COLORS = ['#ff9166', '#e0541d', '#ffd275', '#6fcf3d', '#38bdf8', '#f43f5e', '#a855f7', '#ffffff'];
 
         function createParticle(originX, originY, angleRad, spreadRad) {
             const angle = angleRad + (Math.random() - 0.5) * spreadRad;
             const velocity = 14 + Math.random() * 16;
             const color = COLORS[Math.floor(Math.random() * COLORS.length)];
             const size = 6 + Math.random() * 6;
-            const isCircle = Math.random() > 0.7;
-
             return {
-                x: originX,
-                y: originY,
-                vx: Math.cos(angle) * velocity,
-                vy: Math.sin(angle) * velocity,
-                size: size,
-                color: color,
-                isCircle: isCircle,
-                rotation: Math.random() * 360,
-                rotationSpeed: (Math.random() - 0.5) * 12,
-                wobble: Math.random() * 10,
-                wobbleSpeed: 0.1 + Math.random() * 0.1,
-                alpha: 1,
-                decay: 0.008 + Math.random() * 0.008,
+                x: originX, y: originY, vx: Math.cos(angle) * velocity, vy: Math.sin(angle) * velocity,
+                size: size, color: color, isCircle: Math.random() > 0.7,
+                rotation: Math.random() * 360, rotationSpeed: (Math.random() - 0.5) * 12,
+                wobble: Math.random() * 10, wobbleSpeed: 0.1 + Math.random() * 0.1,
+                alpha: 1, decay: 0.008 + Math.random() * 0.008,
             };
         }
 
@@ -54,40 +32,25 @@
             if (!canvas) {
                 canvas = document.createElement('canvas');
                 canvas.id = 'shopping-confetti-canvas';
-                canvas.style.position = 'fixed';
-                canvas.style.top = '0';
-                canvas.style.left = '0';
-                canvas.style.width = '100vw';
-                canvas.style.height = '100vh';
-                canvas.style.pointerEvents = 'none';
-                canvas.style.zIndex = '99999';
+                canvas.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:99999;';
                 document.body.appendChild(canvas);
                 ctx = canvas.getContext('2d');
             }
-            resizeCanvas();
-        }
-
-        function resizeCanvas() {
-            if (!canvas) return;
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = window.innerWidth * dpr;
-            canvas.height = window.innerHeight * dpr;
-            ctx.scale(dpr, dpr);
+            if (canvas.width !== window.innerWidth) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
         }
 
         function updateAndDraw() {
             ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
             for (let i = particles.length - 1; i >= 0; i--) {
                 const p = particles[i];
-
-                // Physics
                 p.vx *= 0.985;
                 p.vy *= 0.985;
-                p.vy += 0.38; // Gravity
+                p.vy += 0.38;
                 p.x += p.vx;
                 p.y += p.vy;
-
                 p.rotation += p.rotationSpeed;
                 p.wobble += p.wobbleSpeed;
                 p.alpha -= p.decay;
@@ -101,191 +64,29 @@
                 ctx.globalAlpha = Math.max(0, p.alpha);
                 ctx.translate(p.x, p.y);
                 ctx.rotate((p.rotation * Math.PI) / 180);
-
-                const scaleX = Math.cos(p.wobble);
-                ctx.scale(scaleX, 1);
-
+                ctx.scale(Math.cos(p.wobble), 1);
                 ctx.fillStyle = p.color;
-
-                if (p.isCircle) {
-                    ctx.beginPath();
-                    ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
-                    ctx.fill();
-                } else {
-                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 1.3);
-                }
-
+                p.isCircle ? (ctx.beginPath(), ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2), ctx.fill()) : ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 1.3);
                 ctx.restore();
             }
-
-            if (particles.length > 0) {
-                animationId = requestAnimationFrame(updateAndDraw);
-            } else {
-                cancelAnimationFrame(animationId);
-                animationId = null;
-                ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-            }
+            particles.length > 0 ? animationId = requestAnimationFrame(updateAndDraw) : (cancelAnimationFrame(animationId), animationId = null, ctx.clearRect(0, 0, window.innerWidth, window.innerHeight));
         }
 
         function launch(count = 140) {
             ensureCanvas();
-
-            const leftX = window.innerWidth * 0.15;
-            const rightX = window.innerWidth * 0.85;
-            const originY = window.innerHeight * 0.75;
-
-            // Cannon from bottom left (shooting up-right)
-            for (let i = 0; i < count / 2; i++) {
-                particles.push(createParticle(leftX, originY, -Math.PI / 3, Math.PI / 4));
-            }
-
-            // Cannon from bottom right (shooting up-left)
-            for (let i = 0; i < count / 2; i++) {
-                particles.push(createParticle(rightX, originY, (-2 * Math.PI) / 3, Math.PI / 4));
-            }
-
-            // Center fountain
-            for (let i = 0; i < count / 4; i++) {
-                particles.push(createParticle(window.innerWidth * 0.5, originY + 40, -Math.PI / 2, Math.PI / 3));
-            }
-
-            if (!animationId) {
-                animationId = requestAnimationFrame(updateAndDraw);
-            }
+            const lX = window.innerWidth * 0.15, rX = window.innerWidth * 0.85, oY = window.innerHeight * 0.75;
+            for (let i = 0; i < count / 2; i++) particles.push(createParticle(lX, oY, -Math.PI / 3, Math.PI / 4));
+            for (let i = 0; i < count / 2; i++) particles.push(createParticle(rX, oY, (-2 * Math.PI) / 3, Math.PI / 4));
+            for (let i = 0; i < count / 4; i++) particles.push(createParticle(window.innerWidth * 0.5, oY + 40, -Math.PI / 2, Math.PI / 3));
+            if (!animationId) animationId = requestAnimationFrame(updateAndDraw);
         }
 
-        window.addEventListener('resize', resizeCanvas);
-
-        return { launch };
+        return {launch};
     })();
 
-
     /* =========================================================================
-       2. Shopping List Logic
+       2. AJAX Checkbox & Toast Logic
        ========================================================================= */
-    document.addEventListener('DOMContentLoaded', function () {
-        const checkboxes = document.querySelectorAll('.shopping-checkbox');
-        const completeBanner = document.getElementById('shoppingCompleteBanner');
-
-        function checkAllComplete() {
-            const allBoxes = document.querySelectorAll('.shopping-checkbox');
-            if (allBoxes.length === 0) return false;
-            const checkedBoxes = document.querySelectorAll('.shopping-checkbox:checked');
-            return allBoxes.length === checkedBoxes.length;
-        }
-
-        function updateCompletionBanner(isComplete, isUserAction = false) {
-            if (!completeBanner) return;
-
-            if (isComplete) {
-                completeBanner.classList.remove('d-none');
-                completeBanner.classList.add('banner-visible');
-                if (isUserAction) {
-                    Confetti.launch(150);
-                }
-            } else {
-                completeBanner.classList.add('d-none');
-                completeBanner.classList.remove('banner-visible');
-            }
-        }
-
-        // Initialize rows based on current checkbox state
-        checkboxes.forEach(function (chk) {
-            const row = chk.closest('.product-row');
-            if (!row) return;
-
-            if (chk.checked) {
-                row.classList.add('is-completed');
-            } else {
-                row.classList.remove('is-completed');
-            }
-
-            chk.addEventListener('change', function () {
-                const wasChecked = chk.checked;
-                if (wasChecked) {
-                    row.classList.add('is-completed');
-                    row.classList.add('row-just-checked');
-
-                    // Remove transient animation class once finished
-                    setTimeout(function () {
-                        row.classList.remove('row-just-checked');
-                    }, 650);
-
-                    // Check if this was the last product crossed out!
-                    if (checkAllComplete()) {
-                        updateCompletionBanner(true, true);
-                    }
-                } else {
-                    row.classList.remove('is-completed');
-                    row.classList.remove('row-just-checked');
-                    updateCompletionBanner(false, true);
-                }
-            });
-        });
-
-        // Initial completion banner check
-        if (checkAllComplete()) {
-            updateCompletionBanner(true, false);
-        }
-
-        /* =========================================================================
-           3. Row Modals (Edit & Delete Wiring)
-           ========================================================================= */
-        const editProductModal = document.getElementById('editProductModal');
-        if (editProductModal) {
-            editProductModal.addEventListener('show.bs.modal', function (event) {
-                const trigger = event.relatedTarget;
-                if (!trigger) return;
-
-                const name = trigger.getAttribute('data-item-name') || '';
-                const qty = trigger.getAttribute('data-item-quantity') || '';
-                const unit = trigger.getAttribute('data-item-unit') || '';
-
-                const nameInput = document.getElementById('editProductName');
-                const qtyInput = document.getElementById('editProductQty');
-                const unitText = document.getElementById('editSelectedUnitText');
-
-                if (nameInput && name) nameInput.value = name;
-                if (qtyInput && qty) qtyInput.value = qty;
-                if (unitText && unit) unitText.innerText = unit;
-            });
-        }
-
-        const deleteProductModal = document.getElementById('deleteProductModal');
-        if (deleteProductModal) {
-            deleteProductModal.addEventListener('show.bs.modal', function (event) {
-                const trigger = event.relatedTarget;
-                if (!trigger) return;
-
-                const name = trigger.getAttribute('data-item-name');
-                const titleEl = deleteProductModal.querySelector('.popup-title');
-                if (titleEl && name) {
-                    titleEl.textContent = `Are you sure to delete ${name}?`;
-                }
-            });
-        }
-
-        /* =========================================================================
-           4. Header Gooey Menu & Edit List Modal Wiring
-           ========================================================================= */
-        const saveListBtn = document.getElementById('saveShoppingListNameBtn');
-        const listNameInput = document.getElementById('editShoppingListName');
-        const listTitle = document.getElementById('shoppingListTitle');
-
-        if (saveListBtn && listNameInput && listTitle) {
-            saveListBtn.addEventListener('click', function () {
-                const newName = listNameInput.value.trim();
-                if (newName) {
-                    listTitle.textContent = newName;
-                }
-            });
-        }
-    });
-})();
-
-document.addEventListener('DOMContentLoaded', function() {
-
-    // Obsługa ukrytego zapisu Checkboxów (AJAX / Fetch)
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -301,56 +102,83 @@ document.addEventListener('DOMContentLoaded', function() {
         return cookieValue;
     }
 
-    document.querySelectorAll('.shopping-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-            const itemId = this.getAttribute('data-item-id');
-            const isDone = this.checked;
+    const csrftoken = getCookie('csrftoken');
 
-            fetch(`/shopping-list/item/toggle/${itemId}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({ is_done: isDone })
-            }).then(response => {
-                if (response.ok) {
-                    const row = this.closest('.product-row');
-                    if (isDone) row.classList.add('is-completed');
-                    else row.classList.remove('is-completed');
-                } else {
-                    this.checked = !isDone;
+    document.addEventListener('change', (e) => {
+        const checkbox = e.target.closest('.shopping-checkbox');
+        if (!checkbox) return;
+
+        const row = checkbox.closest('.product-row');
+        const nameEl = row ? row.querySelector('.product-name') : null;
+        const isChecked = checkbox.checked;
+
+        // Visual UI Update
+        if (row) row.classList.toggle('is-completed', isChecked);
+        if (nameEl) {
+            nameEl.classList.toggle('text-decoration-line-through', isChecked);
+            nameEl.classList.toggle('opacity-50', isChecked);
+        }
+
+        // Scoped Completion Check (Only evaluates the list this item belongs to)
+        if (isChecked) {
+            if (row) {
+                row.classList.add('row-just-checked');
+                setTimeout(() => row.classList.remove('row-just-checked'), 650);
+            }
+
+            const activePanel = checkbox.closest('.area-panel');
+            if (activePanel) {
+                const allBoxes = activePanel.querySelectorAll('.shopping-checkbox');
+                const checkedBoxes = activePanel.querySelectorAll('.shopping-checkbox:checked');
+
+                if (allBoxes.length > 0 && allBoxes.length === checkedBoxes.length) {
+                    Confetti.launch(150);
+                    const toastEl = document.getElementById('completionToast');
+                    if (toastEl && window.bootstrap) {
+                        const toast = new bootstrap.Toast(toastEl, {delay: 4000});
+                        toast.show();
+                    }
                 }
-            }).catch(error => {
-                console.error("Błąd przy zapisie stanu:", error);
-                this.checked = !isDone;
-            });
+            }
+        }
+
+        // AJAX Update
+        const itemId = checkbox.dataset.itemId;
+        if (!itemId) return;
+
+        fetch(`/shopping-list/item/toggle/${itemId}/`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrftoken},
+            body: JSON.stringify({is_done: isChecked})
+        }).catch(err => console.log('Sync err:', err));
+    });
+});
+
+/* =========================================================================
+   3. Modal Pre-filling
+   ========================================================================= */
+const fillModal = (modalId, inputs) => {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.addEventListener('show.bs.modal', (e) => {
+        const btn = e.relatedTarget;
+        if (!btn) return;
+        inputs.forEach(i => {
+            const el = modal.querySelector(i.selector);
+            if (el) i.isText ? el.textContent = btn.dataset[i.data] || '' : el.value = btn.dataset[i.data] || '';
         });
     });
+};
 
-    // Wstrzykiwanie danych do modala Edycji
-    const editModal = document.getElementById('editProductModal');
-    if (editModal) {
-        editModal.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
+fillModal('deleteShoppingItemModal', [
+    {selector: '#deleteShoppingItemId', data: 'itemId'},
+    {selector: '#deleteShoppingItemName', data: 'itemName', isText: true},
+    {selector: '#deleteItemIdHidden', data: 'itemId'}
+]);
 
-            document.getElementById('editItemIdHidden').value = button.getAttribute('data-item-id');
-            document.getElementById('editProductName').value = button.getAttribute('data-item-name');
-            document.getElementById('editProductQty').value = button.getAttribute('data-item-quantity');
-
-            const unit = button.getAttribute('data-item-unit');
-            document.getElementById('editHiddenUnitSymbol').value = unit;
-            document.getElementById('editSelectedUnitText').innerText = unit;
-        });
-    }
-
-    // Wstrzykiwanie danych do modala Usuwania
-    const deleteModal = document.getElementById('deleteProductModal');
-    if (deleteModal) {
-        deleteModal.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
-            document.getElementById('deleteItemIdHidden').value = button.getAttribute('data-item-id');
-            document.getElementById('deleteItemNameDisplay').innerText = button.getAttribute('data-item-name');
-        });
-    }
-});
+fillModal('editShoppingItemModal', [
+    {selector: '#editItemIdHidden', data: 'itemId'},
+    {selector: '#editProductName', data: 'itemName'},
+    {selector: '#editProductQty', data: 'itemQty'},
+    {selector: '#editHiddenUnitSymbol', data: 'itemUnit'},
+    {selector: '#editSelectedUnitText', data: 'itemUnit', isText: true}
+]);

@@ -35,10 +35,13 @@ urlpatterns = [
     path('areas', views.areas, name='areas'),
     path('areas/create/', views.create_area, name='create_area'),
     path('areas/join/', views.join_area, name='join_area'),
+    # Aliases to match modals:
+    path('areas/create/', views.create_area, name='api_add_area'),
+    path('areas/join/', views.join_area, name='api_join_area'),
+
     path('areas/edit/', views.edit_area, name='edit_area'),
     path('areas/delete/', views.delete_area, name='delete_area'),
     path('profile/delete', views.delete_account, name='delete_account'),
-    path('areas', views.areas, name='areas'),
 
     # Expenses:
     path('expenses', views.expenses, name='expenses'),
@@ -47,6 +50,9 @@ urlpatterns = [
     # Shopping lists:
     path('shopping-list/', views.shopping_list_view, name='shopping_list'),
     path('shopping-list/create/', views.create_shopping_list, name='create_shopping_list'),
+    # Alias to match modals:
+    path('shopping-list/create/', views.create_shopping_list, name='api_create_shopping_list'),
+
     path('shopping-list/<int:list_id>/edit/', views.edit_shopping_list, name='edit_shopping_list'),
     path('shopping-list/<int:list_id>/delete/', views.delete_shopping_list, name='delete_shopping_list'),
     path('shopping-list/<int:list_id>/add-item/', views.add_shopping_item, name='add_shopping_item'),
@@ -55,15 +61,16 @@ urlpatterns = [
     path('shopping-list/item/delete/', views.delete_shopping_item, name='delete_shopping_item'),
     path('units/create/', views.create_unit, name='create_unit'),
 
+    # Products (Added api_add_product alias to prevent NoReverseMatch, point to your product creation view when ready):
+    path('products/add/', views.home, name='api_add_product'), # Replace views.home with your actual product add view if you have one
+
     # Recipes:
     path('recipes/', views.recipes, name='recipes'),
     path('recipes/<int:recipe_id>/', views.recipe_detail, name='recipe_detail'),
-    # Pamiętaj, że add_step przyjmuje recipe_id, a edit_step przyjmuje step_id
     path('recipes/<int:recipe_id>/add-step/', views.add_step, name='add_step'),
     path('steps/<int:step_id>/edit/', views.edit_step, name='edit_step'),
     path('recipes/create/', views.create_recipe, name='create_recipe'),
     path('recipes/<int:recipe_id>/edit_recipe/', views.edit_recipe, name='edit_recipe'),
-    path('recipes/<int:recipe_id>/', views.recipe_detail, name='recipe_detail'),
     path('recipes/<int:recipe_id>/delete/', views.delete_recipe, name='delete_recipe'),
     path('steps/<int:step_id>/delete/', views.delete_step, name='delete_step'),
     path('recipes/<int:recipe_id>/send-to-verify/', views.send_recipe_for_verification,
