@@ -12,6 +12,8 @@ from django.db.models import Q, RestrictedError
 from .forms import CustomUserCreationForm
 import json
 import uuid
+import openfoodfacts
+from django.http import JsonResponse
 
 USE_FAKE_DASHBOARD_DATA = False
 
@@ -1141,3 +1143,57 @@ def admin_delete_unit(request):
                     f'Cannot delete "{unit.symbol}". It is currently used by users in their recipes or shopping lists.'
                 )
     return redirect('admin_panel')
+
+
+@login_required(login_url='login')
+def openfoodfacts_search(request):
+    query = request.GET.get('q', '').strip()
+
+    if len(query) < 3:
+        return JsonResponse({'results': []})
+
+    try:
+        api = openfoodfacts.API(user_agent="SmartFridgePlus/1.0")
+
+        response = api.product.text_search(query, page_size=40, sort_by="unique_scans_n")
+        products_data = response.get('products', [])
+
+        raw_results = []
+        seen_names = set()
+
+        for p in products_data:
+            name = p.get('product_name_pl') or p.get('product_name') or p.get('product_name_en')
+            brand = p.get('brands', '').split(',')[0].strip()
+
+            if name:
+                name = name.strip()
+                name_lower = name.lower()
+
+
+                if name_lower not in seen_names:
+                    seen_names.add(name_lower)
+
+                    raw_results.append({
+                        'name': name.capitalize(),
+                        'brand': brand.capitalize() if brand else '',
+                        'barcode': p.get('code', ''),
+                        'image_url': p.get('image_front_thumb_url', '')
+                    })
+
+        # 2. SORTOWANIE ZAAWANSOWANE (Punktacja jakości wpisu)
+        raw_results.sort(key=lambda x: (
+            0 if x['image_url'] else 1,
+            0 if x['brand'] else 1,
+            len(x['name'])
+        ))
+
+        # 8 wyników
+        best_results = raw_results[:8]
+
+        return JsonResponse({'results': best_results})
+
+    except Exception as e:
+        print(f"OpenFoodFacts API Error (ignored): {e}")
+        # Taki myk by nie zwracało co chwilę błędów, tylko pustą listę
+        return JsonResponse({'results': []})
+

@@ -63,6 +63,7 @@ urlpatterns = [
 
     # Products (Added api_add_product alias to prevent NoReverseMatch, point to your product creation view when ready):
     path('products/add/', views.home, name='api_add_product'), # Replace views.home with your actual product add view if you have one
+    path('api/off-search/', views.openfoodfacts_search, name='openfoodfacts_search'),
 
     # Recipes:
     path('recipes/', views.recipes, name='recipes'),
