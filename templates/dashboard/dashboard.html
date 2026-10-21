@@ -25,6 +25,19 @@
     {% include "partials/background_images.html" %}
 
     <main class="dashboard-page">
+    <!-- SVG Filter for the Gooey Effect -->
+    <svg width="0" height="0" class="position-absolute" style="visibility: hidden;">
+        <defs>
+            <filter id="goo" x="-200%" y="-100%" width="400%" height="300%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo"/>
+                <feBlend in="SourceGraphic" in2="goo"/>
+            </filter>
+        </defs>
+    </svg>
+
+    <div class="dashboard-inner">
+        <!-- rest of your dashboard code... -->
         <div class="dashboard-inner">
             <!-- Search bar wrapped to align with Fridge panel width perfectly -->
             <div class="dashboard-search-wrapper">

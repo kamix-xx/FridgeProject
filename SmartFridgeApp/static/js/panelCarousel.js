@@ -1,6 +1,5 @@
 /**
  * static/js/panelCarousel.js
- * Infinite/Smooth carousel controller based on dashboard.js logic.
  */
 document.addEventListener('DOMContentLoaded', () => {
     const fridgePanels = document.querySelectorAll('.fridge-panel');
@@ -21,6 +20,24 @@ document.addEventListener('DOMContentLoaded', () => {
         let currentAreaIndex = 0;
         let trackPosition = 0;
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetListId = urlParams.get('list_id');
+        const targetAreaId = urlParams.get('area_id');
+
+        if (targetListId || targetAreaId) {
+            const searchId = targetListId || targetAreaId;
+            const searchAttr = targetListId ? 'data-list-id' : 'data-area-id';
+            const foundIndex = slides.findIndex(slide => slide.getAttribute(searchAttr) === searchId);
+            if (foundIndex !== -1) currentAreaIndex = foundIndex;
+        } else if (sessionStorage.getItem('jumpToNewList') === 'true') {
+            currentAreaIndex = panelCount - 1;
+            sessionStorage.removeItem('jumpToNewList');
+        } else if (sessionStorage.getItem('lastActivePanelId')) {
+            const lastId = sessionStorage.getItem('lastActivePanelId');
+            const foundIndex = slides.findIndex(slide => slide.getAttribute('data-list-id') === lastId || slide.getAttribute('data-area-id') === lastId);
+            if (foundIndex !== -1) currentAreaIndex = foundIndex;
+        }
+
         if (infiniteEnabled) {
             const firstClone = slides[0].cloneNode(true);
             const lastClone = slides[panelCount - 1].cloneNode(true);
@@ -34,34 +51,43 @@ document.addEventListener('DOMContentLoaded', () => {
             carousel.appendChild(firstClone);
             carousel.insertBefore(lastClone, slides[0]);
 
-            trackPosition = 1;
+            trackPosition = currentAreaIndex + 1;
             carousel.style.transform = `translateX(-${trackPosition * 100}%)`;
 
             carousel.addEventListener('transitionend', (e) => {
                 if (e.target !== carousel || e.propertyName !== 'transform') return;
 
-                if (trackPosition === 0) {
-                    trackPosition = panelCount;
-                } else if (trackPosition === panelCount + 1) {
-                    trackPosition = 1;
-                } else {
-                    return;
-                }
+                if (trackPosition === 0) trackPosition = panelCount;
+                else if (trackPosition === panelCount + 1) trackPosition = 1;
+                else return;
 
                 carousel.style.transition = 'none';
                 carousel.style.transform = `translateX(-${trackPosition * 100}%)`;
                 void carousel.offsetWidth;
                 carousel.style.transition = '';
             });
+        } else {
+            carousel.style.transform = `translateX(-${currentAreaIndex * 100}%)`;
         }
 
         function updateTitle(index) {
-            if (!titleText || !slides[index]) return;
+            if (!slides[index]) return;
+
             const newTitle = slides[index].dataset.areaName
                           || slides[index].dataset.title
                           || slides[index].dataset.listName;
-            if (newTitle) {
+
+            if (titleText && newTitle) {
                 titleText.textContent = newTitle;
+            }
+
+            // ROCK-SOLID ACTIVE STATE TRACKING
+            slides.forEach(s => s.classList.remove('active-carousel-slide'));
+            slides[index].classList.add('active-carousel-slide');
+
+            const activeId = slides[index].getAttribute('data-list-id') || slides[index].getAttribute('data-area-id');
+            if (activeId) {
+                sessionStorage.setItem('lastActivePanelId', activeId);
             }
         }
 
@@ -91,20 +117,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (prevBtn) {
-            prevBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                stepArea(-1);
-            });
+            prevBtn.addEventListener('click', (e) => { e.preventDefault(); stepArea(-1); });
         }
-
         if (nextBtn) {
-            nextBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                stepArea(1);
-            });
+            nextBtn.addEventListener('click', (e) => { e.preventDefault(); stepArea(1); });
         }
 
-        // Touch/Swipe Support
         let startX = 0;
         let isSwiping = false;
 
@@ -115,14 +133,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         carousel.addEventListener('touchend', (e) => {
             if (!isSwiping) return;
-            const endX = e.changedTouches[0].clientX;
-            const diff = startX - endX;
-            if (Math.abs(diff) > 40) {
-                stepArea(diff > 0 ? 1 : -1);
-            }
+            const diff = startX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 40) stepArea(diff > 0 ? 1 : -1);
             isSwiping = false;
         });
 
-        updateTitle(0);
+        updateTitle(currentAreaIndex);
     });
 });

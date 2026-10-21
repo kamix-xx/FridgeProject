@@ -9,7 +9,7 @@
     <script src="{% static 'js/gooeyMenu.js' %}" defer></script>
     <script src="{% static 'js/menuMorph.js' %}" defer></script>
     <script src="{% static 'js/panelCarousel.js' %}" defer></script>
-    <script src="{% static 'js/shopping_list.js' %}" defer></script>
+    <script src="{% static 'js/shopping_list.js' %}?v=2" defer></script>
 {% endblock %}
 
 {% block title %}SmartFridge+ — Shopping Lists{% endblock %}
@@ -142,15 +142,18 @@
                                                                     aria-label="Remove item">
                                                                 <i class="bi bi-trash"></i>
                                                             </button>
+
                                                             <button type="button" class="gooey-item item-edit"
                                                                     data-bs-toggle="modal"
                                                                     data-bs-target="#editShoppingItemModal"
                                                                     data-item-id="{{ item.id }}"
-                                                                    data-item-qty="{{ item.quantity }}" data-item-unit="
-                                                                    {% if item.unit %}{{ item.unit.symbol }}{% endif %}"
+                                                                    data-item-name="{% if item.product %}{{ item.product.name }}{% else %}{{ item.name }}{% endif %}"
+                                                                    data-item-qty="{{ item.quantity }}"
+                                                                    data-item-unit="{% if item.unit %}{{ item.unit.symbol }}{% endif %}"
                                                                     aria-label="Edit item">
                                                                 <i class="bi bi-pencil"></i>
                                                             </button>
+
                                                             <label class="gooey-main-btn"
                                                                    for="gooey-chk-shop-{{ list.id }}-{{ forloop.counter }}">
                                                                 <i class="bi bi-three-dots"></i>
@@ -179,135 +182,188 @@
                 </button>
             </section>
         </div>
-    </main>
 
-    <!-- Create Shopping List Modal -->
-    <div class="modal fade" id="createShoppingListModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content custom-popup position-relative border-0">
-                <button type="button"
-                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="modal-body text-center p-4 p-md-5">
-                    <h3 class="popup-title mb-4 mt-2">Create shopping list</h3>
-                    <form method="post" action="{% url 'create_shopping_list' %}" id="createShoppingListForm">
-                        {% csrf_token %}
-                        <div class="text-start mb-5">
-                            <label for="newShoppingListName" class="form-label popup-label">Shopping list name</label>
-                            <input type="text" name="name" class="form-control popup-input shadow-none"
-                                   id="newShoppingListName" placeholder="e.g. Groceries" required autocomplete="off">
-                        </div>
-                        <button type="submit" class="popup-circular-btn mx-auto" aria-label="Create list"><i
-                                class="bi bi-plus"></i></button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Shopping List Modal -->
-    <div class="modal fade" id="editShoppingListModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content custom-popup position-relative border-0">
-                <button type="button"
-                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="modal-body text-center p-4 p-md-5">
-                    <h3 class="popup-title mb-4 mt-2">Edit shopping list</h3>
-                    <form method="post" action="{% url 'edit_shopping_list' 0 %}" id="editShoppingListForm">
-                        {% csrf_token %}
-                        <div class="text-start mb-5">
-                            <label for="editShoppingListName" class="form-label popup-label">New list name</label>
-                            <input type="text" name="name" class="form-control popup-input shadow-none"
-                                   id="editShoppingListName" required autocomplete="off">
-                        </div>
-                        <button type="submit" class="popup-circular-btn mx-auto" aria-label="Save name"><i
-                                class="bi bi-check-lg"></i></button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Shopping List Modal -->
-    <div class="modal fade" id="deleteShoppingListModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content custom-popup border-0">
-                <div class="modal-body text-center p-4 p-md-5">
-                    <h3 class="popup-title mb-2">Are you sure to delete this list?</h3>
-                    <p class="popup-subtitle-light mb-5">All items there will be lost!</p>
-                    <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
-                            data-bs-dismiss="modal">Nah, just kidding
-                    </button>
-                    <hr class="popup-divider mx-auto mb-4">
-                    <form method="post" action="{% url 'delete_shopping_list' 0 %}" id="deleteShoppingListForm">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-link text-decoration-none popup-btn-danger">Do it!</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Shopping Item Modal -->
-    <div class="modal fade" id="addShoppingItemModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content custom-popup position-relative border-0">
-                <button type="button"
-                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
-                <form method="POST" action="{% url 'add_shopping_item' 0 %}" id="addShoppingItemForm">
-                    {% csrf_token %}
-                    <input type="hidden" name="list_id" id="activeListIdHidden">
+        <!-- Create Shopping List Modal -->
+        <div class="modal fade" id="createShoppingListModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content custom-popup position-relative border-0">
+                    <button type="button"
+                            class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
                     <div class="modal-body text-center p-4 p-md-5">
-                        <h3 class="popup-title mb-4 mt-2">Add Product</h3>
+                        <h3 class="popup-title mb-4 mt-2">Create shopping list</h3>
+                        <form method="post" action="{% url 'create_shopping_list' %}" id="createShoppingListForm">
+                            {% csrf_token %}
+                            <div class="text-start mb-5">
+                                <label for="newShoppingListName" class="form-label popup-label">Shopping list name</label>
+                                <input type="text" name="name" class="form-control popup-input shadow-none"
+                                       id="newShoppingListName" placeholder="e.g. Groceries" required autocomplete="off">
+                            </div>
+                            <button type="submit" class="popup-circular-btn mx-auto" aria-label="Create list"><i
+                                    class="bi bi-plus"></i></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Shopping List Modal -->
+        <div class="modal fade" id="editShoppingListModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content custom-popup position-relative border-0">
+                    <button type="button"
+                            class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-body text-center p-4 p-md-5">
+                        <h3 class="popup-title mb-4 mt-2">Edit shopping list</h3>
+                        <form method="post" action="{% url 'edit_shopping_list' 0 %}" id="editShoppingListForm">
+                            {% csrf_token %}
+                            <div class="text-start mb-5">
+                                <label for="editShoppingListName" class="form-label popup-label">New list name</label>
+                                <input type="text" name="name" class="form-control popup-input shadow-none"
+                                       id="editShoppingListName" required autocomplete="off">
+                            </div>
+                            <button type="submit" class="popup-circular-btn mx-auto" aria-label="Save name"><i
+                                    class="bi bi-check-lg"></i></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Shopping List Modal -->
+        <div class="modal fade" id="deleteShoppingListModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content custom-popup border-0">
+                    <div class="modal-body text-center p-4 p-md-5">
+                        <h3 class="popup-title mb-2">Are you sure to delete this list?</h3>
+                        <p class="popup-subtitle-light mb-5">All items there will be lost!</p>
+                        <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                                data-bs-dismiss="modal">Nah, just kidding
+                        </button>
+                        <hr class="popup-divider mx-auto mb-4">
+                        <form method="post" action="{% url 'delete_shopping_list' 0 %}" id="deleteShoppingListForm">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link text-decoration-none popup-btn-danger">Do it!</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Shopping Item Modal -->
+        <div class="modal fade" id="addShoppingItemModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content custom-popup position-relative border-0">
+                    <button type="button"
+                            class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+                    <form method="POST" action="{% url 'add_shopping_item' 0 %}" id="addShoppingItemForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="list_id" id="activeListIdHidden">
+                        <div class="modal-body text-center p-4 p-md-5">
+                            <h3 class="popup-title mb-4 mt-2">Add Product</h3>
+                            <div class="text-start mb-4 px-1">
+                                <label for="newProductName" class="form-label popup-label">Product name</label>
+                                <input type="text" name="product_name" class="form-control popup-input shadow-none"
+                                       id="newProductName" list="productOptions" placeholder="Type or select..." required>
+                                <datalist id="productOptions">
+                                    <option value="Milk">
+                                    <option value="Cottage cheese">
+                                    <option value="Pasta">
+                                    <option value="Tomatoes">
+                                    <option value="Potatoes">
+                                </datalist>
+                            </div>
+                            <div class="row g-2 mx-0 mb-5">
+                                <div class="col-6 text-start px-1">
+                                    <label for="newProductQty" class="form-label popup-label">Quantity</label>
+                                </div>
+                                <div class="col-6 text-start px-1">
+                                    <label class="form-label popup-label">Unit</label>
+                                </div>
+                                <div class="col-12 mt-0 px-1">
+                                    <div class="fused-input-group d-flex align-items-stretch">
+                                        <input type="number" name="quantity" class="form-control shadow-none w-50"
+                                               id="newProductQty" min="0.1" step="0.1" placeholder="0.0" required>
+                                        <div class="fused-input-divider"></div>
+                                        <div class="dropdown w-50">
+                                            <input type="hidden" name="unit_symbol" id="hiddenUnitSymbol" value="psc">
+                                            <button class="btn dropdown-toggle w-100 h-100 text-start d-flex justify-content-between align-items-center shadow-none fused-dropdown-btn"
+                                                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <span id="selectedUnitText">psc</span>
+                                            </button>
+                                            <ul class="dropdown-menu custom-dropdown-menu w-100">
+                                                {% for unit in available_units %}
+                                                    <li>
+                                                        <a class="dropdown-item" href="#"
+                                                           onclick="document.getElementById('selectedUnitText').innerText='{{ unit.symbol }}'; document.getElementById('hiddenUnitSymbol').value='{{ unit.symbol }}'; return false;">
+                                                            {{ unit.symbol }}
+                                                            {% if unit.is_global %}
+                                                                <small class="text-muted opacity-50 ms-1">(Global)</small>{% endif %}
+                                                        </a>
+                                                    </li>
+                                                {% endfor %}
+                                                <li>
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item text-primary fw-medium" href="#"
+                                                       data-bs-toggle="modal" data-bs-target="#createUnitModal">
+                                                        <i class="bi bi-plus-circle me-1"></i> Create unit
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="popup-circular-btn mx-auto">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+      <!-- Edit Shopping Item Modal -->
+    <div class="modal fade" id="editShoppingItemModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup position-relative border-0">
+                <button type="button" class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                <form method="POST" action="{% url 'edit_shopping_item' %}" id="editShoppingItemForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="item_id" id="editItemIdHidden">
+                    <div class="modal-body text-center p-4 p-md-5">
+                        <h3 class="popup-title mb-4 mt-2">Edit shopping list item</h3>
                         <div class="text-start mb-4 px-1">
-                            <label for="newProductName" class="form-label popup-label">Product name</label>
-                            <input type="text" name="product_name" class="form-control popup-input shadow-none"
-                                   id="newProductName" list="productOptions" placeholder="Type or select..." required>
-                            <datalist id="productOptions">
-                                <option value="Milk">
-                                <option value="Cottage cheese">
-                                <option value="Pasta">
-                                <option value="Tomatoes">
-                                <option value="Potatoes">
-                            </datalist>
+                            <label for="editProductName" class="form-label popup-label">Product name</label>
+                            <input type="text" name="product_name" class="form-control popup-input shadow-none" id="editProductName" required>
                         </div>
                         <div class="row g-2 mx-0 mb-5">
-                            <div class="col-6 text-start px-1">
-                                <label for="newProductQty" class="form-label popup-label">Quantity</label>
-                            </div>
-                            <div class="col-6 text-start px-1">
-                                <label class="form-label popup-label">Unit</label>
-                            </div>
+                            <div class="col-6 text-start px-1"><label for="editProductQty" class="form-label popup-label">Quantity</label></div>
+                            <div class="col-6 text-start px-1"><label class="form-label popup-label">Unit</label></div>
                             <div class="col-12 mt-0 px-1">
                                 <div class="fused-input-group d-flex align-items-stretch">
-                                    <input type="number" name="quantity" class="form-control shadow-none w-50"
-                                           id="newProductQty" min="0.1" step="0.1" placeholder="0.0" required>
-                                    <div class="fused-input-divider"></div>
+                                    <input type="number" name="quantity" class="form-control shadow-none w-50 border-0 bg-transparent" id="editProductQty" min="0.1" step="0.1" required style="padding: 0.5rem 1rem; color: inherit;">
+                                    <div class="fused-input-divider my-2"></div>
                                     <div class="dropdown w-50">
-                                        <input type="hidden" name="unit_symbol" id="hiddenUnitSymbol" value="psc">
-                                        <button class="btn dropdown-toggle w-100 h-100 text-start d-flex justify-content-between align-items-center shadow-none fused-dropdown-btn"
-                                                type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <span id="selectedUnitText">psc</span>
+                                        <input type="hidden" name="unit_symbol" id="editHiddenUnitSymbol">
+                                        <button class="btn dropdown-toggle w-100 h-100 text-start d-flex justify-content-between align-items-center shadow-none fused-dropdown-btn border-0 bg-transparent" type="button" data-bs-toggle="dropdown" style="padding: 0.5rem 1rem; color: inherit;">
+                                            <span id="editSelectedUnitText">psc</span>
                                         </button>
                                         <ul class="dropdown-menu custom-dropdown-menu w-100">
                                             {% for unit in available_units %}
                                                 <li>
-                                                    <a class="dropdown-item" href="#"
-                                                       onclick="document.getElementById('selectedUnitText').innerText='{{ unit.symbol }}'; document.getElementById('hiddenUnitSymbol').value='{{ unit.symbol }}'; return false;">
+                                                    <a class="dropdown-item" href="#" onclick="document.getElementById('editSelectedUnitText').innerText='{{ unit.symbol }}'; document.getElementById('editHiddenUnitSymbol').value='{{ unit.symbol }}'; return false;">
                                                         {{ unit.symbol }}
-                                                        {% if unit.is_global %}
-                                                            <small class="text-muted opacity-50 ms-1">(Global)</small>{% endif %}
                                                     </a>
                                                 </li>
                                             {% endfor %}
+                                            <li><hr class="dropdown-divider"></li>
                                             <li>
-                                                <hr class="dropdown-divider">
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item text-primary fw-medium" href="#"
-                                                   data-bs-toggle="modal" data-bs-target="#createUnitModal">
+                                                <a class="dropdown-item text-primary fw-medium" href="#" data-bs-toggle="modal" data-bs-target="#createUnitModal">
                                                     <i class="bi bi-plus-circle me-1"></i> Create unit
                                                 </a>
                                             </li>
@@ -316,90 +372,34 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="popup-circular-btn mx-auto">
-                            <i class="bi bi-plus"></i>
-                        </button>
+                        <button type="submit" class="popup-circular-btn mx-auto"><i class="bi bi-check-lg"></i></button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-
-  <!-- Edit Shopping Item Modal -->
-<div class="modal fade" id="editShoppingItemModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content custom-popup position-relative border-0">
-            <button type="button" class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3" data-bs-dismiss="modal" aria-label="Close"></button>
-            <form method="POST" action="{% url 'edit_shopping_item' %}" id="editShoppingItemForm">
-                {% csrf_token %}
-                <input type="hidden" name="item_id" id="editItemIdHidden">
-                <div class="modal-body text-center p-4 p-md-5">
-                    <h3 class="popup-title mb-4 mt-2">Edit shopping list item</h3>
-                    <div class="text-start mb-4 px-1">
-                        <label for="editProductName" class="form-label popup-label">Product name</label>
-                        <input type="text" name="product_name" class="form-control popup-input shadow-none" id="editProductName" required>
+        <!-- Delete Shopping Item Modal -->
+        <div class="modal fade" id="deleteShoppingItemModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content custom-popup border-0">
+                    <div class="modal-body text-center p-4 p-md-5">
+                        <h3 class="popup-title mb-5 mt-2">Are you sure to delete this item?</h3>
+                        <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                                data-bs-dismiss="modal">Nah, just kidding
+                        </button>
+                        <hr class="popup-divider mx-auto mb-4">
+                        <form method="POST" action="{% url 'delete_shopping_item' %}" class="d-inline"
+                              id="deleteShoppingItemForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="item_id" id="deleteItemIdHidden">
+                            <button type="submit" class="btn btn-link text-decoration-none popup-btn-danger">Do it!</button>
+                        </form>
                     </div>
-                    <div class="row g-2 mx-0 mb-5">
-                        <div class="col-6 text-start px-1"><label for="editProductQty" class="form-label popup-label">Quantity</label></div>
-                        <div class="col-6 text-start px-1"><label class="form-label popup-label">Unit</label></div>
-                        <div class="col-12 mt-0 px-1">
-                            <div class="fused-input-group d-flex align-items-stretch">
-                                <input type="number" name="quantity" class="form-control shadow-none w-50 border-0 bg-transparent" id="editProductQty" min="0.1" step="0.1" required style="padding: 0.5rem 1rem; color: inherit;">
-                                <div class="fused-input-divider my-2"></div>
-                                <div class="dropdown w-50">
-                                    <input type="hidden" name="unit_symbol" id="editHiddenUnitSymbol">
-                                    <button class="btn dropdown-toggle w-100 h-100 text-start d-flex justify-content-between align-items-center shadow-none fused-dropdown-btn border-0 bg-transparent" type="button" data-bs-toggle="dropdown" style="padding: 0.5rem 1rem; color: inherit;">
-                                        <span id="editSelectedUnitText">psc</span>
-                                    </button>
-                                    <ul class="dropdown-menu custom-dropdown-menu w-100">
-                                        {% for unit in available_units %}
-                                            <li>
-                                                <a class="dropdown-item" href="#" onclick="document.getElementById('editSelectedUnitText').innerText='{{ unit.symbol }}'; document.getElementById('editHiddenUnitSymbol').value='{{ unit.symbol }}'; return false;">
-                                                    {{ unit.symbol }}
-                                                </a>
-                                            </li>
-                                        {% endfor %}
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <a class="dropdown-item text-primary fw-medium" href="#" data-bs-toggle="modal" data-bs-target="#createUnitModal">
-                                                <i class="bi bi-plus-circle me-1"></i> Create unit
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="popup-circular-btn mx-auto"><i class="bi bi-check-lg"></i></button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-    <!-- Delete Shopping Item Modal -->
-    <div class="modal fade" id="deleteShoppingItemModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content custom-popup border-0">
-                <div class="modal-body text-center p-4 p-md-5">
-                    <h3 class="popup-title mb-5 mt-2">Are you sure to delete this item?</h3>
-                    <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
-                            data-bs-dismiss="modal">Nah, just kidding
-                    </button>
-                    <hr class="popup-divider mx-auto mb-4">
-                    <form method="POST" action="{% url 'delete_shopping_item' %}" class="d-inline"
-                          id="deleteShoppingItemForm">
-                        {% csrf_token %}
-                        <input type="hidden" name="item_id" id="deleteItemIdHidden">
-                        <button type="submit" class="btn btn-link text-decoration-none popup-btn-danger">Do it!</button>
-                    </form>
                 </div>
             </div>
         </div>
-    </div>
 
-        <!-- ========================================== -->
         <!-- POP-UP: Create Custom Unit -->
-        <!-- ========================================== -->
         <div class="modal fade" id="createUnitModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content custom-popup position-relative border-0">
@@ -435,40 +435,4 @@
             </div>
         </div>
     </main>
-    <!-- Dynamic List ID Fix for 404 Error -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const forms = ['addShoppingItemForm', 'editShoppingListForm', 'deleteShoppingListForm'];
-            forms.forEach(formId => {
-                const form = document.getElementById(formId);
-                if (form) {
-                    form.addEventListener('submit', function (e) {
-                        // Find the currently active panel to grab its List ID
-                        const viewport = document.querySelector('.area-carousel-viewport');
-                        const panels = document.querySelectorAll('#listCarousel .area-panel');
-                        let activeListId = '0';
-
-                        if (panels.length > 0 && viewport) {
-                            const viewportCenter = viewport.getBoundingClientRect().left + (viewport.getBoundingClientRect().width / 2);
-                            let minDiff = Infinity;
-
-                            panels.forEach(p => {
-                                const rect = p.getBoundingClientRect();
-                                const center = rect.left + (rect.width / 2);
-                                const diff = Math.abs(viewportCenter - center);
-                                if (diff < minDiff) {
-                                    minDiff = diff;
-                                    activeListId = p.getAttribute('data-list-id');
-                                }
-                            });
-                        }
-                        // Swap out the '0' in the URL with the real active list ID
-                        if (activeListId !== '0') {
-                            this.action = this.action.replace('/0/', '/' + activeListId + '/');
-                        }
-                    });
-                }
-            });
-        });
-    </script>
 {% endblock %}
