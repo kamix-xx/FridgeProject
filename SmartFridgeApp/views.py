@@ -2,16 +2,18 @@ from django.contrib.auth import login, logout, get_user_model, update_session_au
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.http import JsonResponse
+from django.utils.dateparse import parse_date
 from datetime import date, datetime, timedelta
 from types import SimpleNamespace
 from django.utils.html import json_script
 from .models import ProductDictionary, Recipe, RecipeProduct, Unit, Step, Area, ShoppingList, ShoppingListItem, \
-    ItemStatus
+    ItemStatus, UserProduct
 from django.db.models import Q, RestrictedError
 from .forms import CustomUserCreationForm
 import json
 import uuid
+import openfoodfacts
+from django.http import JsonResponse
 
 USE_FAKE_DASHBOARD_DATA = False
 
@@ -179,7 +181,6 @@ def home(request):
             area.products = [_with_freshness(up) for up in area.userproduct_set.all()]
             area.is_owner = (getattr(area, 'owner', None) == request.user)
 
-
             if area.is_shared:
                 members = [
                     {
@@ -197,6 +198,7 @@ def home(request):
         'areas': areas,
         'available_units': available_units,  # PASS IT TO THE TEMPLATE
     })
+
 
 def landing(request):
     return render(request, "landing.html")
@@ -382,27 +384,36 @@ def _fake_shopping_lists():
         id=1,
         name="Weekly Groceries",
         items=[
-            SimpleNamespace(id=101, product=SimpleNamespace(name="Whole Milk"), quantity=2, unit=SimpleNamespace(symbol="l"), is_done=False),
-            SimpleNamespace(id=102, product=SimpleNamespace(name="Free-range Eggs"), quantity=12, unit=SimpleNamespace(symbol="pcs"), is_done=True),
-            SimpleNamespace(id=103, product=SimpleNamespace(name="Sourdough Bread"), quantity=1, unit=SimpleNamespace(symbol="loaf"), is_done=False),
-            SimpleNamespace(id=104, product=SimpleNamespace(name="Cheddar Cheese"), quantity=300, unit=SimpleNamespace(symbol="g"), is_done=False),
+            SimpleNamespace(id=101, product=SimpleNamespace(name="Whole Milk"), quantity=2,
+                            unit=SimpleNamespace(symbol="l"), is_done=False),
+            SimpleNamespace(id=102, product=SimpleNamespace(name="Free-range Eggs"), quantity=12,
+                            unit=SimpleNamespace(symbol="pcs"), is_done=True),
+            SimpleNamespace(id=103, product=SimpleNamespace(name="Sourdough Bread"), quantity=1,
+                            unit=SimpleNamespace(symbol="loaf"), is_done=False),
+            SimpleNamespace(id=104, product=SimpleNamespace(name="Cheddar Cheese"), quantity=300,
+                            unit=SimpleNamespace(symbol="g"), is_done=False),
         ]
     )
     list2 = SimpleNamespace(
         id=2,
         name="Party Supplies",
         items=[
-            SimpleNamespace(id=201, product=SimpleNamespace(name="Sparkling Water"), quantity=6, unit=SimpleNamespace(symbol="bottle"), is_done=False),
-            SimpleNamespace(id=202, product=SimpleNamespace(name="Tortilla Chips"), quantity=3, unit=SimpleNamespace(symbol="pack"), is_done=False),
-            SimpleNamespace(id=203, product=SimpleNamespace(name="Fresh Limes"), quantity=5, unit=SimpleNamespace(symbol="pcs"), is_done=True),
+            SimpleNamespace(id=201, product=SimpleNamespace(name="Sparkling Water"), quantity=6,
+                            unit=SimpleNamespace(symbol="bottle"), is_done=False),
+            SimpleNamespace(id=202, product=SimpleNamespace(name="Tortilla Chips"), quantity=3,
+                            unit=SimpleNamespace(symbol="pack"), is_done=False),
+            SimpleNamespace(id=203, product=SimpleNamespace(name="Fresh Limes"), quantity=5,
+                            unit=SimpleNamespace(symbol="pcs"), is_done=True),
         ]
     )
     list3 = SimpleNamespace(
         id=3,
         name="Home Essentials",
         items=[
-            SimpleNamespace(id=301, product=SimpleNamespace(name="Paper Towels"), quantity=2, unit=SimpleNamespace(symbol="pack"), is_done=False),
-            SimpleNamespace(id=302, product=SimpleNamespace(name="Dish Soap"), quantity=1, unit=SimpleNamespace(symbol="bottle"), is_done=False),
+            SimpleNamespace(id=301, product=SimpleNamespace(name="Paper Towels"), quantity=2,
+                            unit=SimpleNamespace(symbol="pack"), is_done=False),
+            SimpleNamespace(id=302, product=SimpleNamespace(name="Dish Soap"), quantity=1,
+                            unit=SimpleNamespace(symbol="bottle"), is_done=False),
         ]
     )
     return [list1, list2, list3]
@@ -589,7 +600,7 @@ def create_unit(request):
         symbol = request.POST.get('symbol', '').strip()
 
         if symbol:
-            exists = Unit.objects.filter(Q(symbol__iexact=symbol) & (Q(is_global=True) | Q(user=request.user))).exists()
+            exists = Unit.objects.filter(symbol__iexact=symbol).exists()
 
             if not exists:
                 is_global = (request.user.role == 'ADMIN')
@@ -601,7 +612,7 @@ def create_unit(request):
                 )
                 messages.success(request, f'Unit "{symbol}" created successfully!')
             else:
-                messages.warning(request, f'Unit "{symbol}" already exists.')
+                messages.warning(request, f'Unit "{symbol}" already exists in the database.')
 
     return redirect(request.META.get('HTTP_REFERER', 'shopping_list'))
 
@@ -1141,3 +1152,173 @@ def admin_delete_unit(request):
                     f'Cannot delete "{unit.symbol}". It is currently used by users in their recipes or shopping lists.'
                 )
     return redirect('admin_panel')
+
+
+# TODO: Te api to troche kasztan, bo można wysłać max 15 żądań na minutę z jednego IP, zrobiłem teraz tak że po wpisaniu czeka 800ms i dopiero wysyła sygnał do API
+
+# --- 1. Wyszukiwanie po nazwie (Live Search) ---
+@login_required(login_url='login')
+def openfoodfacts_search(request):
+    query = request.GET.get('q', '').strip()
+    if len(query) < 3:
+        return JsonResponse({'results': []})
+
+    try:
+        api = openfoodfacts.API(user_agent="SmartFridgePlus/1.0")
+        response = api.product.text_search(query, page_size=40, sort_by="unique_scans_n")
+        products_data = response.get('products', [])
+
+        raw_results = []
+        seen_names = set()
+
+        for p in products_data:
+            name = p.get('product_name_pl') or p.get('product_name') or p.get('product_name_en')
+            brand = p.get('brands', '').split(',')[0].strip()
+
+            if name:
+                name = name.strip()
+                name_lower = name.lower()
+                if name_lower not in seen_names:
+                    seen_names.add(name_lower)
+                    raw_results.append({
+                        'name': name.capitalize(),
+                        'brand': brand.capitalize() if brand else '',
+                        'barcode': p.get('code', ''),
+                        'image_url': p.get('image_front_thumb_url', '')
+                    })
+
+        raw_results.sort(key=lambda x: (
+            0 if x['image_url'] else 1,
+            0 if x['brand'] else 1,
+            len(x['name'])
+        ))
+
+        return JsonResponse({'results': raw_results[:8]})
+
+    except Exception as e:
+        print(f"OpenFoodFacts API Error (ignored): {e}")
+        return JsonResponse({'results': []})
+
+
+# --- 2. Pobieranie pełnych danych po kodzie kreskowym ---
+@login_required(login_url='login')
+def fetch_barcode_data(request, barcode):
+    try:
+        api = openfoodfacts.API(user_agent="SmartFridgePlus/1.0")
+        product_data = api.product.get(barcode, fields=["code", "product_name", "product_name_pl", "nutriscore_grade",
+                                                        "nutriments"])
+
+        if not product_data:
+            return JsonResponse({'error': 'Product not found.'}, status=404)
+
+        name = product_data.get('product_name_pl') or product_data.get('product_name') or ""
+        nutriments = product_data.get('nutriments', {})
+
+        return JsonResponse({
+            'barcode': barcode,
+            'name': name.capitalize(),
+            'kcal': int(nutriments.get('energy-kcal_100g', 0)),
+            'proteins': round(float(nutriments.get('proteins_100g', 0.0)), 2),
+            'fats': round(float(nutriments.get('fat_100g', 0.0)), 2),
+            'nutriscore': (product_data.get('nutriscore_grade') or 'X').upper()
+        })
+    except Exception as e:
+        return JsonResponse({'error': 'Connection error'}, status=503)
+
+
+from django.db.models import Q
+from django.utils.dateparse import parse_date
+
+
+@login_required(login_url='login')
+def api_add_product(request):
+    if request.method == 'POST':
+        barcode = request.POST.get('barcode', '').strip()
+        name = request.POST.get('product_name', '').strip()
+        area_id = request.POST.get('area_id')
+
+        if not name or not area_id:
+            messages.error(request, 'Nazwa produktu i obszar są wymagane.')
+            return redirect('home')
+
+        try:
+            quantity = int(float(request.POST.get('quantity', 1)))
+            if quantity < 1: quantity = 1
+        except ValueError:
+            quantity = 1
+
+        try:
+            price = float(request.POST.get('price', 0.01))
+            if price < 0.01: price = 0.01
+        except ValueError:
+            price = 0.01
+
+        try:
+            kcal = int(request.POST.get('kcal') or 0)
+        except ValueError:
+            kcal = 0
+
+        try:
+            proteins = float(request.POST.get('proteins') or 0.0)
+        except ValueError:
+            proteins = 0.0
+
+        try:
+            fats = float(request.POST.get('fats') or 0.0)
+        except ValueError:
+            fats = 0.0
+
+        nutriscore = request.POST.get('nutriscore', 'X').upper()
+        if nutriscore not in ['A', 'B', 'C', 'D', 'E']:
+            nutriscore = 'X'
+
+        expiration_date_raw = request.POST.get('expiration_date')
+        expiration_date = parse_date(expiration_date_raw) if expiration_date_raw else None
+
+        unit_symbol = request.POST.get('unit_symbol', 'pcs').strip()
+
+        area = get_object_or_404(Area, id=area_id)
+        if area.owner != request.user and not area.users.filter(id=request.user.id).exists():
+            messages.error(request, 'Nie masz dostępu do wybranego obszaru.')
+            return redirect('home')
+
+        unit = Unit.objects.filter(symbol__iexact=unit_symbol).first()
+
+        if not unit:
+            unit = Unit.objects.create(symbol=unit_symbol, is_global=False, user=request.user)
+
+        product_dict = None
+
+        if barcode:
+            product_dict = ProductDictionary.objects.filter(barcode=barcode).first()
+
+        if not product_dict:
+            product_dict = ProductDictionary.objects.filter(name__iexact=name).first()
+
+        if not product_dict:
+            product_dict = ProductDictionary.objects.create(
+                name=name,
+                barcode=barcode if barcode else None,
+                kcal=kcal,
+                proteins=proteins,
+                fats=fats,
+                nutriscore=nutriscore,
+                icon_number=1,
+                is_global=False,
+                user=request.user,
+                status=ItemStatus.UNOFFICIAL
+            )
+
+        # --- 6. Fizyczne dodanie produktu do lodówki usera (UserProduct) ---
+        UserProduct.objects.create(
+            quantity=quantity,
+            price=price,
+            expiration_date=expiration_date,
+            area=area,
+            product=product_dict,
+            unit=unit
+        )
+
+        messages.success(request, f'Dodano "{name}" do obszaru: {area.name}!')
+
+    return redirect('home')
