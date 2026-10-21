@@ -405,3 +405,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 });
+
+    // =========================================
+    // Area Carousel
+    // =========================================
+    const carousel = document.getElementById('areaCarousel');
+    const prevBtn = document.getElementById('areaPrev');
+    const nextBtn = document.getElementById('areaNext');
+    const panels = document.querySelectorAll('.area-panel');
+    const titleText = document.getElementById('areaTitleText');
+    const editBtn = document.getElementById('areaEditBtn');
+
+    let currentAreaIndex = 0;
+
+    function updateCarousel() {
+        if (!panels || panels.length === 0) return;
+
+        if (carousel) {
+            const offset = -(currentAreaIndex * 100);
+            carousel.style.transform = `translateX(${offset}%)`;
+            carousel.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
+            carousel.style.display = 'flex';
+        }
+
+        if (prevBtn) prevBtn.disabled = (currentAreaIndex === 0);
+        if (nextBtn) nextBtn.disabled = (currentAreaIndex === panels.length - 1);
+
+        const currentPanel = panels[currentAreaIndex];
+        const areaId = currentPanel.dataset.areaId;
+        const areaName = currentPanel.dataset.areaName;
+        const isShared = currentPanel.dataset.isShared === 'true';
+        const isOwner = currentPanel.dataset.areaOwner === 'true';
+
+        if (titleText) {
+            let iconHtml = isShared ? `<span class="area-shared-icon area-title-word" title="Shared area" aria-label="Shared area"><i class="bi bi-people-fill" aria-hidden="true"></i></span>` : '';
+            titleText.innerHTML = `${areaName || 'No areas'} ${iconHtml}`;
+        }
+
+        if (editBtn) {
+            if (areaId) {
+                editBtn.dataset.areaId = areaId;
+                editBtn.dataset.areaName = areaName;
+                editBtn.dataset.areaShared = isShared;
+                editBtn.dataset.areaOwner = isOwner;
+                editBtn.disabled = false;
+            } else {
+                editBtn.disabled = true;
+            }
+        }
+    }
+
+    if (prevBtn && nextBtn && carousel) {
+        prevBtn.addEventListener('click', () => {
+            if (currentAreaIndex > 0) {
+                currentAreaIndex--;
+                updateCarousel();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentAreaIndex < panels.length - 1) {
+                currentAreaIndex++;
+                updateCarousel();
+            }
+        });
+
+
+        panels.forEach(panel => {
+            panel.style.minWidth = '100%';
+            panel.style.flexShrink = '0';
+        });
+
+        updateCarousel();
+    }

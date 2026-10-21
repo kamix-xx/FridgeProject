@@ -168,7 +168,7 @@ def home(request):
     else:
         user_areas = Area.objects.filter(
             Q(owner=request.user) | Q(users=request.user)
-        ).distinct().prefetch_related(
+        ).distinct().select_related('owner').prefetch_related(
             'users',
             'userproduct_set__product',
             'userproduct_set__unit',
@@ -178,7 +178,9 @@ def home(request):
         for area in areas:
             area.products = [_with_freshness(up) for up in area.userproduct_set.all()]
             area.is_owner = (getattr(area, 'owner', None) == request.user)
-            if area.is_shared and area.is_owner:
+
+
+            if area.is_shared:
                 members = [
                     {
                         "username": u.username,
@@ -193,9 +195,8 @@ def home(request):
 
     return render(request, 'dashboard/dashboard.html', {
         'areas': areas,
-        'available_units': available_units, # PASS IT TO THE TEMPLATE
+        'available_units': available_units,  # PASS IT TO THE TEMPLATE
     })
-
 
 def landing(request):
     return render(request, "landing.html")
