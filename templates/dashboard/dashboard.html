@@ -4,6 +4,7 @@
 {% block head %}
     <link rel="expect" href="#page-transition-panel" blocking="render">
     <script src="{% static 'js/dashboard.js' %}?v=4" defer></script>
+    <script src="{% static 'js/panelCarousel.js' %}" defer></script>
     <script src="{% static 'js/menuMorph.js' %}?v=2" defer></script>
     <script src="{% static 'js/gooeyMenu.js' %}" defer></script>
     <script src="{% static 'js/modals.js' %}?v=3" defer></script>
@@ -25,59 +26,60 @@
     {% include "partials/background_images.html" %}
 
     <main class="dashboard-page">
-    <!-- SVG Filter for the Gooey Effect -->
-    <svg width="0" height="0" class="position-absolute" style="visibility: hidden;">
-        <defs>
-            <filter id="goo" x="-200%" y="-100%" width="400%" height="300%">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
-                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo"/>
-                <feBlend in="SourceGraphic" in2="goo"/>
-            </filter>
-        </defs>
-    </svg>
+        <!-- SVG Filter for the Gooey Effect -->
+        <svg width="0" height="0" class="position-absolute" style="visibility: hidden;">
+            <defs>
+                <filter id="goo" x="-200%" y="-100%" width="400%" height="300%">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"
+                                   result="goo"/>
+                    <feBlend in="SourceGraphic" in2="goo"/>
+                </filter>
+            </defs>
+        </svg>
 
-    <div class="dashboard-inner">
-        <!-- rest of your dashboard code... -->
         <div class="dashboard-inner">
-            <!-- Search bar wrapped to align with Fridge panel width perfectly -->
-            <div class="dashboard-search-wrapper">
-                <div class="dashboard-search-bar t-clear" id="searchWrap">
-                    <i class="bi bi-search dashboard-search-icon" aria-hidden="true"></i>
-                    <input
-                            type="search"
-                            id="productSearch"
-                            class="dashboard-search-input"
-                            placeholder="Search products…"
-                            aria-label="Search products"
-                            autocomplete="off"
-                    >
-                    <div class="t-clear-mirror" aria-hidden="true"></div>
-                    <div class="t-clear-placeholder" aria-hidden="true">
-                        Search products…
+            <!-- rest of your dashboard code... -->
+            <div class="dashboard-inner">
+                <!-- Search bar wrapped to align with Fridge panel width perfectly -->
+                <div class="dashboard-search-wrapper">
+                    <div class="dashboard-search-bar t-clear" id="searchWrap">
+                        <i class="bi bi-search dashboard-search-icon" aria-hidden="true"></i>
+                        <input
+                                type="search"
+                                id="productSearch"
+                                class="dashboard-search-input"
+                                placeholder="Search products…"
+                                aria-label="Search products"
+                                autocomplete="off"
+                        >
+                        <div class="t-clear-mirror" aria-hidden="true"></div>
+                        <div class="t-clear-placeholder" aria-hidden="true">
+                            Search products…
+                        </div>
+                        <div class="t-clear-glow" aria-hidden="true"></div>
+                        <button
+                                type="button"
+                                class="t-clear-btn"
+                                id="searchClearBtn"
+                                aria-label="Clear Search"
+                        >
+                            <i class="bi bi-x" aria-hidden="true"></i>
+                        </button>
                     </div>
-                    <div class="t-clear-glow" aria-hidden="true"></div>
-                    <button
-                            type="button"
-                            class="t-clear-btn"
-                            id="searchClearBtn"
-                            aria-label="Clear Search"
-                    >
-                        <i class="bi bi-x" aria-hidden="true"></i>
-                    </button>
                 </div>
-            </div>
 
-            <!-- Fridge area carousel -->
-            <section class="fridge-panel">
-                <button type="button" class="btn-scroll-down carousel-arrow" id="areaPrev"
-                        aria-label="Previous area"
-                        {% if areas|length < 2 %}disabled{% endif %}>
-                    <i class="bi bi-chevron-left"></i>
-                </button>
+                <!-- Fridge area carousel -->
+                <section class="fridge-panel">
+                    <button type="button" class="btn-scroll-down carousel-arrow" id="areaPrev"
+                            aria-label="Previous area"
+                            {% if areas|length < 2 %}disabled{% endif %}>
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
 
-                <div class="fridge-panel-body" id="page-transition-panel">
-                    <header class="fridge-panel-header">
-                        <h2 class="fridge-panel-title" id="areaTitle">
+                    <div class="fridge-panel-body" id="page-transition-panel">
+                        <header class="fridge-panel-header">
+                            <h2 class="fridge-panel-title" id="areaTitle">
                             <span class="area-title-text" id="areaTitleText">{% if areas %}{{ areas.0.name }}{% else %}
                                 No areas{% endif %}{% if areas and areas.0.is_shared %}
                                 <span class="area-shared-icon area-title-word"
@@ -86,257 +88,111 @@
                                     <i class="bi bi-people-fill" aria-hidden="true"></i>
                                 </span>
                             {% endif %}</span>
-                        </h2>
+                            </h2>
 
-                        <!-- Edit area button -->
-                        <button type="button"
-                                class="area-edit-btn"
-                                id="areaEditBtn"
-                                title="Edit area"
-                                aria-label="Edit area"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editAreaModal"
-                                {% if areas %}
-                                data-area-id="{{ areas.0.id }}"
-                                data-area-name="{{ areas.0.name }}"
-                                data-area-shared="{{ areas.0.is_shared|yesno:'true,false' }}"
-                                data-area-owner="{{ areas.0.is_owner|yesno:'true,false' }}"
-                                {% else %}
-                                disabled
-                                {% endif %}>
-                            <i class="bi bi-pencil"></i>
-                        </button>
-
-                        <div class="t-morph" data-open="false">
-                            <button type="button" class="t-morph-plus" aria-expanded="false"
-                                    aria-label="Quick actions">
-                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                                    <path d="M9 1v16M1 9h16" stroke="currentColor" stroke-width="2"
-                                          stroke-linecap="round"/>
-                                </svg>
-                            </button>
-                            <nav class="t-morph-menu">
-                                <a href="#" class="t-morph-menu-item"
-                                   data-bs-toggle="modal" data-bs-target="#addProductModal"
-                                   data-initial-mode="scan">
-                                    <i class="bi bi-upc-scan"></i> Scan product
-                                </a>
-                                <a href="#" class="t-morph-menu-item"
-                                   data-bs-toggle="modal" data-bs-target="#addProductModal"
-                                   data-initial-mode="manual">
-                                    <i class="bi bi-plus-circle"></i> Add product by hand
-                                </a>
-                                <button type="button" class="t-morph-menu-item"
-                                        data-bs-toggle="modal" data-bs-target="#addAreaModal"
-                                        data-area-mode="create">
-                                    <i class="bi bi-folder-plus"></i> Add area
-                                </button>
-                            </nav>
-                        </div>
-                    </header>
-
-                    <div class="area-carousel-viewport">
-                        <div class="area-carousel" id="areaCarousel">
-                            {% for area in areas %}
-                                <div class="area-panel"
-                                     data-area-id="{{ area.id }}"
-                                     data-area-name="{{ area.name }}"
-                                     data-is-shared="{{ area.is_shared|yesno:'true,false' }}"
-                                     data-area-owner="{{ area.is_owner|yesno:'true,false' }}">
-
-                                    {% if area.shared_users_script %}{{ area.shared_users_script }}{% endif %}
-
-                                    {% if area.products %}
-                                        <ul class="product-list">
-                                            {% for user_product in area.products %}
-                                                {% include "partials/product_row.html" with up=user_product area_name=area.name %}
-                                            {% endfor %}
-                                        </ul>
+                            <!-- Edit area button -->
+                            <button type="button"
+                                    class="area-edit-btn"
+                                    id="areaEditBtn"
+                                    title="Edit area"
+                                    aria-label="Edit area"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editAreaModal"
+                                    {% if areas %}
+                                    data-area-id="{{ areas.0.id }}"
+                                    data-area-name="{{ areas.0.name }}"
+                                    data-area-shared="{{ areas.0.is_shared|yesno:'true,false' }}"
+                                    data-area-owner="{{ areas.0.is_owner|yesno:'true,false' }}"
                                     {% else %}
-                                        <p class="dashboard-empty-state">No products in this area yet.</p>
-                                    {% endif %}
-                                </div>
-                            {% empty %}
-                                <div class="area-panel">
-                                    <p class="dashboard-empty-state">
-                                        You don't have any areas yet — add one to get started.
-                                    </p>
-                                </div>
-                            {% endfor %}
+                                    disabled
+                                    {% endif %}>
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <div class="t-morph" data-open="false">
+                                <button type="button" class="t-morph-plus" aria-expanded="false"
+                                        aria-label="Quick actions">
+                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                                        <path d="M9 1v16M1 9h16" stroke="currentColor" stroke-width="2"
+                                              stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                                <nav class="t-morph-menu">
+                                    <button type="button" class="t-morph-menu-item"
+                                            data-bs-toggle="modal" data-bs-target="#addProductModal"
+                                            data-initial-mode="scan">
+                                        <i class="bi bi-upc-scan"></i> Scan product
+                                    </button>
+                                    <button type="button" class="t-morph-menu-item"
+                                            data-bs-toggle="modal" data-bs-target="#addProductModal"
+                                            data-initial-mode="manual">
+                                        <i class="bi bi-plus-circle"></i> Add product by hand
+                                    </button>
+                                    <button type="button" class="t-morph-menu-item"
+                                            data-bs-toggle="modal" data-bs-target="#addAreaModal"
+                                            data-area-mode="create">
+                                        <i class="bi bi-folder-plus"></i> Add area
+                                    </button>
+                                </nav>
+                            </div>
+                        </header>
+
+                        <div class="area-carousel-viewport">
+                            <div class="area-carousel" id="areaCarousel">
+                                {% for area in areas %}
+                                    <div class="area-panel"
+                                         data-area-id="{{ area.id }}"
+                                         data-area-name="{{ area.name }}"
+                                         data-is-shared="{{ area.is_shared|yesno:'true,false' }}"
+                                         data-area-owner="{{ area.is_owner|yesno:'true,false' }}">
+
+                                        {% if area.shared_users_script %}{{ area.shared_users_script }}{% endif %}
+
+                                        {% if area.products %}
+                                            <ul class="product-list">
+                                                {% for user_product in area.products %}
+                                                    {% include "partials/product_row.html" with up=user_product area_name=area.name %}
+                                                {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <p class="dashboard-empty-state">No products in this area yet.</p>
+                                        {% endif %}
+                                    </div>
+                                {% empty %}
+                                    <div class="area-panel">
+                                        <p class="dashboard-empty-state">
+                                            You don't have any areas yet — add one to get started.
+                                        </p>
+                                    </div>
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
+
+                    <button type="button" class="btn-scroll-down carousel-arrow" id="areaNext" aria-label="Next area"
+                            {% if areas|length < 2 %}disabled{% endif %}>
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </section>
+
+                <div class="dashboard-actions">
+                    <a href="{% url 'areas' %}" class="btn-fridge-outline" data-page-transition>View all areas</a>
+
+                    <button type="button" class="btn-fridge-outline"
+                            data-bs-toggle="modal" data-bs-target="#addAreaModal"
+                            data-area-mode="create">
+                        <i class="bi bi-plus"></i> Add new area
+                    </button>
                 </div>
-
-                <button type="button" class="btn-scroll-down carousel-arrow" id="areaNext" aria-label="Next area"
-                        {% if areas|length < 2 %}disabled{% endif %}>
-                    <i class="bi bi-chevron-right"></i>
-                </button>
-            </section>
-
-            <div class="dashboard-actions">
-                <a href="{% url 'areas' %}" class="btn-fridge-outline" data-page-transition>View all areas</a>
-
-                <button type="button" class="btn-fridge-outline"
-                        data-bs-toggle="modal" data-bs-target="#addAreaModal"
-                        data-area-mode="create">
-                    <i class="bi bi-plus"></i> Add new area
-                </button>
             </div>
         </div>
+
     </main>
 
     <!-- DASHBOARD SPECIFIC MODALS -->
-    <!-- Remove Product Confirmation Modal -->
-    <div class="modal fade" id="deleteProductModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content custom-popup t-modal">
-                <div class="modal-body text-center p-4 p-md-5">
-                    <h3 class="popup-title mb-5">
-                        Remove <span id="deleteProductName">this product</span>?
-                    </h3>
-                    <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
-                            data-bs-dismiss="modal">
-                        Nah, just kidding
-                    </button>
-                    <hr class="popup-divider mx-auto mb-4">
-                    <form method="post" action="" id="deleteProductForm">
-                        {% csrf_token %}
-                        <input type="hidden" name="product_id" id="deleteProductId">
-                        <button type="button" class="btn btn-link text-decoration-none popup-btn-danger" id="confirmDeleteProductBtn">
-                            Yes, remove it!
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Add Area / Add Shared Area with Code (Combined Sliding Modal) -->
-    <div class="modal fade" id="addAreaModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content custom-popup t-modal">
-                <button type="button"
-                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="add-area-slider-wrap">
-                    <div class="add-area-slider-track">
-                        <!-- Panel: Add Area -->
-                        <div class="add-area-panel add-area-panel-create modal-body text-center p-4 p-md-5"
-                             data-panel="create">
-                            <h3 class="popup-title mb-4">Add Area</h3>
-                            <form method="post" action="{% url 'api_add_area' %}" id="addAreaForm">
-                                {% csrf_token %}
-                                <div class="text-start mb-2">
-                                    <label for="newAreaName" class="form-label popup-label">Area Name</label>
-                                    <input type="text" name="name" maxlength="10" class="form-control popup-input shadow-none"
-                                           id="newAreaName" required autocomplete="off">
-                                </div>
-                                <p class="custom-subtext mb-5">
-                                    Add a shared area
-                                    <button type="button"
-                                            class="custom-link custom-link-button add-area-switch-btn"
-                                            data-switch-to="code">
-                                        HERE
-                                    </button>
-                                </p>
-                                <button type="submit" class="popup-circular-btn mx-auto" aria-label="Add Area" id="submitAddAreaBtn">
-                                    <i class="bi bi-plus"></i>
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Panel: Add Shared Area with Code -->
-                        <div class="add-area-panel add-area-panel-code modal-body text-center p-4 p-md-5"
-                             data-panel="code" aria-hidden="true">
-                            <h3 class="popup-title mb-4">Add Shared Area</h3>
-                            <form method="post" action="{% url 'api_join_area' %}" id="joinAreaForm">
-                                {% csrf_token %}
-                                <div class="text-start mb-2">
-                                    <label for="newAreaCode" class="form-label popup-label">Area Code</label>
-                                    <input type="text" name="code" class="form-control popup-input shadow-none"
-                                           id="newAreaCode" required autocomplete="off">
-                                </div>
-                                <p class="custom-subtext mb-5">
-                                    Add a new area
-                                    <button type="button"
-                                            class="custom-link custom-link-button add-area-switch-btn"
-                                            data-switch-to="create">
-                                        HERE
-                                    </button>
-                                </p>
-                                <button type="submit" class="popup-circular-btn mx-auto" aria-label="Add Shared Area" id="submitJoinAreaBtn">
-                                    <i class="bi bi-plus"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Area Modal -->
-    <div class="modal fade" id="editAreaModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content custom-popup t-modal">
-                <button type="button"
-                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
-                        data-bs-dismiss="modal" aria-label="Close"></button>
-                <div class="modal-body p-4 p-md-5">
-                    <div class="edit-area-morph-wrap" id="editAreaMorphWrap">
-                        <div class="edit-area-panel text-center" data-panel="main">
-                            <h3 class="popup-title mb-5">Edit Area</h3>
-                            <form method="post" action="" id="editAreaForm">
-                                {% csrf_token %}
-                                <input type="hidden" name="area_id" id="editAreaId">
-                                <div class="text-start mb-5">
-                                    <label for="editAreaName" class="form-label popup-label">Area Name</label>
-                                    <input type="text" name="name" maxlength="10" class="form-control popup-input shadow-none" id="editAreaName" required>
-                                </div>
-                                <button type="submit" class="popup-circular-btn mx-auto" aria-label="Save Area" id="saveAreaBtn">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M17 21V13H7V21M7 3V8H15M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </button>
-                            </form>
-                            <div class="edit-area-people d-none" id="editAreaPeopleSection">
-                                <hr class="popup-divider mx-auto mt-5 mb-4">
-                                <p class="popup-label mb-3">Shared with</p>
-                                <div class="avatar-group" id="editAreaAvatarGroup"></div>
-                                <button type="button" class="btn btn-link text-decoration-none popup-btn-danger mt-4" id="stopSharingAreaBtn">
-                                    Stop sharing this area
-                                </button>
-                            </div>
-                        </div>
-                        <div class="edit-area-panel d-none" data-panel="list">
-                            <button type="button" class="edit-area-back-btn" id="editAreaListBack" aria-label="Back">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                                </svg>
-                            </button>
-                            <h3 class="popup-title mb-4 text-center">Shared with</h3>
-                            <div class="edit-area-people-list" id="editAreaPeopleList"></div>
-                        </div>
-                        <div class="edit-area-panel d-none text-center" data-panel="confirm">
-                            <h3 class="popup-title mb-5">Are you sure you want to remove <span id="editAreaConfirmName"></span> from the area?</h3>
-                            <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4" id="editAreaConfirmCancel">Nah, just kidding</button>
-                            <hr class="popup-divider mx-auto mb-4">
-                            <button type="button" class="btn btn-link text-decoration-none popup-btn-danger" id="editAreaConfirmRemove">Yes, remove them!</button>
-                        </div>
-                        <div class="edit-area-panel d-none text-center" data-panel="confirm-stop">
-                            <h3 class="popup-title mb-5">Are you sure you want to stop sharing this area?</h3>
-                            <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4" id="editAreaStopCancel">Nah, just kidding</button>
-                            <hr class="popup-divider mx-auto mb-4">
-                            <button type="button" class="btn btn-link text-decoration-none popup-btn-danger" id="editAreaStopConfirm">Yes, stop sharing!</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Product Modal -->
-    <div class="modal fade" id="addProductModal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+    <!-- Add Product Modal (RESTORED) -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content custom-popup t-modal product-modal" id="addProductModalContent">
                 <button type="button" class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -375,20 +231,152 @@
         </div>
     </div>
 
+    <!-- Remove Product Confirmation Modal -->
+    <div class="modal fade" id="deleteProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup t-modal">
+                <div class="modal-body text-center p-4 p-md-5">
+                    <h3 class="popup-title mb-5">
+                        Remove <span id="deleteProductName">this product</span>?
+                    </h3>
+                    <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                            data-bs-dismiss="modal">
+                        Nah, just kidding
+                    </button>
+                    <hr class="popup-divider mx-auto mb-4">
+                    <form method="post" action="{% url 'api_delete_product' %}" id="deleteProductForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" id="deleteProductId">
+                        <button type="submit" class="btn btn-link text-decoration-none popup-btn-danger"
+                                id="confirmDeleteProductBtn">
+                            Yes, remove it!
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Area / Add Shared Area -->
+    <div class="modal fade" id="addAreaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup t-modal">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="add-area-slider-wrap">
+                    <div class="add-area-slider-track">
+                        <div class="add-area-panel add-area-panel-create modal-body text-center p-4 p-md-5"
+                             data-panel="create">
+                            <h3 class="popup-title mb-4">Add Area</h3>
+                            <form method="post" action="{% url 'api_add_area' %}" id="addAreaForm">
+                                {% csrf_token %}
+                                <div class="text-start mb-2">
+                                    <label for="newAreaName" class="form-label popup-label">Area Name</label>
+                                    <input type="text" name="area_name" maxlength="10"
+                                           class="form-control popup-input shadow-none"
+                                           id="newAreaName" required autocomplete="off">
+                                </div>
+                                <p class="custom-subtext mb-5">
+                                    Add a shared area
+                                    <button type="button"
+                                            class="custom-link custom-link-button add-area-switch-btn"
+                                            data-switch-to="code">
+                                        HERE
+                                    </button>
+                                </p>
+                                <button type="submit" class="popup-circular-btn mx-auto" aria-label="Add Area"
+                                        id="submitAddAreaBtn">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="add-area-panel add-area-panel-code modal-body text-center p-4 p-md-5"
+                             data-panel="code" aria-hidden="true">
+                            <h3 class="popup-title mb-4">Add Shared Area</h3>
+                            <form method="post" action="{% url 'api_join_area' %}" id="joinAreaForm">
+                                {% csrf_token %}
+                                <div class="text-start mb-2">
+                                    <label for="newAreaCode" class="form-label popup-label">Area Code</label>
+                                    <input type="text" name="area_code" class="form-control popup-input shadow-none"
+                                           id="newAreaCode" required autocomplete="off">
+                                </div>
+                                <p class="custom-subtext mb-5">
+                                    Add a new area
+                                    <button type="button"
+                                            class="custom-link custom-link-button add-area-switch-btn"
+                                            data-switch-to="create">
+                                        HERE
+                                    </button>
+                                </p>
+                                <button type="submit" class="popup-circular-btn mx-auto" aria-label="Add Shared Area"
+                                        id="submitJoinAreaBtn">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Area Modal -->
+    <div class="modal fade" id="editAreaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup t-modal">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-body p-4 p-md-5">
+                    <div class="edit-area-morph-wrap" id="editAreaMorphWrap">
+                        <div class="edit-area-panel text-center" data-panel="main">
+                            <h3 class="popup-title mb-5">Edit Area</h3>
+                            <form method="post" action="{% url 'edit_area' %}" id="editAreaForm">
+                                {% csrf_token %}
+                                <input type="hidden" name="area_id" id="editAreaId">
+                                <div class="text-start mb-5">
+                                    <label for="editAreaName" class="form-label popup-label">Area Name</label>
+                                    <input type="text" name="area_name" maxlength="10"
+                                           class="form-control popup-input shadow-none" id="editAreaName" required>
+                                </div>
+                                <button type="submit" class="popup-circular-btn mx-auto" aria-label="Save Area" id="saveAreaBtn" onclick="HTMLFormElement.prototype.submit.call(this.form);">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                         xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M17 21V13H7V21M7 3V8H15M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z"
+                                              stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                              stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Edit Product Modal -->
     <div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content custom-popup t-modal product-modal" id="editProductModalContent">
-                <button type="button" class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="modal-body p-4 p-md-5">
                     <h3 class="popup-title text-center mb-4">Edit Product</h3>
-                    <form method="post" action="" id="editProductForm">
+                    <form method="post" action="{% url 'api_edit_product' %}" id="editProductForm">
                         {% csrf_token %}
+                        <input type="hidden" name="user_product_id" id="editUserProductId">
                         <div class="mb-2">
                             <label for="editProductCode" class="form-label popup-label">Product code</label>
                             <div class="product-code-row">
-                                <input type="text" name="barcode" class="form-control popup-input shadow-none" id="editProductCode" placeholder="Scan or type a barcode" autocomplete="off">
-                                <button type="button" class="product-code-enter" id="editProductCodeEnter" title="Enter" aria-label="Enter"><i class="bi bi-arrow-return-left" aria-hidden="true"></i></button>
+                                <input type="text" name="barcode" class="form-control popup-input shadow-none"
+                                       id="editProductCode" placeholder="Scan or type a barcode" autocomplete="off">
+                                <button type="button" class="product-code-enter" id="editProductCodeEnter" title="Enter"
+                                        aria-label="Enter"><i class="bi bi-arrow-return-left" aria-hidden="true"></i>
+                                </button>
                             </div>
                         </div>
                         {% include "partials/product_form_fields.html" with id_prefix="edit" submit_icon="bi-floppy-fill" submit_label="Save changes" areas=areas %}
@@ -398,42 +386,42 @@
         </div>
     </div>
 
-   <!-- ========================================== -->
-        <!-- POP-UP: Create Custom Unit -->
-        <!-- ========================================== -->
-        <div class="modal fade" id="createUnitModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content custom-popup position-relative border-0">
-                    <button type="button"
-                            class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
-                            data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- ========================================== -->
+    <!-- POP-UP: Create Custom Unit -->
+    <!-- ========================================== -->
+    <div class="modal fade" id="createUnitModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-popup position-relative border-0">
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
 
-                    <form method="POST" action="{% url 'create_unit' %}">
-                        {% csrf_token %}
-                        <div class="modal-body text-center p-4 p-md-5">
-                            <h3 class="popup-title mb-4 mt-2">Create New Unit</h3>
+                <form method="POST" action="{% url 'create_unit' %}">
+                    {% csrf_token %}
+                    <div class="modal-body text-center p-4 p-md-5">
+                        <h3 class="popup-title mb-4 mt-2">Create New Unit</h3>
 
-                            <div class="text-start mb-5">
-                                <label for="newUnitSymbol" class="form-label popup-label">Unit symbol</label>
-                                <input type="text" name="symbol" class="form-control popup-input shadow-none"
-                                       id="newUnitSymbol" placeholder="e.g. piece, jar, box" required maxlength="10">
+                        <div class="text-start mb-5">
+                            <label for="newUnitSymbol" class="form-label popup-label">Unit symbol</label>
+                            <input type="text" name="symbol" class="form-control popup-input shadow-none"
+                                   id="newUnitSymbol" placeholder="e.g. piece, jar, box" required maxlength="10">
 
-                                <div class="form-text mt-2 text-muted" style="font-size: 0.8rem;">
-                                    {% if request.user.role == 'ADMIN' %}
-                                        You are an ADMIN. This unit will be <b class="text-primary">GLOBAL</b>.
-                                    {% else %}
-                                        This unit will be private and visible only to you.
-                                    {% endif %}
-                                </div>
+                            <div class="form-text mt-2 text-muted" style="font-size: 0.8rem;">
+                                {% if request.user.role == 'ADMIN' %}
+                                    You are an ADMIN. This unit will be <b class="text-primary">GLOBAL</b>.
+                                {% else %}
+                                    This unit will be private and visible only to you.
+                                {% endif %}
                             </div>
-
-                            <button type="submit" class="popup-circular-btn mx-auto" aria-label="Create Unit">
-                                <i class="bi bi-check-lg"></i>
-                            </button>
                         </div>
-                    </form>
-                </div>
+
+                        <button type="submit" class="popup-circular-btn mx-auto" aria-label="Create Unit">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
     </main>
 {% endblock %}

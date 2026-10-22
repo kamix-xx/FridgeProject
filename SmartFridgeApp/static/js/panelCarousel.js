@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const prevBtn = panelContainer.querySelector('#areaPrev, #listPrev, .carousel-arrow-prev');
         const nextBtn = panelContainer.querySelector('#areaNext, #listNext, .carousel-arrow-next');
         const titleText = panelContainer.querySelector('#areaTitleText, .panel-title-text');
+        const editBtn = panelContainer.querySelector('#areaEditBtn');
 
         const slides = Array.from(carousel.querySelectorAll('.area-panel'));
         const panelCount = slides.length;
@@ -44,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             [firstClone, lastClone].forEach((clone) => {
                 clone.setAttribute('aria-hidden', 'true');
-                clone.style.pointerEvents = 'none';
                 clone.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
             });
 
@@ -73,33 +73,39 @@ document.addEventListener('DOMContentLoaded', () => {
         function updateTitle(index) {
             if (!slides[index]) return;
 
-            const newTitle = slides[index].dataset.areaName
-                          || slides[index].dataset.title
-                          || slides[index].dataset.listName;
+            const slide = slides[index];
+            const areaName = slide.dataset.areaName || slide.dataset.title || slide.dataset.listName;
+            const isShared = slide.dataset.isShared === 'true';
+            const isOwner = slide.dataset.areaOwner === 'true';
+            const areaId = slide.dataset.areaId || slide.dataset.listId;
 
-            if (titleText && newTitle) {
-                titleText.textContent = newTitle;
+            if (titleText && areaName) {
+                let iconHtml = isShared ? ` <span class="area-shared-icon area-title-word" title="Shared area" aria-label="Shared area"><i class="bi bi-people-fill" aria-hidden="true"></i></span>` : '';
+                titleText.innerHTML = `${areaName}${iconHtml}`;
             }
 
-            // ROCK-SOLID ACTIVE STATE TRACKING
-            slides.forEach(s => s.classList.remove('active-carousel-slide'));
-            slides[index].classList.add('active-carousel-slide');
+            if (editBtn) {
+                if (areaId) {
+                    editBtn.dataset.areaId = areaId;
+                    editBtn.dataset.areaName = areaName || '';
+                    editBtn.dataset.areaShared = isShared;
+                    editBtn.dataset.areaOwner = isOwner;
+                    editBtn.disabled = false;
+                } else {
+                    editBtn.disabled = true;
+                }
+            }
 
-            const activeId = slides[index].getAttribute('data-list-id') || slides[index].getAttribute('data-area-id');
-            if (activeId) {
-                sessionStorage.setItem('lastActivePanelId', activeId);
+            slides.forEach(s => s.classList.remove('active-carousel-slide'));
+            slide.classList.add('active-carousel-slide');
+
+            if (areaId) {
+                sessionStorage.setItem('lastActivePanelId', areaId);
             }
         }
 
         function stepArea(delta) {
-            if (!infiniteEnabled) {
-                currentAreaIndex = Math.max(0, Math.min(panelCount - 1, currentAreaIndex + delta));
-                carousel.style.transform = `translateX(-${currentAreaIndex * 100}%)`;
-                updateTitle(currentAreaIndex);
-                if (prevBtn) prevBtn.disabled = currentAreaIndex === 0;
-                if (nextBtn) nextBtn.disabled = currentAreaIndex === panelCount - 1;
-                return;
-            }
+            if (!infiniteEnabled) return;
 
             if (trackPosition <= 0 || trackPosition >= panelCount + 1) {
                 trackPosition = ((trackPosition - 1) % panelCount + panelCount) % panelCount + 1;
@@ -113,13 +119,16 @@ document.addEventListener('DOMContentLoaded', () => {
             currentAreaIndex = ((trackPosition - 1) % panelCount + panelCount) % panelCount;
 
             updateTitle(currentAreaIndex);
+            carousel.style.transition = 'transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)';
             carousel.style.transform = `translateX(-${trackPosition * 100}%)`;
         }
 
         if (prevBtn) {
+            prevBtn.removeAttribute('disabled');
             prevBtn.addEventListener('click', (e) => { e.preventDefault(); stepArea(-1); });
         }
         if (nextBtn) {
+            nextBtn.removeAttribute('disabled');
             nextBtn.addEventListener('click', (e) => { e.preventDefault(); stepArea(1); });
         }
 

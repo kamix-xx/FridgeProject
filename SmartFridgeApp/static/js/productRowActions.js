@@ -1,13 +1,3 @@
-// productRowActions.js
-//
-// Each .product-row acts as its own "edit" trigger (click, or Enter/Space
-// when focused) — clicks inside .product-row-actions (the gooey menu) are
-// left alone there, since they've got their own listener below. Edit opens
-// the shared #editProductModal (see window.openEditProductModal() in
-// productModal.js), pre-filled from the row's data-edit-* attributes.
-// Also fills in the shared #deleteProductModal with whichever product's
-// delete button was clicked, using Bootstrap's show.bs.modal event.
-
 document.addEventListener('DOMContentLoaded', function () {
     function isFromActions(e) {
         return !!e.target.closest('.product-row-actions');
@@ -15,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function readEditPayload(row) {
         return {
+            id: row.dataset.userProductId || row.dataset.productId || row.dataset.editId || '',
             code: row.dataset.editCode || '',
             name: row.dataset.editName || '',
             price: row.dataset.editPrice || '',
@@ -22,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
             unit: row.dataset.editUnit || '',
             expirationDate: row.dataset.editExpiration || '',
             area: row.dataset.editArea || '',
+            areaId: row.dataset.editAreaId || '',
         };
     }
 
@@ -30,8 +22,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // Close the gooey menu first, if it was open, so it's not still
-        // sitting there (checked) the next time this row is expanded.
         var gooeyChk = row.querySelector('.gooey-chk');
         if (gooeyChk) {
             gooeyChk.checked = false;
@@ -68,11 +58,20 @@ document.addEventListener('DOMContentLoaded', function () {
     if (deleteModal) {
         deleteModal.addEventListener('show.bs.modal', function (event) {
             var trigger = event.relatedTarget;
-            var name = trigger && trigger.dataset.productDisplayName;
+            var row = trigger ? trigger.closest('.product-row') : null;
+            
+            var pId = (trigger && trigger.dataset.productId) || 
+                      (row && row.dataset.userProductId) || 
+                      (row && row.dataset.productId) || '';
+
+            var name = (trigger && trigger.dataset.productDisplayName) || 
+                       (row && row.dataset.editName) || 'this product';
+                       
+            var idInput = document.getElementById('deleteProductId');
             var nameEl = document.getElementById('deleteProductName');
-            if (nameEl) {
-                nameEl.textContent = name || 'this product';
-            }
+            
+            if (idInput) idInput.value = pId;
+            if (nameEl) nameEl.textContent = name;
         });
     }
 });

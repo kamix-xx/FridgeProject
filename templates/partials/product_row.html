@@ -1,23 +1,12 @@
 {% comment %}
 Renders a single product row inside an area's product list.
-Expects:
-  - `up` — a UserProduct instance, annotated by the view with
-    `freshness_percent` (0-100 or None) and `freshness_level`
-    ('fresh' | 'warning' | 'critical' | 'expired' | 'unknown').
-  - `area_name` — the name of the area this row lives in, so the Edit
-    Product modal can default its area picker correctly.
-
-The row itself acts as the "edit" trigger (see productRowActions.js) —
-tap/click/Enter/Space anywhere on it except the actions menu opens the
-Edit Product modal (see window.openEditProductModal() in productModal.js),
-pre-filled from this row's data-edit-* attributes. The actions menu (a
-subtler variant of the areas page's gooey menu) offers the same Edit
-action plus Remove, which opens the shared #deleteProductModal
-confirmation.
 {% endcomment %}
 
 <li class="product-row"
+    data-user-product-id="{{ up.id }}"
+    data-product-id="{{ up.id }}"
     data-product-name="{{ up.product.name|lower }}"
+    data-edit-id="{{ up.id }}"
     data-edit-code="{{ up.product.barcode|default_if_none:'' }}"
     data-edit-name="{{ up.product.name|default_if_none:'' }}"
     data-edit-price="{{ up.price|default_if_none:'' }}"
@@ -25,11 +14,11 @@ confirmation.
     data-edit-unit="{{ up.unit.symbol|default_if_none:'' }}"
     data-edit-expiration="{{ up.expiration_date|date:'Y-m-d' }}"
     data-edit-area="{{ area_name|default_if_none:'' }}"
+    data-edit-area-id="{{ up.area.id }}"
     role="button"
     tabindex="0"
     aria-label="Edit {{ up.product.name }}">
 
-    {# TODO: swap for a per-product icon once product_dictionary.icon_number maps to real assets #}
     <span class="product-icon" aria-hidden="true">
         <i class="bi bi-basket2-fill"></i>
     </span>
@@ -59,7 +48,6 @@ confirmation.
         <!-- SVG Filter for the Gooey Effect -->
         <svg width="0" height="0" class="position-absolute" style="visibility: hidden;">
             <defs>
-                <!-- Expanded bounds so the sliding buttons don't get clipped -->
                 <filter id="goo" x="-200%" y="-100%" width="400%" height="300%">
                     <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
                     <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"
@@ -69,17 +57,16 @@ confirmation.
             </defs>
         </svg>
 
-
         <input type="checkbox"
                id="gooey-chk-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"
                class="gooey-chk d-none">
 
         <div class="gooey-container">
-            {# TODO: wire the "Yes, remove it!" button up once the delete view exists #}
             <button type="button"
                     class="gooey-item item-remove"
                     data-bs-toggle="modal"
                     data-bs-target="#deleteProductModal"
+                    data-product-id="{{ up.id }}"
                     data-product-display-name="{{ up.product.name }}"
                     aria-label="Remove {{ up.product.name }}">
                 <i class="bi bi-trash"></i>

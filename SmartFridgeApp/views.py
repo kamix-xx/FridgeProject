@@ -30,26 +30,35 @@ def _with_freshness(user_product):
     total_days = (exp - added).days
     remaining_days = (exp - date.today()).days
 
-    if remaining_days <= 0:
-        percent = 0
-    elif total_days <= 0:
-        percent = 100
-    else:
-        percent = max(0, min(100, round(remaining_days / total_days * 100)))
-
-    user_product.freshness_percent = percent
-
-    if remaining_days <= 0:
+    # 1. Determine Color/Level strictly by absolute days remaining
+    if remaining_days < 0:
         user_product.freshness_level = 'expired'
-    elif percent <= 30:
+    elif remaining_days <= 2:
         user_product.freshness_level = 'critical'
-    elif percent <= 65:
+    elif remaining_days <= 5:
         user_product.freshness_level = 'warning'
     else:
         user_product.freshness_level = 'fresh'
 
-    return user_product
+    # 2. Determine Bar Size (Percentage)
+    if remaining_days < 0:
+        # Expired items are pushed to 100% so the CSS rotting gradient can fill the space
+        user_product.freshness_percent = 100
+    else:
+        # Prevent 1-day items from showing 100% by assuming a minimum visual baseline of 14 days
+        effective_total = max(total_days, 14)
+        percent = max(0, min(100, round((remaining_days / effective_total) * 100)))
 
+        # Force visual caps so the physical size always matches the urgency level
+        if user_product.freshness_level == 'critical':
+            percent = min(percent, 15)  # Never wider than 15% if critical (Red)
+        elif user_product.freshness_level == 'warning':
+            percent = min(percent, 40)  # Never wider than 40% if warning (Orange)
+
+        # Ensure a tiny sliver is always visible (4%) so it doesn't look completely empty on the last day
+        user_product.freshness_percent = max(percent, 4)
+
+    return user_product
 
 def _fake_dashboard_areas(user=None):
     display_name = user.username if (user and user.is_authenticated) else "You"
@@ -292,29 +301,26 @@ def areas(request):
 @login_required(login_url='login')
 def create_area(request):
     if request.method == 'POST':
-        area_name = request.POST.get('area_name')
+        area_name = request.POST.get('area_name') or request.POST.get('name')
 
         if area_name:
-            # invitation code (12 chars)
             unique_key = uuid.uuid4().hex[:12].upper()
-
             new_area = Area.objects.create(
                 name=area_name,
                 key=unique_key,
                 owner=request.user
             )
-
             new_area.users.add(request.user)
-
             messages.success(request, f'Area "{area_name}" created successfully!')
 
-    return redirect('areas')
+    next_url = request.META.get('HTTP_REFERER') or 'home'
+    return redirect(next_url)
 
 
 @login_required(login_url='login')
 def join_area(request):
     if request.method == 'POST':
-        area_code = request.POST.get('area_code', '').strip()
+        area_code = (request.POST.get('area_code') or request.POST.get('code') or '').strip()
 
         if area_code:
             try:
@@ -322,25 +328,23 @@ def join_area(request):
 
                 if area.owner == request.user:
                     messages.info(request, f'You are the owner of "{area.name}", you cannot join it again.')
-
                 elif area.users.filter(id=request.user.id).exists():
                     messages.info(request, f'You are already a member of "{area.name}".')
-
                 else:
                     area.users.add(request.user)
                     messages.success(request, f'Successfully joined "{area.name}"!')
-
             except Area.DoesNotExist:
                 messages.error(request, 'Invalid area code. Please check and try again.')
 
-    return redirect('areas')
+    next_url = request.META.get('HTTP_REFERER') or 'home'
+    return redirect(next_url)
 
 
 @login_required(login_url='login')
 def edit_area(request):
     if request.method == 'POST':
         area_id = request.POST.get('area_id')
-        new_name = request.POST.get('area_name')
+        new_name = request.POST.get('area_name') or request.POST.get('name')
 
         if area_id and new_name:
             area = get_object_or_404(Area, id=area_id)
@@ -352,7 +356,8 @@ def edit_area(request):
             else:
                 messages.error(request, 'Only the owner can rename this area.')
 
-    return redirect('areas')
+    next_url = request.META.get('HTTP_REFERER') or 'home'
+    return redirect(next_url)
 
 
 @login_required(login_url='login')
@@ -1238,34 +1243,34 @@ def api_add_product(request):
         area_id = request.POST.get('area_id')
 
         if not name or not area_id:
-            messages.error(request, 'Nazwa produktu i obszar są wymagane.')
-            return redirect('home')
+            messages.error(request, 'Product name and area are required.')
+            return redirect(request.META.get('HTTP_REFERER') or 'home')
 
         try:
             quantity = int(float(request.POST.get('quantity', 1)))
             if quantity < 1: quantity = 1
-        except ValueError:
+        except (ValueError, TypeError):
             quantity = 1
 
         try:
             price = float(request.POST.get('price', 0.01))
             if price < 0.01: price = 0.01
-        except ValueError:
+        except (ValueError, TypeError):
             price = 0.01
 
         try:
             kcal = int(request.POST.get('kcal') or 0)
-        except ValueError:
+        except (ValueError, TypeError):
             kcal = 0
 
         try:
             proteins = float(request.POST.get('proteins') or 0.0)
-        except ValueError:
+        except (ValueError, TypeError):
             proteins = 0.0
 
         try:
             fats = float(request.POST.get('fats') or 0.0)
-        except ValueError:
+        except (ValueError, TypeError):
             fats = 0.0
 
         nutriscore = request.POST.get('nutriscore', 'X').upper()
@@ -1279,22 +1284,18 @@ def api_add_product(request):
 
         area = get_object_or_404(Area, id=area_id)
         if area.owner != request.user and not area.users.filter(id=request.user.id).exists():
-            messages.error(request, 'Nie masz dostępu do wybranego obszaru.')
-            return redirect('home')
+            messages.error(request, 'Access denied for selected area.')
+            return redirect(request.META.get('HTTP_REFERER') or 'home')
 
         unit = Unit.objects.filter(symbol__iexact=unit_symbol).first()
-
         if not unit:
             unit = Unit.objects.create(symbol=unit_symbol, is_global=False, user=request.user)
 
         product_dict = None
-
         if barcode:
             product_dict = ProductDictionary.objects.filter(barcode=barcode).first()
-
         if not product_dict:
             product_dict = ProductDictionary.objects.filter(name__iexact=name).first()
-
         if not product_dict:
             product_dict = ProductDictionary.objects.create(
                 name=name,
@@ -1309,7 +1310,6 @@ def api_add_product(request):
                 status=ItemStatus.UNOFFICIAL
             )
 
-        # --- 6. Fizyczne dodanie produktu do lodówki usera (UserProduct) ---
         UserProduct.objects.create(
             quantity=quantity,
             price=price,
@@ -1319,6 +1319,90 @@ def api_add_product(request):
             unit=unit
         )
 
-        messages.success(request, f'Dodano "{name}" do obszaru: {area.name}!')
+        messages.success(request, f'Added "{name}" to area: {area.name}!')
 
-    return redirect('home')
+    return redirect(request.META.get('HTTP_REFERER') or 'home')
+
+
+@login_required(login_url='login')
+def api_delete_product(request):
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+
+        if product_id:
+            try:
+                # Force integer conversion to catch 'undefined' or empty strings
+                product_id = int(product_id)
+                user_product = get_object_or_404(UserProduct, id=product_id)
+                area = user_product.area
+
+                if area.owner == request.user or area.users.filter(id=request.user.id).exists():
+                    user_product.delete()
+                    messages.success(request, 'Product removed successfully.')
+                else:
+                    messages.error(request, 'Permission denied.')
+
+            except (ValueError, TypeError):
+                messages.error(request, 'Invalid product data received.')
+
+    return redirect(request.META.get('HTTP_REFERER') or 'home')
+
+
+@login_required(login_url='login')
+def api_edit_product(request):
+    if request.method == 'POST':
+        raw_id = request.POST.get('user_product_id') or request.POST.get('product_id')
+
+        try:
+            # Force integer conversion to catch 'undefined'
+            user_product_id = int(raw_id)
+            user_product = get_object_or_404(UserProduct, id=user_product_id)
+        except (ValueError, TypeError):
+            messages.error(request, 'Invalid product data received.')
+            return redirect(request.META.get('HTTP_REFERER') or 'home')
+
+        area = user_product.area
+        if area.owner != request.user and not area.users.filter(id=request.user.id).exists():
+            messages.error(request, 'Permission denied.')
+            return redirect(request.META.get('HTTP_REFERER') or 'home')
+
+        name = request.POST.get('product_name', '').strip()
+        area_id = request.POST.get('area_id')
+
+        if name:
+            user_product.product.name = name
+            user_product.product.save()
+
+        if area_id:
+            try:
+                new_area = get_object_or_404(Area, id=int(area_id))
+                if new_area.owner == request.user or new_area.users.filter(id=request.user.id).exists():
+                    user_product.area = new_area
+            except (ValueError, TypeError):
+                pass
+
+        try:
+            user_product.quantity = float(request.POST.get('quantity', user_product.quantity))
+        except (ValueError, TypeError):
+            pass
+
+        try:
+            user_product.price = float(request.POST.get('price', user_product.price))
+        except (ValueError, TypeError):
+            pass
+
+        exp_raw = request.POST.get('expiration_date')
+        if exp_raw:
+            user_product.expiration_date = parse_date(exp_raw)
+
+        unit_symbol = request.POST.get('unit_symbol', '').strip()
+        if unit_symbol:
+            unit = Unit.objects.filter(symbol__iexact=unit_symbol).first()
+            if not unit:
+                unit = Unit.objects.create(symbol=unit_symbol, is_global=False, user=request.user)
+            user_product.unit = unit
+
+        user_product.save()
+        messages.success(request, 'Product updated successfully.')
+
+    return redirect(request.META.get('HTTP_REFERER') or 'home')

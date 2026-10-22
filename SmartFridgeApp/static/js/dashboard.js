@@ -404,77 +404,210 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
+// =========================================
+    // Jump to New Area on Submit
+    // =========================================
+    const addAreaForm = document.getElementById('addAreaForm');
+    const joinAreaForm = document.getElementById('joinAreaForm');
+
+    if (addAreaForm) addAreaForm.addEventListener('submit', () => sessionStorage.setItem('jumpToNewList', 'true'));
+    if (joinAreaForm) joinAreaForm.addEventListener('submit', () => sessionStorage.setItem('jumpToNewList', 'true'));
+
+    // =========================================
+    // Edit Area Modal population
+    // =========================================
+    const editAreaModal = document.getElementById('editAreaModal');
+    if (editAreaModal) {
+        editAreaModal.addEventListener('show.bs.modal', () => {
+            const editBtn = document.getElementById('areaEditBtn');
+            if (editBtn) {
+                const areaIdInput = document.getElementById('editAreaId');
+                const areaNameInput = document.getElementById('editAreaName');
+                if (areaIdInput) areaIdInput.value = editBtn.dataset.areaId || '';
+                if (areaNameInput) areaNameInput.value = editBtn.dataset.areaName || '';
+            }
+        });
+    }
+
+    // =========================================
+    // Unified Modal population (Add/Edit/Delete)
+    // Runs in capturing phase to bypass morph menu hijacking
+    // =========================================
+    document.addEventListener('click', (e) => {
+
+        // Helper to deeply search for data attributes to prevent "undefined" errors
+        const findData = (btn, row, keys, fallback = '') => {
+            for (let k of keys) {
+                if (btn && btn.hasAttribute(k) && btn.getAttribute(k) !== 'undefined' && btn.getAttribute(k) !== 'null') return btn.getAttribute(k);
+                if (row && row.hasAttribute(k) && row.getAttribute(k) !== 'undefined' && row.getAttribute(k) !== 'null') return row.getAttribute(k);
+            }
+            return fallback;
+        };
+
+        // 1. ADD PRODUCT: Open modal and auto-select active area
+        const addBtn = e.target.closest('[data-bs-target="#addProductModal"]');
+        if (addBtn) {
+            e.preventDefault();
+            const modalEl = document.getElementById('addProductModal');
+            if (modalEl && typeof bootstrap !== 'undefined') {
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+
+                const morphWrap = addBtn.closest('.t-morph');
+                if (morphWrap) morphWrap.dataset.open = 'false';
+
+                const activeSlide = document.querySelector('.area-panel.active-carousel-slide');
+                const addAreaInput = document.querySelector('#addProductModal [name="area_id"]');
+                if (activeSlide && addAreaInput) {
+                    const areaId = activeSlide.getAttribute('data-area-id') || activeSlide.getAttribute('data-list-id');
+                    if (areaId) {
+                        addAreaInput.value = areaId;
+                        addAreaInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                }
+            }
+            return;
+        }
+
+        // 2. DELETE PRODUCT
+        const deleteTrigger = e.target.closest('[data-bs-target="#deleteProductModal"]');
+        if (deleteTrigger) {
+            const row = deleteTrigger.closest('.product-row');
+
+            const pId = findData(deleteTrigger, row, ['data-id', 'data-product-id', 'data-user-product-id']);
+            const pName = findData(deleteTrigger, row, ['data-product-name', 'data-name'], 'this product');
+
+            const idInput = document.getElementById('deleteProductId');
+            const nameSpan = document.getElementById('deleteProductName');
+
+            if (idInput) idInput.value = pId;
+            if (nameSpan) nameSpan.textContent = pName;
+            return;
+        }
+
+        // 3. EDIT PRODUCT
+        const editTrigger = e.target.closest('[data-bs-target="#editProductModal"]');
+        if (editTrigger) {
+            const row = editTrigger.closest('.product-row');
+            const panel = editTrigger.closest('.area-panel');
+
+            // ID
+            const pId = findData(editTrigger, row, ['data-id', 'data-user-product-id', 'data-product-id']);
+            const idInput = document.getElementById('editUserProductId');
+            if (idInput) idInput.value = pId;
+
+            // Name
+            const pName = findData(editTrigger, row, ['data-product-name', 'data-name']);
+            const nameInput = document.querySelector('#editProductModal input[name="product_name"]');
+            if (nameInput) nameInput.value = pName;
+
+            // Quantity
+            const pQty = findData(editTrigger, row, ['data-quantity', 'data-qty']);
+            const qtyInput = document.querySelector('#editProductModal input[name="quantity"]');
+            if (qtyInput) qtyInput.value = pQty;
+
+            // Unit
+            const pUnit = findData(editTrigger, row, ['data-unit-symbol', 'data-unit']);
+            const unitInput = document.querySelector('#editProductModal [name="unit_symbol"]');
+            if (unitInput) {
+                unitInput.value = pUnit;
+                unitInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+
+            // Area
+            const pArea = findData(editTrigger, row, ['data-area-id']) || (panel ? panel.getAttribute('data-area-id') : '');
+            const areaInput = document.querySelector('#editProductModal [name="area_id"]');
+            if (areaInput) {
+                areaInput.value = pArea;
+                areaInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+
+            // Barcode
+            const pCode = findData(editTrigger, row, ['data-barcode']);
+            const codeInput = document.getElementById('editProductCode');
+            if (codeInput) codeInput.value = pCode;
+
+            // Price & Exp
+            const pPrice = findData(editTrigger, row, ['data-price']);
+            const priceInput = document.querySelector('#editProductModal input[name="price"]');
+            if (priceInput) priceInput.value = pPrice;
+
+            const pExp = findData(editTrigger, row, ['data-expiration-date', 'data-exp']);
+            const expInput = document.querySelector('#editProductModal input[name="expiration_date"]');
+            if (expInput) expInput.value = pExp;
+        }
+    }, true);
 });
 
-    // =========================================
-    // Area Carousel
-    // =========================================
-    const carousel = document.getElementById('areaCarousel');
-    const prevBtn = document.getElementById('areaPrev');
-    const nextBtn = document.getElementById('areaNext');
-    const panels = document.querySelectorAll('.area-panel');
-    const titleText = document.getElementById('areaTitleText');
-    const editBtn = document.getElementById('areaEditBtn');
-
-    let currentAreaIndex = 0;
-
-    function updateCarousel() {
-        if (!panels || panels.length === 0) return;
-
-        if (carousel) {
-            const offset = -(currentAreaIndex * 100);
-            carousel.style.transform = `translateX(${offset}%)`;
-            carousel.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
-            carousel.style.display = 'flex';
-        }
-
-        if (prevBtn) prevBtn.disabled = (currentAreaIndex === 0);
-        if (nextBtn) nextBtn.disabled = (currentAreaIndex === panels.length - 1);
-
-        const currentPanel = panels[currentAreaIndex];
-        const areaId = currentPanel.dataset.areaId;
-        const areaName = currentPanel.dataset.areaName;
-        const isShared = currentPanel.dataset.isShared === 'true';
-        const isOwner = currentPanel.dataset.areaOwner === 'true';
-
-        if (titleText) {
-            let iconHtml = isShared ? `<span class="area-shared-icon area-title-word" title="Shared area" aria-label="Shared area"><i class="bi bi-people-fill" aria-hidden="true"></i></span>` : '';
-            titleText.innerHTML = `${areaName || 'No areas'} ${iconHtml}`;
-        }
-
-        if (editBtn) {
-            if (areaId) {
-                editBtn.dataset.areaId = areaId;
-                editBtn.dataset.areaName = areaName;
-                editBtn.dataset.areaShared = isShared;
-                editBtn.dataset.areaOwner = isOwner;
-                editBtn.disabled = false;
-            } else {
-                editBtn.disabled = true;
-            }
-        }
-    }
-
-    if (prevBtn && nextBtn && carousel) {
-        prevBtn.addEventListener('click', () => {
-            if (currentAreaIndex > 0) {
-                currentAreaIndex--;
-                updateCarousel();
-            }
-        });
-
-        nextBtn.addEventListener('click', () => {
-            if (currentAreaIndex < panels.length - 1) {
-                currentAreaIndex++;
-                updateCarousel();
-            }
-        });
-
-
-        panels.forEach(panel => {
-            panel.style.minWidth = '100%';
-            panel.style.flexShrink = '0';
-        });
-
-        updateCarousel();
-    }
+// // =========================================
+// // Area Carousel
+// // =========================================
+// const carousel = document.getElementById('areaCarousel');
+// const prevBtn = document.getElementById('areaPrev');
+// const nextBtn = document.getElementById('areaNext');
+// const panels = document.querySelectorAll('.area-panel');
+// const titleText = document.getElementById('areaTitleText');
+// const editBtn = document.getElementById('areaEditBtn');
+//
+// let currentAreaIndex = 0;
+//
+// function updateCarousel() {
+//     if (!panels || panels.length === 0) return;
+//
+//     if (carousel) {
+//         const offset = -(currentAreaIndex * 100);
+//         carousel.style.transform = `translateX(${offset}%)`;
+//         carousel.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
+//         carousel.style.display = 'flex';
+//     }
+//
+//     if (prevBtn) prevBtn.disabled = (currentAreaIndex === 0);
+//     if (nextBtn) nextBtn.disabled = (currentAreaIndex === panels.length - 1);
+//
+//     const currentPanel = panels[currentAreaIndex];
+//     const areaId = currentPanel.dataset.areaId;
+//     const areaName = currentPanel.dataset.areaName;
+//     const isShared = currentPanel.dataset.isShared === 'true';
+//     const isOwner = currentPanel.dataset.areaOwner === 'true';
+//
+//     if (titleText) {
+//         let iconHtml = isShared ? `<span class="area-shared-icon area-title-word" title="Shared area" aria-label="Shared area"><i class="bi bi-people-fill" aria-hidden="true"></i></span>` : '';
+//         titleText.innerHTML = `${areaName || 'No areas'} ${iconHtml}`;
+//     }
+//
+//     if (editBtn) {
+//         if (areaId) {
+//             editBtn.dataset.areaId = areaId;
+//             editBtn.dataset.areaName = areaName;
+//             editBtn.dataset.areaShared = isShared;
+//             editBtn.dataset.areaOwner = isOwner;
+//             editBtn.disabled = false;
+//         } else {
+//             editBtn.disabled = true;
+//         }
+//     }
+// }
+//
+// if (prevBtn && nextBtn && carousel) {
+//     prevBtn.addEventListener('click', () => {
+//         if (currentAreaIndex > 0) {
+//             currentAreaIndex--;
+//             updateCarousel();
+//         }
+//     });
+//
+//     nextBtn.addEventListener('click', () => {
+//         if (currentAreaIndex < panels.length - 1) {
+//             currentAreaIndex++;
+//             updateCarousel();
+//         }
+//     });
+//
+//
+//     panels.forEach(panel => {
+//         panel.style.minWidth = '100%';
+//         panel.style.flexShrink = '0';
+//     });
+//
+//     updateCarousel();
+// }
