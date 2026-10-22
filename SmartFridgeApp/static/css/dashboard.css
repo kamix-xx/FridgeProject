@@ -532,32 +532,36 @@ body {
     display: flex;
     align-items: baseline;
     gap: 0.4em;
-
     color: var(--title-color);
-
     font-size: 1.75rem;
-
     font-weight: 500;
-
     letter-spacing: 0.15em;
-
     text-transform: uppercase;
-
     margin: 0;
-
     padding-right: 120px;
-
     transition: color 0.3s ease;
 
-    /* Keep the header a single, predictable line no matter how long the
-       area name is. Without this, a long name wraps to two lines, which
-       grows the header, shoves the edit button out of place, and pushes
-       the dashboard-actions buttons below the viewport. */
+    /* Layout safeguards */
     flex: 1 1 auto;
     min-width: 0;
-    white-space: nowrap;
+
+    /* REMOVE white-space: nowrap from here so scrolling can take effect */
 }
 
+/* Make this the absolute scroll container for the area name */
+.area-title-text {
+    display: inline-block !important;
+    white-space: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100%;
+    scrollbar-width: none !important;
+}
+
+.area-title-text::-webkit-scrollbar {
+    display: none !important;
+}
 
 /*
  * Holds the per-word spans that get morphed on area swap. Note this is
@@ -1913,4 +1917,10 @@ body {
 
 [data-bs-theme="dark"] .fused-input-group .custom-dropdown-menu .dropdown-divider {
     border-top-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Wewnętrzny tekst nazwy obszaru */
+.area-title-text, .panel-title-text {
+    display: inline-block;
+    white-space: nowrap;
 }
