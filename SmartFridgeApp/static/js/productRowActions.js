@@ -27,7 +27,25 @@ document.addEventListener('DOMContentLoaded', function () {
             gooeyChk.checked = false;
         }
 
-        window.openEditProductModal(readEditPayload(row));
+        var payload = readEditPayload(row);
+        window.openEditProductModal(payload);
+
+        // FORCE THE AREA PICKER TO SYNC IMMEDIATELY AFTER MODAL OPENS
+        setTimeout(function() {
+            var areaSelect = document.getElementById('editProductArea');
+            if (areaSelect && payload.area) {
+                areaSelect.value = payload.area;
+                areaSelect.dispatchEvent(new Event('change', { bubbles: true }));
+
+                // Force update the orange pill visual text label
+                var selectedOption = areaSelect.options[areaSelect.selectedIndex];
+                var wrapper = areaSelect.closest('.picker-select-wrap');
+                var pickerLabel = wrapper ? wrapper.querySelector('.picker-trigger-label') : null;
+                if (selectedOption && pickerLabel) {
+                    pickerLabel.textContent = selectedOption.text;
+                }
+            }
+        }, 100);
     }
 
     document.querySelectorAll('.product-row').forEach(function (row) {

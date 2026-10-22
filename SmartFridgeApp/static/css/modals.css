@@ -361,3 +361,122 @@
         transition: none !important;
     }
 }
+
+
+/* =========================================================================
+   UNIFIED FIGMA-ACCURATE MODAL STYLES (SHOPPING LIST & MY PRODUCTS)
+   ========================================================================= */
+
+/* 1. Base Popup & Inputs (Solid, brown border, inner shadow, 52px height) */
+.custom-popup .popup-input,
+.custom-popup .fused-input-group {
+    background-color: #ffffff !important;
+    border: 1px solid #8b481c !important;
+    border-radius: 12px !important;
+    box-shadow: inset 0px 9px 19px rgba(0, 0, 0, 0.07) !important;
+    color: #000000 !important;
+    height: 52px !important;
+    align-items: center !important;
+}
+
+[data-bs-theme="dark"] .custom-popup .popup-input,
+[data-bs-theme="dark"] .custom-popup .fused-input-group {
+    background-color: #1e1e1e !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    color: #ffffff !important;
+}
+
+/* Ensure inner fused inputs/buttons stay transparent */
+.fused-input-group input,
+.fused-input-group button {
+    background-color: transparent !important;
+    color: inherit !important;
+}
+
+/* 2. Unit Dropdown Menu (Solid beige/dark background, no glass/blur) */
+.custom-popup .fused-input-group .custom-dropdown-menu {
+    background-color: #FFFBF5 !important;
+    border: 1px solid #8B481C !important;
+    border-radius: 12px !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 0.4rem !important;
+    z-index: 1060 !important;
+}
+
+[data-bs-theme="dark"] .custom-popup .fused-input-group .custom-dropdown-menu {
+    background-color: #1e1e1e !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.custom-popup .fused-input-group .custom-dropdown-menu .dropdown-item {
+    color: var(--title-color) !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 0.75rem !important;
+    background: transparent !important;
+}
+
+.custom-popup .fused-input-group .custom-dropdown-menu .dropdown-item:hover {
+    background-color: rgba(226, 83, 39, 0.1) !important;
+}
+
+.custom-popup .fused-input-group .custom-dropdown-menu .dropdown-divider {
+    border-top: 1px solid rgba(139, 72, 28, 0.2) !important;
+    margin: 0.4rem 0 !important;
+}
+
+/* 3. Area Picker & Custom Date Trigger (Match width and solid popover style) */
+.picker-select-wrap {
+    width: 170px !important;
+    max-width: 100% !important;
+    position: relative !important;
+}
+
+.picker-select-wrap .picker-trigger-pill {
+    background-color: #FF794C !important;
+    color: #1E1E1E !important;
+    border: none !important;
+    border-radius: 50px !important;
+    box-shadow: inset 0px 9px 19px rgba(0, 0, 0, 0.07) !important;
+    height: 50px !important;
+    width: 100% !important;
+    padding: 0 1.2rem !important;
+    font-weight: 500 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.picker-select-wrap .picker-panel {
+    background-color: #FFFBF5 !important;
+    border: 1px solid #8B481C !important;
+    border-radius: 12px !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18) !important;
+    backdrop-filter: none !important;
+}
+
+[data-bs-theme="dark"] .picker-select-wrap .picker-panel {
+    background-color: #1e1e1e !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 4. Circular Submit Action Buttons */
+.custom-popup .popup-circular-btn {
+    background-color: #FF794C !important;
+    color: #1E1E1E !important;
+    border: none !important;
+    box-shadow: inset 0px -3px 5px rgba(0,0,0,0.1) !important;
+}
+
+.custom-popup .popup-circular-btn:hover {
+    background-color: #ff8c66 !important;
+}
+
+/* Mobile flip adjustment for pickers */
+@media (max-width: 575.98px) {
+    .product-area-submit-row .picker-select-wrap.is-open .picker-panel {
+        top: auto !important;
+        bottom: calc(100% + 8px) !important;
+    }
+}

@@ -1852,3 +1852,65 @@ body {
         margin-right: 0 !important;
     }
 }
+
+/* =========================================
+   FORCE AREA PICKER TO OPEN UPWARDS ON MOBILE
+   ========================================= */
+@media (max-width: 575.98px) {
+    /* Target the area select wrapper specifically */
+    .product-area-submit-row .picker-select-wrap.is-open .picker-panel {
+        top: auto !important;
+        bottom: calc(100% + 8px) !important;
+        transform: translateY(0) scale(1) !important;
+    }
+}
+
+/* =========================================
+   NARROWER AREA PICKER & SOLID UNIT DROPDOWN
+   ========================================= */
+
+/* 1. Make the Area Picker Pill less wide */
+.picker-select-wrap {
+    width: 170px !important; /* Reduced from 220px */
+}
+
+.picker-select-wrap .picker-trigger-pill {
+    padding: 0 1.2rem !important; /* Slightly tighter padding to fit the smaller width */
+}
+
+/* 2. Remove gloss/blur from Unit Picker and match the Area Picker style */
+.fused-input-group .custom-dropdown-menu {
+    background-color: #FFFBF5 !important;
+    border: 1px solid #8B481C !important;
+    border-radius: 12px !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 0.4rem !important;
+}
+
+[data-bs-theme="dark"] .fused-input-group .custom-dropdown-menu {
+    background-color: #1e1e1e !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 3. Style the unit dropdown items to match the other picker options */
+.fused-input-group .custom-dropdown-menu .dropdown-item {
+    color: var(--title-color) !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 0.75rem !important;
+    background: transparent !important;
+}
+
+.fused-input-group .custom-dropdown-menu .dropdown-item:hover {
+    background-color: rgba(226, 83, 39, 0.1) !important;
+}
+
+.fused-input-group .custom-dropdown-menu .dropdown-divider {
+    border-top: 1px solid rgba(139, 72, 28, 0.2) !important;
+    margin: 0.4rem 0 !important;
+}
+
+[data-bs-theme="dark"] .fused-input-group .custom-dropdown-menu .dropdown-divider {
+    border-top-color: rgba(255, 255, 255, 0.15) !important;
+}

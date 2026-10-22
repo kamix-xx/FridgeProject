@@ -13,8 +13,7 @@ Renders a single product row inside an area's product list.
     data-edit-quantity="{{ up.quantity|default_if_none:'' }}"
     data-edit-unit="{{ up.unit.symbol|default_if_none:'' }}"
     data-edit-expiration="{{ up.expiration_date|date:'Y-m-d' }}"
-    data-edit-area="{{ area_name|default_if_none:'' }}"
-    data-edit-area-id="{{ up.area.id }}"
+    data-edit-area="{{ up.area.id|default:area.id }}"
     role="button"
     tabindex="0"
     aria-label="Edit {{ up.product.name }}">
@@ -72,9 +71,14 @@ Renders a single product row inside an area's product list.
                 <i class="bi bi-trash"></i>
             </button>
 
-            <a href="#" class="gooey-item item-edit" aria-label="Edit {{ up.product.name }}">
+            <!-- FIX: The Edit button needs data-bs-toggle to trigger the modal -->
+            <button type="button"
+                    class="gooey-item item-edit"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editProductModal"
+                    aria-label="Edit {{ up.product.name }}">
                 <i class="bi bi-pencil"></i>
-            </a>
+            </button>
 
             <label class="gooey-main-btn"
                    for="gooey-chk-{{ forloop.parentloop.counter }}-{{ forloop.counter }}"

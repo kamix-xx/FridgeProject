@@ -247,8 +247,14 @@ def my_products_view(request):
         for area in areas:
             area.products = [_with_freshness(up) for up in area.userproduct_set.all()]
 
-    return render(request, 'my-products/my_products.html', {'areas': areas})
+    # ADD THIS: Fetch available units
+    available_units = Unit.objects.filter(Q(is_global=True) | Q(user=request.user)).order_by('-is_global', 'symbol')
 
+    # ADD THIS: Pass available_units to the template
+    return render(request, 'my-products/my_products.html', {
+        'areas': areas,
+        'available_units': available_units
+    })
 
 # -------------------- #
 # ------ Areas: ------ #
