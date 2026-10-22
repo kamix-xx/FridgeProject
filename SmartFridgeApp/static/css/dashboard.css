@@ -1809,3 +1809,46 @@ body {
 .picker-date-wrap .picker-trigger .picker-trigger-chevron {
     color: inherit !important;
 }
+
+/* =========================================
+   REMOVE EXCESS EXTERNAL PADDING ON MOBILE
+   ========================================= */
+@media (max-width: 900px) {
+    /* Clear out the inner container side padding so the card fills the width */
+    .dashboard-inner {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    /* Zero out outer spacing on the search bar wrapper */
+    .dashboard-search-wrapper {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* Force the panel container to use 100% of the screen width */
+    .fridge-panel {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
+    }
+
+    .dashboard-search-wrapper {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .dashboard-search-bar {
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+}

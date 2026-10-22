@@ -79,3 +79,43 @@
     #areaPrev { left: 10px; }
     #areaNext { right: 10px; }
 }
+
+/* =========================================
+   MATCH DASHBOARD & SHOPPING LIST WIDTH ON MOBILE
+   ========================================= */
+@media (max-width: 900px) {
+    /* 1. Clear out outer container side padding so the layout fills the screen */
+    .dashboard-inner,
+    .my-products-wrapper .dashboard-inner,
+    .container {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* 2. Force the fridge panel card to use 100% of the mobile screen width */
+    .fridge-panel {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* 3. Expand the inner carousel viewport and body to match */
+    .area-carousel-viewport,
+    .fridge-panel-body {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
+
+/* =========================================
+   PRODUCT ROW TEXT COLOR FIX
+   ========================================= */
+.product-row .product-name,
+.product-row .product-exp {
+    color: var(--title-color) !important;
+}
