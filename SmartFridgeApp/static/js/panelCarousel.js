@@ -24,11 +24,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const targetListId = urlParams.get('list_id');
         const targetAreaId = urlParams.get('area_id');
+        const targetAreaName = urlParams.get('area');
 
-        if (targetListId || targetAreaId) {
-            const searchId = targetListId || targetAreaId;
-            const searchAttr = targetListId ? 'data-list-id' : 'data-area-id';
-            const foundIndex = slides.findIndex(slide => slide.getAttribute(searchAttr) === searchId);
+        if (targetListId || targetAreaId || targetAreaName) {
+            let foundIndex = -1;
+            if (targetListId) {
+                foundIndex = slides.findIndex(slide => slide.getAttribute('data-list-id') === targetListId);
+            } else if (targetAreaId) {
+                foundIndex = slides.findIndex(slide => slide.getAttribute('data-area-id') === targetAreaId);
+            } else if (targetAreaName) {
+                foundIndex = slides.findIndex(slide => slide.getAttribute('data-area-name') === targetAreaName);
+            }
             if (foundIndex !== -1) currentAreaIndex = foundIndex;
         } else if (sessionStorage.getItem('jumpToNewList') === 'true') {
             currentAreaIndex = panelCount - 1;

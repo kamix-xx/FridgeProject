@@ -86,7 +86,7 @@
                             <div class="col-12 col-md-6 col-lg-4">
 
                                 <div class="area-card {% if area.is_shared %}bg-yellow{% else %}bg-orange{% endif %} position-relative"
-                                     data-area-link="{% url 'home' %}?area={{ area.name|urlencode }}"
+                                     data-area-link="{% url 'home' %}?area={{ area.name|urlencode }}&area_id={{ area.id }}"
                                      role="link"
                                      tabindex="0"
                                      aria-label="Open {{ area.name }} in the dashboard">
