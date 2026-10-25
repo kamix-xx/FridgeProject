@@ -406,46 +406,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // =========================================
-    // Jump to New Area on Submit
-    // =========================================
-    const addAreaForm = document.getElementById('addAreaForm');
-    const joinAreaForm = document.getElementById('joinAreaForm');
+// Jump to Target Area on Submit (Bulletproof)
+// =========================================
+    const trackForms = [
+        {id: 'addAreaForm', type: 'new'},
+        {id: 'joinAreaForm', type: 'new'},
+        {id: 'addProductForm', type: 'area_input'},
+        {id: 'editProductForm', type: 'area_input'},
+        {id: 'editAreaForm', type: 'area_input_alt'},
+        {id: 'deleteProductForm', type: 'active_slide'}
+    ];
 
-    if (addAreaForm) addAreaForm.addEventListener('submit', () => sessionStorage.setItem('jumpToNewList', 'true'));
-    if (joinAreaForm) joinAreaForm.addEventListener('submit', () => sessionStorage.setItem('jumpToNewList', 'true'));
+    trackForms.forEach(config => {
+        const form = document.getElementById(config.id);
+        if (!form) return;
 
-    // =========================================
-    // Edit Area Modal population
-    // =========================================
-    const editAreaModal = document.getElementById('editAreaModal');
-    if (editAreaModal) {
-        editAreaModal.addEventListener('show.bs.modal', () => {
-            const editBtn = document.getElementById('areaEditBtn');
-            if (editBtn) {
-                const areaIdInput = document.getElementById('editAreaId');
-                const areaNameInput = document.getElementById('editAreaName');
-                if (areaIdInput) areaIdInput.value = editBtn.dataset.areaId || '';
-                if (areaNameInput) areaNameInput.value = editBtn.dataset.areaName || '';
+        const savePosition = () => {
+            let targetAreaId = null;
+
+            if (config.type === 'new') {
+                sessionStorage.setItem('jumpToNewList', 'true');
+                return;
+            } else if (config.type === 'area_input') {
+                const areaInput = form.querySelector('[name="area_id"]');
+                if (areaInput && areaInput.value) targetAreaId = areaInput.value;
+            } else if (config.type === 'area_input_alt') {
+                const areaInput = document.getElementById('editAreaId');
+                if (areaInput && areaInput.value) targetAreaId = areaInput.value;
+            } else if (config.type === 'active_slide') {
+                const activeSlide = document.querySelector('.area-panel.active-carousel-slide');
+                if (activeSlide) targetAreaId = activeSlide.getAttribute('data-area-id') || activeSlide.getAttribute('data-list-id');
             }
-        });
-    }
 
-    // =========================================
-    // Unified Modal population (Add/Edit/Delete)
-    // Runs in capturing phase to bypass morph menu hijacking
-    // =========================================
-    document.addEventListener('click', (e) => {
-
-        // Helper to deeply search for data attributes to prevent "undefined" errors
-        const findData = (btn, row, keys, fallback = '') => {
-            for (let k of keys) {
-                if (btn && btn.hasAttribute(k) && btn.getAttribute(k) !== 'undefined' && btn.getAttribute(k) !== 'null') return btn.getAttribute(k);
-                if (row && row.hasAttribute(k) && row.getAttribute(k) !== 'undefined' && row.getAttribute(k) !== 'null') return row.getAttribute(k);
+            if (targetAreaId) {
+                sessionStorage.setItem('lastActivePanelId', targetAreaId);
             }
-            return fallback;
         };
 
-        // 1. ADD PRODUCT: Open modal and auto-select active area
+        // 1. Native form submit
+        form.addEventListener('submit', savePosition);
+
+        // 2. Fallback: Button click (catches JS-bypassed submits)
+        const submitBtn = form.querySelector('button[type="submit"], [onclick*="submit"]');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', savePosition);
+        }
+    });
+
+// =========================================
+// Unified Modal population (ADD PRODUCT ONLY)
+// =========================================
+    document.addEventListener('click', (e) => {
         const addBtn = e.target.closest('[data-bs-target="#addProductModal"]');
         if (addBtn) {
             e.preventDefault();
@@ -462,82 +473,141 @@ document.addEventListener('DOMContentLoaded', () => {
                     const areaId = activeSlide.getAttribute('data-area-id') || activeSlide.getAttribute('data-list-id');
                     if (areaId) {
                         addAreaInput.value = areaId;
-                        addAreaInput.dispatchEvent(new Event('change', { bubbles: true }));
+                        addAreaInput.dispatchEvent(new Event('change', {bubbles: true}));
                     }
                 }
             }
-            return;
-        }
-
-        // 2. DELETE PRODUCT
-        const deleteTrigger = e.target.closest('[data-bs-target="#deleteProductModal"]');
-        if (deleteTrigger) {
-            const row = deleteTrigger.closest('.product-row');
-
-            const pId = findData(deleteTrigger, row, ['data-id', 'data-product-id', 'data-user-product-id']);
-            const pName = findData(deleteTrigger, row, ['data-product-name', 'data-name'], 'this product');
-
-            const idInput = document.getElementById('deleteProductId');
-            const nameSpan = document.getElementById('deleteProductName');
-
-            if (idInput) idInput.value = pId;
-            if (nameSpan) nameSpan.textContent = pName;
-            return;
-        }
-
-        // 3. EDIT PRODUCT
-        const editTrigger = e.target.closest('[data-bs-target="#editProductModal"]');
-        if (editTrigger) {
-            const row = editTrigger.closest('.product-row');
-            const panel = editTrigger.closest('.area-panel');
-
-            // ID
-            const pId = findData(editTrigger, row, ['data-id', 'data-user-product-id', 'data-product-id']);
-            const idInput = document.getElementById('editUserProductId');
-            if (idInput) idInput.value = pId;
-
-            // Name
-            const pName = findData(editTrigger, row, ['data-product-name', 'data-name']);
-            const nameInput = document.querySelector('#editProductModal input[name="product_name"]');
-            if (nameInput) nameInput.value = pName;
-
-            // Quantity
-            const pQty = findData(editTrigger, row, ['data-quantity', 'data-qty']);
-            const qtyInput = document.querySelector('#editProductModal input[name="quantity"]');
-            if (qtyInput) qtyInput.value = pQty;
-
-            // Unit
-            const pUnit = findData(editTrigger, row, ['data-unit-symbol', 'data-unit']);
-            const unitInput = document.querySelector('#editProductModal [name="unit_symbol"]');
-            if (unitInput) {
-                unitInput.value = pUnit;
-                unitInput.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-
-            // Area
-            const pArea = findData(editTrigger, row, ['data-area-id']) || (panel ? panel.getAttribute('data-area-id') : '');
-            const areaInput = document.querySelector('#editProductModal [name="area_id"]');
-            if (areaInput) {
-                areaInput.value = pArea;
-                areaInput.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-
-            // Barcode
-            const pCode = findData(editTrigger, row, ['data-barcode']);
-            const codeInput = document.getElementById('editProductCode');
-            if (codeInput) codeInput.value = pCode;
-
-            // Price & Exp
-            const pPrice = findData(editTrigger, row, ['data-price']);
-            const priceInput = document.querySelector('#editProductModal input[name="price"]');
-            if (priceInput) priceInput.value = pPrice;
-
-            const pExp = findData(editTrigger, row, ['data-expiration-date', 'data-exp']);
-            const expInput = document.querySelector('#editProductModal input[name="expiration_date"]');
-            if (expInput) expInput.value = pExp;
         }
     }, true);
-});
+
+    // =========================================
+    // Edit Area Modal population
+    // =========================================
+    const editAreaModal = document.getElementById('editAreaModal');
+    if (editAreaModal) {
+        editAreaModal.addEventListener('show.bs.modal', (event) => {
+            // The trigger is either the clicked button or the static dashboard button
+            const triggerBtn = event.relatedTarget || document.getElementById('areaEditBtn');
+
+            const areaIdInput = document.getElementById('editAreaId');
+            const areaNameInput = document.getElementById('editAreaName');
+
+            if (triggerBtn) {
+                if (areaIdInput) areaIdInput.value = triggerBtn.getAttribute('data-area-id') || '';
+                if (areaNameInput) areaNameInput.value = triggerBtn.getAttribute('data-area-name') || '';
+            }
+        });
+    }
+
+}); // End of DOMContentLoaded
+
+// =========================================
+// Unified Modal population (Add/Edit/Delete)
+// Runs in capturing phase to bypass morph menu hijacking
+// =========================================
+document.addEventListener('click', (e) => {
+
+    // Helper to deeply search for data attributes to prevent "undefined" errors
+    const findData = (btn, row, keys, fallback = '') => {
+        for (let k of keys) {
+            if (btn && btn.hasAttribute(k) && btn.getAttribute(k) !== 'undefined' && btn.getAttribute(k) !== 'null') return btn.getAttribute(k);
+            if (row && row.hasAttribute(k) && row.getAttribute(k) !== 'undefined' && row.getAttribute(k) !== 'null') return row.getAttribute(k);
+        }
+        return fallback;
+    };
+
+    // 1. ADD PRODUCT: Open modal and auto-select active area
+    const addBtn = e.target.closest('[data-bs-target="#addProductModal"]');
+    if (addBtn) {
+        e.preventDefault();
+        const modalEl = document.getElementById('addProductModal');
+        if (modalEl && typeof bootstrap !== 'undefined') {
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+
+            const morphWrap = addBtn.closest('.t-morph');
+            if (morphWrap) morphWrap.dataset.open = 'false';
+
+            const activeSlide = document.querySelector('.area-panel.active-carousel-slide');
+            const addAreaInput = document.querySelector('#addProductModal [name="area_id"]');
+            if (activeSlide && addAreaInput) {
+                const areaId = activeSlide.getAttribute('data-area-id') || activeSlide.getAttribute('data-list-id');
+                if (areaId) {
+                    addAreaInput.value = areaId;
+                    addAreaInput.dispatchEvent(new Event('change', {bubbles: true}));
+                }
+            }
+        }
+        return;
+    }
+
+    //     // 2. DELETE PRODUCT
+    //     const deleteTrigger = e.target.closest('[data-bs-target="#deleteProductModal"]');
+    //     if (deleteTrigger) {
+    //         const row = deleteTrigger.closest('.product-row');
+    //
+    //         const pId = findData(deleteTrigger, row, ['data-id', 'data-product-id', 'data-user-product-id']);
+    //         const pName = findData(deleteTrigger, row, ['data-product-name', 'data-name'], 'this product');
+    //
+    //         const idInput = document.getElementById('deleteProductId');
+    //         const nameSpan = document.getElementById('deleteProductName');
+    //
+    //         if (idInput) idInput.value = pId;
+    //         if (nameSpan) nameSpan.textContent = pName;
+    //         return;
+    //     }
+    //
+    //     // 3. EDIT PRODUCT
+    //     const editTrigger = e.target.closest('[data-bs-target="#editProductModal"]');
+    //     if (editTrigger) {
+    //         const row = editTrigger.closest('.product-row');
+    //         const panel = editTrigger.closest('.area-panel');
+    //
+    //         // ID
+    //         const pId = findData(editTrigger, row, ['data-id', 'data-user-product-id', 'data-product-id']);
+    //         const idInput = document.getElementById('editUserProductId');
+    //         if (idInput) idInput.value = pId;
+    //
+    //         // Name
+    //         const pName = findData(editTrigger, row, ['data-product-name', 'data-name']);
+    //         const nameInput = document.querySelector('#editProductModal input[name="product_name"]');
+    //         if (nameInput) nameInput.value = pName;
+    //
+    //         // Quantity
+    //         const pQty = findData(editTrigger, row, ['data-quantity', 'data-qty']);
+    //         const qtyInput = document.querySelector('#editProductModal input[name="quantity"]');
+    //         if (qtyInput) qtyInput.value = pQty;
+    //
+    //         // Unit
+    //         const pUnit = findData(editTrigger, row, ['data-unit-symbol', 'data-unit']);
+    //         const unitInput = document.querySelector('#editProductModal [name="unit_symbol"]');
+    //         if (unitInput) {
+    //             unitInput.value = pUnit;
+    //             unitInput.dispatchEvent(new Event('change', {bubbles: true}));
+    //         }
+    //
+    //         // Area
+    //         const pArea = findData(editTrigger, row, ['data-area-id']) || (panel ? panel.getAttribute('data-area-id') : '');
+    //         const areaInput = document.querySelector('#editProductModal [name="area_id"]');
+    //         if (areaInput) {
+    //             areaInput.value = pArea;
+    //             areaInput.dispatchEvent(new Event('change', {bubbles: true}));
+    //         }
+    //
+    //         // Barcode
+    //         const pCode = findData(editTrigger, row, ['data-barcode']);
+    //         const codeInput = document.getElementById('editProductCode');
+    //         if (codeInput) codeInput.value = pCode;
+    //
+    //         // Price & Exp
+    //         const pPrice = findData(editTrigger, row, ['data-price']);
+    //         const priceInput = document.querySelector('#editProductModal input[name="price"]');
+    //         if (priceInput) priceInput.value = pPrice;
+    //
+    //         const pExp = findData(editTrigger, row, ['data-expiration-date', 'data-exp']);
+    //         const expInput = document.querySelector('#editProductModal input[name="expiration_date"]');
+    //         if (expInput) expInput.value = pExp;
+    //     }
+}, true);
 
 // // =========================================
 // // Area Carousel
@@ -611,3 +681,13 @@ document.addEventListener('DOMContentLoaded', () => {
 //
 //     updateCarousel();
 // }
+
+// =========================================
+// Prevent Sticky Referer Redirects
+// =========================================
+window.addEventListener('load', () => {
+    if (window.location.search) {
+        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+    }
+});

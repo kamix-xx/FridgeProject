@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function readEditPayload(row) {
         return {
-            id: row.dataset.userProductId || row.dataset.productId || row.dataset.editId || '',
+            id: row.dataset.editId || row.dataset.userProductId || '',
             code: row.dataset.editCode || '',
             name: row.dataset.editName || '',
             price: row.dataset.editPrice || '',
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
             unit: row.dataset.editUnit || '',
             expirationDate: row.dataset.editExpiration || '',
             area: row.dataset.editArea || '',
-            areaId: row.dataset.editAreaId || '',
+            areaId: row.dataset.editArea || '',
         };
     }
 
@@ -32,12 +32,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // FORCE THE AREA PICKER TO SYNC IMMEDIATELY AFTER MODAL OPENS
         setTimeout(function() {
-            var areaSelect = document.getElementById('editProductArea');
-            if (areaSelect && payload.area) {
-                areaSelect.value = payload.area;
+            var areaSelect = document.querySelector('#editProductModal [name="area_id"]');
+            if (areaSelect && payload.areaId) {
+                areaSelect.value = payload.areaId;
                 areaSelect.dispatchEvent(new Event('change', { bubbles: true }));
 
-                // Force update the orange pill visual text label
+                // Force update the visual text label
                 var selectedOption = areaSelect.options[areaSelect.selectedIndex];
                 var wrapper = areaSelect.closest('.picker-select-wrap');
                 var pickerLabel = wrapper ? wrapper.querySelector('.picker-trigger-label') : null;
@@ -77,17 +77,16 @@ document.addEventListener('DOMContentLoaded', function () {
         deleteModal.addEventListener('show.bs.modal', function (event) {
             var trigger = event.relatedTarget;
             var row = trigger ? trigger.closest('.product-row') : null;
-            
-            var pId = (trigger && trigger.dataset.productId) || 
-                      (row && row.dataset.userProductId) || 
-                      (row && row.dataset.productId) || '';
 
-            var name = (trigger && trigger.dataset.productDisplayName) || 
-                       (row && row.dataset.editName) || 'this product';
-                       
+            var pId = (trigger && (trigger.dataset.productId || trigger.dataset.id)) ||
+                      (row && (row.dataset.userProductId || row.dataset.id)) || '';
+
+            var name = (trigger && (trigger.dataset.productDisplayName || trigger.dataset.productName)) ||
+                       (row && (row.dataset.editName || row.dataset.productName)) || 'this product';
+
             var idInput = document.getElementById('deleteProductId');
             var nameEl = document.getElementById('deleteProductName');
-            
+
             if (idInput) idInput.value = pId;
             if (nameEl) nameEl.textContent = name;
         });
