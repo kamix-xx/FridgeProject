@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils.dateparse import parse_date
+from django.db import transaction
 from datetime import date, datetime, timedelta
 from types import SimpleNamespace
 from django.utils.html import json_script
@@ -295,18 +296,21 @@ def create_area(request):
         area_name = request.POST.get('area_name')
 
         if area_name:
-            # invitation code (12 chars)
             unique_key = uuid.uuid4().hex[:12].upper()
 
-            new_area = Area.objects.create(
-                name=area_name,
-                key=unique_key,
-                owner=request.user
+            with transaction.atomic():
+                new_area = Area.objects.create(
+                    name=area_name,
+                    key=unique_key,
+                    owner=request.user
+                )
+
+                new_area.users.add(request.user)
+
+            messages.success(
+                request,
+                f'Area "{area_name}" created successfully!'
             )
-
-            new_area.users.add(request.user)
-
-            messages.success(request, f'Area "{area_name}" created successfully!')
 
     return redirect('areas')
 
@@ -478,37 +482,48 @@ def edit_shopping_list(request, list_id):
 @login_required(login_url='login')
 def add_shopping_item(request, list_id):
     if request.method == 'POST':
-        shopping_list = get_object_or_404(ShoppingList, id=list_id, user=request.user)
+        shopping_list = get_object_or_404(
+            ShoppingList,
+            id=list_id,
+            user=request.user
+        )
 
         product_name = request.POST.get('product_name')
         quantity = request.POST.get('quantity')
         unit_symbol = request.POST.get('unit_symbol', 'psc')
 
         if product_name and quantity:
-            unit_obj, _ = Unit.objects.get_or_create(
-                symbol=unit_symbol,
-                defaults={'user': request.user, 'is_global': False}
-            )
+            with transaction.atomic():
+                unit_obj, _ = Unit.objects.get_or_create(
+                    symbol=unit_symbol,
+                    defaults={
+                        'user': request.user,
+                        'is_global': False
+                    }
+                )
 
-            product_obj, _ = ProductDictionary.objects.get_or_create(
-                name=product_name,
-                defaults={
-                    'user': request.user,
-                    'is_global': False,
-                    'icon_number': 1,  # Domyślna ikonka
-                    'nutriscore': 'X',
-                    'status': ItemStatus.UNOFFICIAL
-                }
-            )
+                product_obj, _ = ProductDictionary.objects.get_or_create(
+                    name=product_name,
+                    defaults={
+                        'user': request.user,
+                        'is_global': False,
+                        'icon_number': 1,
+                        'nutriscore': 'X',
+                        'status': ItemStatus.UNOFFICIAL
+                    }
+                )
 
-            ShoppingListItem.objects.create(
-                shoppingList=shopping_list,
-                product=product_obj,
-                quantity=float(quantity),
-                unit=unit_obj
-            )
+                ShoppingListItem.objects.create(
+                    shoppingList=shopping_list,
+                    product=product_obj,
+                    quantity=float(quantity),
+                    unit=unit_obj
+                )
 
-            messages.success(request, f'Added "{product_name}" to the list.')
+            messages.success(
+                request,
+                f'Added "{product_name}" to the list.'
+            )
 
     return redirect(f"/shopping-list/?list_id={list_id}")
 
