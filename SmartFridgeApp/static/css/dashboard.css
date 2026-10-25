@@ -1924,3 +1924,11 @@ body {
     display: inline-block;
     white-space: nowrap;
 }
+
+.product-name,
+.product-exp {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

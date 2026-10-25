@@ -171,5 +171,55 @@
 
 <!-- Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+{% if user.is_authenticated %}
+<script>
+    // On mobile, swipe left from the right edge to open the existing side menu.
+    (function () {
+        const sideMenu = document.getElementById('sideMenu');
+        if (!sideMenu || !window.matchMedia('(max-width: 991.98px)').matches) return;
+
+        const edgeWidth = 32;
+        const minSwipeDistance = 60;
+        let touchStart = null;
+
+        document.addEventListener('pointerdown', function (event) {
+            if (event.pointerType !== 'touch' || sideMenu.classList.contains('show')) {
+                touchStart = null;
+                return;
+            }
+
+            // Only start tracking gestures that begin close to the right screen edge.
+            if (event.clientX >= window.innerWidth - edgeWidth) {
+                touchStart = {
+                    pointerId: event.pointerId,
+                    x: event.clientX,
+                    y: event.clientY
+                };
+            } else {
+                touchStart = null;
+            }
+        }, { passive: true });
+
+        document.addEventListener('pointerup', function (event) {
+            if (!touchStart || event.pointerId !== touchStart.pointerId) return;
+
+            const deltaX = event.clientX - touchStart.x;
+            const deltaY = event.clientY - touchStart.y;
+            const isLeftSwipe = deltaX <= -minSwipeDistance;
+            const isMostlyHorizontal = Math.abs(deltaX) > Math.abs(deltaY) * 1.2;
+            touchStart = null;
+
+            if (isLeftSwipe && isMostlyHorizontal && !sideMenu.classList.contains('show')) {
+                bootstrap.Offcanvas.getOrCreateInstance(sideMenu).show();
+            }
+        }, { passive: true });
+
+        document.addEventListener('pointercancel', function () {
+            touchStart = null;
+        }, { passive: true });
+    })();
+</script>
+{% endif %}
 </body>
 </html>
