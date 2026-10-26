@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const kcalInput = document.getElementById('addProductKcal') || document.querySelector('[name="kcal"]');
     const proteinsInput = document.getElementById('addProductProteins') || document.querySelector('[name="proteins"]');
     const fatsInput = document.getElementById('addProductFats') || document.querySelector('[name="fats"]');
+    const nutriscoreInput = document.getElementById('addProductNutriscore') || document.querySelector('[name="nutriscore"]');
 
 
     const fetchBarcodeData = (barcodeToFetch) => {
@@ -35,6 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (kcalInput) kcalInput.value = data.kcal;
                 if (proteinsInput) proteinsInput.value = data.proteins;
                 if (fatsInput) fatsInput.value = data.fats;
+                if (nutriscoreInput) nutriscoreInput.value = data.nutriscore;
+
             })
             .catch(err => console.warn("Barcode fetch error:", err))
             .finally(() => {

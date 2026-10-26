@@ -215,7 +215,6 @@ def landing(request):
 
 
 def register(request):
-    # Redirect the logged-in user:
     if request.user.is_authenticated:
         return redirect('home')
 
@@ -280,10 +279,8 @@ def areas(request):
         is_shared = area.is_shared
 
         area_data = {
-            "id": area.id,
-            "name": area.name,
-            "created_at": area.creation_date.strftime("%d.%m.%Y"),
-            "is_shared": is_shared,
+            "id": area.id, "name": area.name,
+            "created_at": area.creation_date.strftime("%d.%m.%Y"), "is_shared": is_shared,
             "share_code": area.key if area.key else "ERROR",
         }
 
@@ -291,7 +288,6 @@ def areas(request):
             area_data["owner"] = user_stub(area.owner) if area.owner else None
             area_data["is_owner"] = is_owner
 
-            # Pobieramy wszystkich członków oprocz obecnego użytkownika,
             members = [user_stub(u) for u in area.users.all() if u != request.user]
             area_data["shared_users"] = members
             area_data["shared_users_script"] = json_script(members, f"area-users-{area.id}")
@@ -382,11 +378,9 @@ def delete_area(request):
             area = get_object_or_404(Area, id=area_id)
 
             if area.owner == request.user:
-                # Właściciel usuwa cały obszar ze wszystkim
                 area.delete()
                 messages.success(request, 'Area deleted successfully.')
             else:
-                # Gość opuszcza obszar, ale nie usuwa go z bazy danych
                 area.users.remove(request.user)
                 messages.success(request, f'You have left the area "{area.name}".')
 
