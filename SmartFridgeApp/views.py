@@ -9,7 +9,8 @@ from types import SimpleNamespace
 from django.utils.html import json_script
 from .models import ProductDictionary, Recipe, RecipeProduct, Unit, Step, Area, ShoppingList, ShoppingListItem, \
     ItemStatus, UserProduct
-from django.db.models import Q, RestrictedError
+from django.db.models import Q, RestrictedError, Sum, F
+from django.db.models.functions import TruncDate
 from .forms import CustomUserCreationForm
 import json
 import uuid
@@ -51,6 +52,7 @@ def _with_freshness(user_product):
         user_product.freshness_percent = max(percent, 3)
 
     return user_product
+
 
 def _fake_dashboard_areas(user=None):
     display_name = user.username if (user and user.is_authenticated) else "You"
@@ -246,6 +248,7 @@ def my_products_view(request):
         'areas': areas,
         'available_units': available_units
     })
+
 
 # -------------------- #
 # ------ Areas: ------ #
@@ -637,6 +640,47 @@ def create_unit(request):
 @login_required(login_url='login')
 def expenses(request):
     return render(request, 'expense-tracker/expense-tracker.html')
+
+
+@login_required(login_url='login')
+def api_get_expenses(request):
+    start_str = request.GET.get('start')
+    end_str = request.GET.get('end')
+
+    try:
+        end_date = datetime.strptime(end_str, '%Y-%m-%d').date() if end_str else date.today()
+        start_date = datetime.strptime(start_str, '%Y-%m-%d').date() if start_str else (end_date - timedelta(days=30))
+    except ValueError:
+        end_date = date.today()
+        start_date = end_date - timedelta(days=30)
+
+    expenses = UserProduct.objects.filter(
+        Q(area__owner=request.user) | Q(area__users=request.user),
+        added_date__date__gte=start_date,
+        added_date__date__lte=end_date
+    ).annotate(
+        date_only=TruncDate('added_date')
+    ).values('date_only').annotate(
+        daily_total=Sum(F('price') * F('quantity'))
+    ).order_by('date_only')
+
+    data = []
+    total_sum = 0
+
+    for exp in expenses:
+        val = round(float(exp['daily_total']), 2)
+        data.append({
+            'x': exp['date_only'].strftime('%Y-%m-%d'),
+            'y': val
+        })
+        total_sum += val
+
+    return JsonResponse({
+        'data': data,
+        'total_sum': round(total_sum, 2),
+        'start_date': start_date.strftime('%Y-%m-%d'),
+        'end_date': end_date.strftime('%Y-%m-%d')
+    })
 
 
 @login_required(login_url='login')

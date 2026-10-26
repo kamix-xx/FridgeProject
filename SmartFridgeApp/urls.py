@@ -6,10 +6,17 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     # Password reset & Auth...
-    path('password_reset/', auth_views.PasswordResetView.as_view(template_name='regain-access/password_reset.html'), name='password_reset'),
-    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='regain-access/password_reset_done.html'), name='password_reset_done'),
-    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='regain-access/password_reset_confirm.html'), name='password_reset_confirm'),
-    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='regain-access/password_reset_complete.html'), name='password_reset_complete'),
+    path('password_reset/', auth_views.PasswordResetView.as_view(template_name='regain-access/password_reset.html'),
+         name='password_reset'),
+    path('password_reset/done/',
+         auth_views.PasswordResetDoneView.as_view(template_name='regain-access/password_reset_done.html'),
+         name='password_reset_done'),
+    path('reset/<uidb64>/<token>/',
+         auth_views.PasswordResetConfirmView.as_view(template_name='regain-access/password_reset_confirm.html'),
+         name='password_reset_confirm'),
+    path('reset/done/',
+         auth_views.PasswordResetCompleteView.as_view(template_name='regain-access/password_reset_complete.html'),
+         name='password_reset_complete'),
     path('home', views.home, name='home'),
     path('', views.landing, name='landing'),
 
@@ -34,6 +41,7 @@ urlpatterns = [
 
     # Expenses & Shopping list...
     path('expenses', views.expenses, name='expenses'),
+    path('api/expenses/', views.api_get_expenses, name='api_get_expenses'),
     path('expenses/details/', views.expense_details, name='expense_details'),
     path('shopping-list/', views.shopping_list_view, name='shopping_list'),
     path('shopping-list/create/', views.create_shopping_list, name='create_shopping_list'),
@@ -62,7 +70,8 @@ urlpatterns = [
     path('recipes/<int:recipe_id>/edit_recipe/', views.edit_recipe, name='edit_recipe'),
     path('recipes/<int:recipe_id>/delete/', views.delete_recipe, name='delete_recipe'),
     path('steps/<int:step_id>/delete/', views.delete_step, name='delete_step'),
-    path('recipes/<int:recipe_id>/send-to-verify/', views.send_recipe_for_verification, name='send_recipe_for_verification'),
+    path('recipes/<int:recipe_id>/send-to-verify/', views.send_recipe_for_verification,
+         name='send_recipe_for_verification'),
 
     path('admin-panel/', views.admin_panel_view, name='admin_panel'),
     path('admin-panel/unit/add/', views.admin_add_unit, name='admin_add_unit'),
