@@ -30,16 +30,33 @@ Renders a single product row inside an area's product list.
     </div>
 
     {% if up.freshness_percent is not None %}
-        <div class="freshness-bar freshness-{{ up.freshness_level }}"
+        <div class="freshness-bar freshness-{{ up.freshness_level }} position-relative"
              role="progressbar"
              aria-label="Freshness"
              aria-valuenow="{{ up.freshness_percent }}"
              aria-valuemin="0"
-             aria-valuemax="100">
+             aria-valuemax="100"
+             title="Skala przydatności: 1m (miesiąc), 6m (pół roku), 1r (rok)">
+
             <div class="freshness-bar-fill" style="width: {{ up.freshness_percent }}%"></div>
+
+            <div class="freshness-scale-overlay">
+                <div class="freshness-scale-line scale-pos-7d"></div>
+                <div class="freshness-scale-line scale-pos-1m"></div>
+                <div class="freshness-scale-line scale-pos-6m"></div>
+
+                <span class="freshness-scale-label scale-pos-1m translate-middle">1m</span>
+                <span class="freshness-scale-label scale-pos-6m translate-middle">6m</span>
+                <span class="freshness-scale-label scale-pos-1y translate-middle-y">1r</span>
+            </div>
         </div>
     {% else %}
-        <div class="freshness-bar" aria-hidden="true"></div>
+        <div class="freshness-bar position-relative" aria-hidden="true" title="Brak daty ważności">
+            <div class="freshness-scale-overlay">
+                <div class="freshness-scale-line freshness-scale-line-muted scale-pos-1m"></div>
+                <div class="freshness-scale-line freshness-scale-line-muted scale-pos-6m"></div>
+            </div>
+        </div>
     {% endif %}
 
     <div class="product-row-actions gooey-menu">

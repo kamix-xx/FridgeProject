@@ -27,37 +27,28 @@ def _with_freshness(user_product):
         user_product.freshness_level = 'unknown'
         return user_product
 
-    added = user_product.added_date.date() if user_product.added_date else date.today()
-    total_days = (exp - added).days
     remaining_days = (exp - date.today()).days
 
-    # 1. Determine Color/Level strictly by absolute days remaining
     if remaining_days < 0:
         user_product.freshness_level = 'expired'
-    elif remaining_days <= 2:
+    elif remaining_days <= 7:
         user_product.freshness_level = 'critical'
-    elif remaining_days <= 5:
+    elif remaining_days <= 30:
         user_product.freshness_level = 'warning'
     else:
         user_product.freshness_level = 'fresh'
 
-    # 2. Determine Bar Size (Percentage)
+    MAX_DAYS = 365
+
     if remaining_days < 0:
-        # Expired items are pushed to 100% so the CSS rotting gradient can fill the space
+
+        user_product.freshness_percent = 100
+    elif remaining_days >= MAX_DAYS:
         user_product.freshness_percent = 100
     else:
-        # Prevent 1-day items from showing 100% by assuming a minimum visual baseline of 14 days
-        effective_total = max(total_days, 14)
-        percent = max(0, min(100, round((remaining_days / effective_total) * 100)))
+        percent = int((remaining_days / MAX_DAYS) * 100)
 
-        # Force visual caps so the physical size always matches the urgency level
-        if user_product.freshness_level == 'critical':
-            percent = min(percent, 15)  # Never wider than 15% if critical (Red)
-        elif user_product.freshness_level == 'warning':
-            percent = min(percent, 40)  # Never wider than 40% if warning (Orange)
-
-        # Ensure a tiny sliver is always visible (4%) so it doesn't look completely empty on the last day
-        user_product.freshness_percent = max(percent, 4)
+        user_product.freshness_percent = max(percent, 3)
 
     return user_product
 
