@@ -1,6 +1,12 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}SmartFridge+ — Know what's in your fridge{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+{% endblock %}
 
 {% block content %}
     {% include "partials/no_page_transition_panel.html" %}
@@ -8,18 +14,16 @@
     <main>
         <div class="landing-container">
             <!-- Hero -->
-            <section class="landing-hero">
-                <div class="hero-bg" aria-hidden="true">
-                    <img src="https://i.imgur.com/2SjgpvQ.jpeg" alt="" class="theme-img-light">
-                    <img src="https://i.imgur.com/p5ndq5n.jpeg" alt="" class="theme-img-dark">
-                </div>
-                <div class="hero-overlay"></div>
-{#                            <span class="notify-badge" aria-hidden="true">#}
-{#                                <i class="bi bi-bell-fill"></i>#}
-{#                                <span class="notify-ping"></span>#}
-{#                            </span>#}
+            <section class="landing-hero" style="position: relative; overflow: hidden;" id="hero-section">
+                <!-- Glowing ambient backdrop -->
+                <div class="ambient-blob" id="ambient-cursor-blob"></div>
 
-                <div class="container">
+                <!-- Interactive ASCII container -->
+                <div class="hero-bg" aria-hidden="true" id="ascii-oranges-container"></div>
+
+                <div class="hero-overlay" style="pointer-events: none;"></div>
+
+                <div class="container" style="pointer-events: auto;">
                     <p class="hero-eyebrow hero-fade d1">For people who forget what's in the back of the fridge</p>
                     <h1 class="hero-title hero-fade d2">Know what's in your fridge<br>before you open it.</h1>
                     <p class="hero-sub hero-fade d3">
@@ -98,4 +102,6 @@
             </section>
         </div>
     </main>
+
+    <script src="{% static 'js/landing.js' %}"></script>
 {% endblock %}

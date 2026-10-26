@@ -204,7 +204,10 @@ def home(request):
 
 
 def landing(request):
-    return render(request, "landing.html")
+    # Redirect to home if they are already logged in
+    if request.user.is_authenticated:
+        return redirect('home')
+    return render(request, "landing.html") # Update filename if needed
 
 
 def register(request):
