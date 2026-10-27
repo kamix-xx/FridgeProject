@@ -62,8 +62,10 @@
     animation: citrus-ripple 760ms cubic-bezier(.15, .65, .2, 1) forwards;
 }
 
-.hero-overlay {
-    z-index: 2;
+/* No overlay on top of the art in either theme */
+#hero-section .hero-overlay {
+    display: none;
+    background: none;
 }
 
 #hero-section > .container {
@@ -132,6 +134,13 @@ html:not([data-bs-theme="dark"]) body:not([data-bs-theme="dark"]) #hero-section 
     background-color: rgb(255 255 255 / 0);
     border-color: rgba(157, 76, 52, 0.4);
     transform: translateY(-2px);
+}
+
+/* Dark mode: let the ASCII colours come through at full strength */
+html[data-bs-theme="dark"] #ascii-oranges-container .ascii-art-canvas,
+body[data-bs-theme="dark"] #ascii-oranges-container .ascii-art-canvas {
+    opacity: 1;
+    filter: saturate(1.45) contrast(1.1);
 }
 
 html[data-bs-theme="dark"] .ambient-blob,

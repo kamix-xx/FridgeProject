@@ -5,6 +5,18 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!container || typeof THREE === 'undefined' || container.dataset.initialized === 'true') return;
     container.dataset.initialized = 'true';
 
+    // "Lite" mode for phones / touch devices: fewer objects, simpler geometry, smaller grid, lower frame rate.
+    // Add ?lite=1 to the page URL to force it on a desktop for testing (?lite=0 forces it off).
+    const liteParam = new URLSearchParams(window.location.search).get('lite');
+    const lite = liteParam === '1' ||
+        (liteParam !== '0' && (
+            (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
+            Math.min(window.innerWidth, window.innerHeight) < 600
+        ));
+    // Change frameInterval to allow standard 60fps pacing once optimized
+    const frameInterval = lite ? 24 : 24;    // ms between rendered frames (~18fps vs ~24fps)
+    const renderScale = lite ? 1 : 2;          // WebGL supersampling per ASCII cell
+
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(47, 1, 0.1, 500);
     camera.position.set(0, 0, 104);
@@ -28,7 +40,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const sampleCtx = sampleCanvas.getContext('2d', {willReadFrequently: true});
     sampleCtx.imageSmoothingEnabled = false;
 
-    const glyphs = ' .,:;irsXA253hMHGS#9B&@';
+    // Dense, fine-grained ramp (same family as the classic shark / jellyfish ASCII pieces)
+    const glyphs = ' .\'`^",:;Il!i><~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$';
+    // 4x4 ordered-dither matrix so gradients get that stippled, textured look
+    const bayer = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => v / 16 - 0.5);
     const objects = [];
     let grid = {
         cols: 120,
@@ -72,13 +87,15 @@ document.addEventListener("DOMContentLoaded", function () {
         return texture;
     }
 
+    const bumpScale = lite ? 0 : 0.12; // Disable bump map sampling on mobile
     const peelTexture = makePeelTexture();
+
     const fruitMaterials = ['#e95725', '#f16a31', '#e64d1e', '#f1783d', '#cf481f'].map(color =>
         new THREE.MeshStandardMaterial({
             color,
             map: peelTexture,
-            bumpMap: peelTexture,
-            bumpScale: 0.12,
+            bumpMap: lite ? null : peelTexture,
+            bumpScale: bumpScale,
             roughness: 0.82,
             metalness: 0
         })
@@ -87,8 +104,8 @@ document.addEventListener("DOMContentLoaded", function () {
         color: '#ed5b28',
         roughness: 0.76,
         map: peelTexture,
-        bumpMap: peelTexture,
-        bumpScale: 0.12
+        bumpMap: lite ? null : peelTexture,
+        bumpScale: bumpScale
     });
     const pithMaterial = new THREE.MeshStandardMaterial({
         color: '#f1d4bf',
@@ -113,7 +130,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const glintMaterial = new THREE.MeshStandardMaterial({color: '#e96036', roughness: 0.76});
 
     function makeMandarinGeometry(phase) {
-        const geometry = new THREE.SphereGeometry(1, 30, 22);
+        // Reduced segments on mobile: 12x10 instead of 18x14
+        const geometry = new THREE.SphereGeometry(1, lite ? 12 : 30, lite ? 10 : 22);
         const position = geometry.attributes.position;
         for (let i = 0; i < position.count; i++) {
             const x = position.getX(i);
@@ -211,7 +229,10 @@ document.addEventListener("DOMContentLoaded", function () {
             leaf.rotation.set(-0.25, (Math.random() - 0.5) * 0.8, Math.random() * 0.8 - 0.35);
             group.add(leaf);
         }
-        const scale = 0.68 + Math.random() * 0.54;
+
+        // UPDATE THIS LINE: Scale down the big oranges on mobile
+        const scale = (lite ? 0.6 : 0.9) + Math.random() * (lite ? 0.5 : 0.7);
+
         group.scale.setScalar(scale);
         return addMotion(group, {radius: 9 * scale, speed: 0.075, tilt: 0.45});
     }
@@ -228,11 +249,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function makeMandarinSlice() {
         const group = new THREE.Group();
-        const rind = new THREE.Mesh(new THREE.CylinderGeometry(6.15, 6.15, 1.15, 48, 1, false), rindMaterial);
+        // Reduced radial segments from 28 to 14 on lite
+        const rind = new THREE.Mesh(new THREE.CylinderGeometry(6.15, 6.15, 1.15, lite ? 14 : 48, 1, false), rindMaterial);
         rind.rotation.x = Math.PI / 2;
         group.add(rind);
 
-        const pith = new THREE.Mesh(new THREE.CircleGeometry(5.72, 48), pithMaterial);
+        const pith = new THREE.Mesh(new THREE.CircleGeometry(5.72, lite ? 14 : 48), pithMaterial);
         pith.position.z = 0.585;
         group.add(pith);
 
@@ -262,7 +284,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 group.add(seed);
             }
         }
-        const scale = 0.55 + Math.random() * 0.62;
+
+        // UPDATE THIS LINE: Make the slices slightly smaller on mobile too
+        const scale = (lite ? 0.55 : 0.75) + Math.random() * (lite ? 0.5 : 0.75);
+
         group.scale.setScalar(scale);
         const item = addMotion(group, {radius: 7 * scale, speed: 0.11, tilt: 0.28});
         item.rotation.x = (Math.random() - 0.5) * 0.35;
@@ -284,7 +309,8 @@ document.addEventListener("DOMContentLoaded", function () {
             ));
         }
         const curve = new THREE.CatmullRomCurve3(points);
-        const geometry = new THREE.TubeGeometry(curve, 64, 0.22, 5, false);
+        // Reduced tube segments on mobile from 64 to 18
+        const geometry = new THREE.TubeGeometry(curve, lite ? 18 : 64, 0.22, lite ? 4 : 5, false);
         const peelMaterial = new THREE.MeshStandardMaterial({
             color: Math.random() > 0.5 ? '#ef7744' : '#d94b25',
             roughness: 0.7,
@@ -307,39 +333,60 @@ document.addEventListener("DOMContentLoaded", function () {
         return addMotion(group, {radius: 3, speed: 0.15, tilt: 1.5});
     }
 
-    scene.add(new THREE.HemisphereLight(0xffd5c5, 0x263b2d, 0.82));
-    scene.add(new THREE.AmbientLight(0xffffff, 0.46));
-    const keyLight = new THREE.PointLight(0xff8056, 1.8, 260);
+    // Depth fog fades far objects to black, like things sinking into deep water
+    scene.fog = new THREE.Fog(0x000000, 88, 150);
+
+    // Punchier, more contrasty lighting: low ambient, hot key, warm rim, magenta fill, teal accent
+    scene.add(new THREE.HemisphereLight(0xffc9b0, 0x1a2a2a, 0.5));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.22));
+
+    const keyLight = new THREE.PointLight(0xffa066, 2.6, 280);
     keyLight.position.set(34, 45, 58);
     scene.add(keyLight);
-    const fillLight = new THREE.PointLight(0xee4f25, 1.1, 220);
-    fillLight.position.set(-48, -24, 25);
-    scene.add(fillLight);
-    const leafLight = new THREE.PointLight(0x6aa36a, 0.48, 180);
-    leafLight.position.set(-42, 38, -20);
-    scene.add(leafLight);
 
-    for (let i = 0; i < 11; i++) makeMandarin();
-    for (let i = 0; i < 8; i++) makeMandarinSlice();
-    for (let i = 0; i < 5; i++) makePeelCurl();
-    for (let i = 0; i < 9; i++) makeFloatingLeaf();
+    const rimLight = new THREE.PointLight(0xffd08a, 2.2, 240);
+    rimLight.position.set(62, 8, -34);
+    scene.add(rimLight);
+
+    // Skip extra accent lights on mobile
+    if (!lite) {
+        const fillLight = new THREE.PointLight(0xd8325e, 1.5, 230);
+        fillLight.position.set(-48, -24, 25);
+        scene.add(fillLight);
+
+        const leafLight = new THREE.PointLight(0x2fb7a5, 0.9, 200);
+        leafLight.position.set(-42, 38, -20);
+        scene.add(leafLight);
+    }
+
+    // Less big oranges on mobile (2 instead of 5), same on desktop
+    for (let i = 0; i < (lite ? 2 : 9); i++) makeMandarin();
+
+    // More smaller items (slices, curls, leaves) on mobile
+    for (let i = 0; i < (lite ? 7 : 7); i++) makeMandarinSlice();
+    for (let i = 0; i < (lite ? 5 : 6); i++) makePeelCurl();
+    for (let i = 0; i < (lite ? 7 : 9); i++) makeFloatingLeaf();
 
     const fleckGeometry = new THREE.IcosahedronGeometry(0.24, 0);
-    for (let i = 0; i < 24; i++) {
+    for (let i = 0; i < (lite ? 10 : 24); i++) {
         const fleck = new THREE.Mesh(fleckGeometry, i % 3 === 0 ? glintMaterial : fruitMaterials[i % fruitMaterials.length]);
         const scale = 0.45 + Math.random() * 1.1;
         fleck.scale.setScalar(scale);
         addMotion(fleck, {radius: 0.5, speed: 0.18, tilt: 2.5});
     }
 
-    function resize() {
+   function resize() {
         const rect = container.getBoundingClientRect();
         const width = Math.max(1, Math.round(rect.width || heroSection?.clientWidth || window.innerWidth));
         const height = Math.max(1, Math.round(rect.height || heroSection?.clientHeight || 420));
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const fontSize = width < 540 ? 7 : width < 1000 ? 8 : 9;
-        const cols = Math.max(58, Math.min(190, Math.floor(width / (fontSize * 0.72))));
-        const rows = Math.max(30, Math.min(86, Math.floor(height / (fontSize * 1.15))));
+        const dpr = Math.min(window.devicePixelRatio || 1, lite ? 1.25 : 2);
+
+        // Lower mobile font size to 9 to create a denser, higher-resolution grid
+        const fontSize = lite ? 9 : (width < 540 ? 7 : width < 1000 ? 8 : 9);
+
+        // Raise mobile caps to 72x48 (dense enough for shapes, but avoids the laggy 96x64 original)
+        const cols = Math.max(lite ? 44 : 58, Math.min(lite ? 120 : 190, Math.floor(width / (fontSize * 0.72))));
+        const rows = Math.max(lite ? 24 : 30, Math.min(lite ? 60 : 86, Math.floor(height / (fontSize * 1.15))));
         grid = {cols, rows, width, height, dpr, fontSize};
 
         asciiCanvas.width = Math.round(width * dpr);
@@ -353,8 +400,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         sampleCanvas.width = cols;
         sampleCanvas.height = rows;
-        sampleCtx.imageSmoothingEnabled = false;
-        renderer.setSize(cols, rows, false);
+        sampleCtx.imageSmoothingEnabled = !lite;
+        if (!lite) sampleCtx.imageSmoothingQuality = 'high';
+        renderer.setSize(cols * renderScale, rows * renderScale, false);
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
     }
@@ -366,34 +414,62 @@ document.addEventListener("DOMContentLoaded", function () {
         const pixels = sampleCtx.getImageData(0, 0, grid.cols, grid.rows).data;
         const cellWidth = grid.width / grid.cols;
         const cellHeight = grid.height / grid.rows;
+        const clamp255 = v => v < 0 ? 0 : v > 255 ? 255 : v;
         const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark' ||
             document.body.getAttribute('data-bs-theme') === 'dark';
+        // Depth fog fades to black: great on dark, but would leave dark smudges on the light page
+        if (scene.fog) {
+            scene.fog.near = isDark ? 115 : 100000;
+            scene.fog.far = isDark ? 210 : 100001;
+        }
         ctx.clearRect(0, 0, grid.width, grid.height);
 
-        ctx.globalAlpha = 1;
         for (let y = 0; y < grid.rows; y++) {
             for (let x = 0; x < grid.cols; x++) {
                 const p = (y * grid.cols + x) * 4;
                 const alpha = pixels[p + 3] / 255;
-                if (alpha < 0.08) continue;
+                if (alpha < 0.06) continue;
                 let r = pixels[p];
                 let g = pixels[p + 1];
                 let b = pixels[p + 2];
-                let luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-                luminance = Math.max(0, Math.min(1, (luminance - 0.015) / 0.78));
-                luminance = Math.pow(luminance, 0.78);
-                const glyphIndex = Math.min(glyphs.length - 1, Math.floor(luminance * (glyphs.length - 1)));
-                const glyph = glyphs[glyphIndex];
-                if (glyph === ' ') continue;
 
-                if (r > g * 1.12 && r > b * 1.28) {
-                    r = r * 0.62 + 228 * 0.38;
-                    g = g * 0.66 + 83 * 0.34;
-                    b = b * 0.7 + 48 * 0.3;
-                }
-                ctx.globalAlpha = isDark ? Math.min(0.94, 0.52 + luminance * 0.36) : Math.min(0.95, 0.45 + luminance * 0.50);
-                ctx.fillStyle = `rgb(${r | 0},${g | 0},${b | 0})`;
-                ctx.fillText(glyph, x * cellWidth, y * cellHeight);
+                let lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+                lum = Math.max(0, Math.min(1, (lum - 0.02) / 0.75));
+                lum = Math.pow(lum, 0.75);
+
+                // Colour grade: shadows slide toward deep magenta, highlights toward hot gold,
+                // then push saturation so every cell reads as vivid colour, not just tinted text
+                const shadow = 1 - lum;
+                r += (135 - r) * shadow * 0.32;
+                g += (16 - g) * shadow * 0.32;
+                b += (88 - b) * shadow * 0.32;
+                const hi = Math.max(0, lum - 0.55) / 0.45;
+                r += (255 - r) * hi * 0.55;
+                g += (208 - g) * hi * 0.55;
+                b += (120 - b) * hi * 0.40;
+                const mean = (r + g + b) / 3;
+                const sat = isDark ? 1.6 : 1.3;
+                r = clamp255(mean + (r - mean) * sat);
+                g = clamp255(mean + (g - mean) * sat);
+                b = clamp255(mean + (b - mean) * sat);
+
+                // 1) Coloured cell background (this is what gives the solid, painted look)
+                //    Dark theme: deep, glowing cells. Light theme: bright, saturated cells.
+                const bgK = isDark ? 0.52 + lum * 0.5 : 0.7 + lum * 0.3;
+                ctx.globalAlpha = Math.min(1, alpha * 1.1);
+                ctx.fillStyle = `rgb(${(r * bgK) | 0},${(g * bgK) | 0},${(b * bgK) | 0})`;
+                ctx.fillRect(x * cellWidth, y * cellHeight, cellWidth + 0.6, cellHeight + 0.6);
+
+                // 2) Glyph on top, dithered for texture.
+                //    Dark theme: lighter tint of the same hue. Light theme: darker shade of it.
+                const dl = Math.max(0, Math.min(1, lum + bayer[(y & 3) * 4 + (x & 3)] * 0.12));
+                const glyphIndex = Math.min(glyphs.length - 1, Math.floor(dl * (glyphs.length - 1)));
+                if (glyphIndex === 0) continue;
+                ctx.globalAlpha = Math.min(1, alpha * 1.05);
+                ctx.fillStyle = isDark
+                    ? `rgb(${clamp255(r * 1.18 + 42) | 0},${clamp255(g * 1.14 + 34) | 0},${clamp255(b * 1.1 + 30) | 0})`
+                    : `rgb(${(r * 0.5) | 0},${(g * 0.4) | 0},${(b * 0.42) | 0})`;
+                ctx.fillText(glyphs[glyphIndex], x * cellWidth, y * cellHeight);
             }
         }
         ctx.globalAlpha = 1;
@@ -414,6 +490,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (heroSection) {
+        // Let the page scroll vertically on touch while still reporting horizontal drags / taps to the scene
+        heroSection.style.touchAction = 'pan-y';
         heroSection.addEventListener('pointermove', event => {
             pointerActive = true;
             pointFromEvent(event);
@@ -425,6 +503,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 ambientBlob.style.left = '50%';
                 ambientBlob.style.top = '50%';
             }
+        }, {passive: true});
+
+        // Touch scroll / interruption cancels the pointer: treat it like the pointer leaving
+        heroSection.addEventListener('pointercancel', () => {
+            heroSection.dispatchEvent(new Event('pointerleave'));
         }, {passive: true});
 
         heroSection.addEventListener('pointerdown', event => {
@@ -457,10 +540,18 @@ document.addEventListener("DOMContentLoaded", function () {
         }, {passive: true});
     }
 
+    // Pause rendering entirely while the hero is scrolled out of view
+    let heroVisible = true;
+    if (heroSection && 'IntersectionObserver' in window) {
+        new IntersectionObserver(entries => {
+            heroVisible = entries[0].isIntersecting;
+        }).observe(heroSection);
+    }
+
     function animate(timestamp) {
         frameId = requestAnimationFrame(animate);
-        if (document.hidden) return;
-        if (timestamp - lastFrame < 42) return;
+        if (document.hidden || !heroVisible) return;   // don't burn battery when the hero is off-screen
+        if (timestamp - lastFrame < frameInterval) return;
         const step = lastFrame ? Math.min((timestamp - lastFrame) / 16.67, 2.2) : 1;
         lastFrame = timestamp;
         elapsed += step * 0.0167;
@@ -528,6 +619,60 @@ document.addEventListener("DOMContentLoaded", function () {
             if (object.position.z < -23) { object.position.z = -23; velocity.z = Math.abs(velocity.z) + 0.01; }
             if (object.position.z > 17) { object.position.z = 17; velocity.z = -Math.abs(velocity.z) - 0.01; }
         });
+
+        // Objects interact with each other: soft push-apart, momentum exchange and a little spin
+        for (let i = 0; i < objects.length; i++) {
+            const a = objects[i];
+            const ra = a.userData.radius * 0.85;
+            for (let j = i + 1; j < objects.length; j++) {
+                const b = objects[j];
+                const rb = b.userData.radius * 0.85;
+                const minD = ra + rb;
+                const dx = a.position.x - b.position.x;
+                if (dx > minD || dx < -minD) continue;
+                const dy = a.position.y - b.position.y;
+                if (dy > minD || dy < -minD) continue;
+                const dz = (a.position.z - b.position.z) * 0.6;
+                const distSq = dx * dx + dy * dy + dz * dz;
+                if (distSq >= minD * minD) continue;
+
+                const dist = Math.max(Math.sqrt(distSq), 0.01);
+                const nx = dx / dist;
+                const ny = dy / dist;
+                const nz = dz / dist;
+                const overlap = (minD - dist) / minD;           // 0 (touching) .. 1 (fully overlapping)
+                const massA = ra * ra;
+                const massB = rb * rb;
+                const wa = massB / (massA + massB);             // the lighter object gets pushed more
+                const wb = massA / (massA + massB);
+                const va = a.userData.velocity;
+                const vb = b.userData.velocity;
+
+                // Soft repulsion so they never sit on top of each other
+                const accel = overlap * 0.09 * step;
+                va.x += nx * accel * wa * 2;
+                va.y += ny * accel * wa * 2;
+                va.z += nz * accel * wa * 0.6;
+                vb.x -= nx * accel * wb * 2;
+                vb.y -= ny * accel * wb * 2;
+                vb.z -= nz * accel * wb * 0.6;
+
+                // Bounce: swap momentum along the contact normal if they're moving toward each other
+                const approach = (va.x - vb.x) * nx + (va.y - vb.y) * ny;
+                if (approach < 0) {
+                    const impulse = -approach * 0.7;
+                    va.x += nx * impulse * wa;
+                    va.y += ny * impulse * wa;
+                    vb.x -= nx * impulse * wb;
+                    vb.y -= ny * impulse * wb;
+                }
+
+                // Glancing hits make them spin in opposite directions
+                const spin = overlap * 0.02 * step * (nx * ny >= 0 ? 1 : -1);
+                a.userData.rotVelocity.z += spin * wa;
+                b.userData.rotVelocity.z -= spin * wb;
+            }
+        }
 
         camera.position.x += ((pointerActive ? mouseX * 0.025 : 0) - camera.position.x) * 0.018 * step;
         camera.position.y += ((pointerActive ? mouseY * 0.025 : 0) - camera.position.y) * 0.018 * step;
