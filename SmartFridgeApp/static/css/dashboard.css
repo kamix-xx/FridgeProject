@@ -1963,23 +1963,28 @@ body {
     font-weight: 500;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
     z-index: 2;
+    user-select: none;
 }
 
 .scale-pos-7d {
     left: 1.9%;
+    user-select: none;
 }
 
 .scale-pos-1m {
     left: 8.2%;
+    user-select: none;
 }
 
 .scale-pos-6m {
     left: 50%;
+    user-select: none;
 }
 
 /* Push the 1 year label slightly to the left */
 .scale-pos-1y {
     right: 45px !important; /* Adjust this value until it clears the gooey menu */
+    user-select: none;
 }
 
 /* Or, alternative approach: Make the entire freshness bar slightly narrower so it doesn't collide with the menu */
@@ -1996,6 +2001,7 @@ body {
     font-weight: 500;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
     z-index: 0;
+    user-select: none;
 }
 
 /* Ensure the gooey menu container sits heavily above the bar */
