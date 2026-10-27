@@ -78,6 +78,7 @@ class ItemStatus(models.TextChoices):
     # 1. Rename is_global to is_official (official recipes made by admin and staff)
     # 2. Item status: PRIVATE, PENDING, PUBLIC
 
+# models.py
 class ProductDictionary(models.Model):
     id = models.AutoField(primary_key=True)
     barcode = models.CharField(max_length=50, null=True)
@@ -94,6 +95,8 @@ class ProductDictionary(models.Model):
         choices=ItemStatus.choices,
         default=ItemStatus.UNOFFICIAL
     )
+    # ADD THIS:
+    category = models.CharField(max_length=50, default='other')
 
 class UserProduct(models.Model):
     id = models.AutoField(primary_key=True)

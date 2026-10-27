@@ -176,6 +176,21 @@ document.addEventListener('DOMContentLoaded', () => {
             setVal('[name="expiration_date"]', product.expirationDate);
             setVal('[name="area_id"]', product.areaId);
 
+            // 3. Setup Category Field & Icon
+            const cat = product.category || 'other';
+            setVal('#editProductCategory', cat);
+
+            const editMenu = document.getElementById('editCategoryMenu');
+            const editBtnText = document.getElementById('editSelectedCategoryText');
+            if (editMenu && editBtnText) {
+                const option = editMenu.querySelector(`.category-option[data-category="${cat}"]`);
+                if (option) {
+                    editBtnText.innerHTML = option.innerHTML;
+                } else {
+                    editBtnText.innerHTML = '<i class="bi bi-basket2-fill fs-5"></i> Other';
+                }
+            }
+
             if (window.bootstrap && window.bootstrap.Modal) {
                 window.bootstrap.Modal.getOrCreateInstance(editModalEl).show();
             }

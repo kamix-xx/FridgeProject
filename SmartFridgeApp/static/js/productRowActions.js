@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return !!e.target.closest('.product-row-actions');
     }
 
-    function readEditPayload(row) {
+   function readEditPayload(row) {
         return {
             id: row.dataset.editId || row.dataset.userProductId || '',
             code: row.dataset.editCode || '',
@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
             expirationDate: row.dataset.editExpiration || '',
             area: row.dataset.editArea || '',
             areaId: row.dataset.editArea || '',
+            category: row.dataset.editCategory || 'other', // <-- ADD THIS LINE
         };
     }
 

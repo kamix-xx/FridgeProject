@@ -54,6 +54,24 @@ def _with_freshness(user_product):
     return user_product
 
 
+def _group_off_category(tags):
+    if not tags: return 'other'
+    tags_str = ' '.join(tags).lower()
+
+    # Check specific solid foods FIRST
+    if any(x in tags_str for x in ['bakery', 'bread', 'cereal', 'roll', 'pastry']): return 'bakery'
+    if any(x in tags_str for x in ['dairy', 'milk', 'cheese', 'yogurt', 'butter']): return 'dairy'
+    if any(x in tags_str for x in ['meat', 'poultry', 'seafood', 'fish', 'sausage']): return 'meat'
+    if any(x in tags_str for x in ['snack', 'sweet', 'candy', 'chocolate', 'cookie']): return 'snack'
+    if any(x in tags_str for x in ['fruit', 'vegetable', 'produce']): return 'produce'
+    if any(x in tags_str for x in ['sauce', 'condiment', 'grocery', 'spread', 'pasta']): return 'pantry'
+
+    # Check for drinks LAST to avoid the "plant-based foods and beverages" trap
+    if any(x in tags_str for x in ['beverage', 'drink', 'water', 'juice', 'soda']): return 'drink'
+
+    return 'other'
+
+
 def _fake_dashboard_areas(user=None):
     display_name = user.username if (user and user.is_authenticated) else "You"
     user_avatar = user.avatar.url if (
@@ -207,7 +225,7 @@ def landing(request):
     # Redirect to home if they are already logged in
     if request.user.is_authenticated:
         return redirect('home')
-    return render(request, "landing.html") # Update filename if needed
+    return render(request, "landing.html")  # Update filename if needed
 
 
 def register(request):
@@ -1266,8 +1284,9 @@ def openfoodfacts_search(request):
 def fetch_barcode_data(request, barcode):
     try:
         api = openfoodfacts.API(user_agent="SmartFridgePlus/1.0")
+        # ADD 'categories_tags' TO THE FIELDS LIST
         product_data = api.product.get(barcode, fields=["code", "product_name", "product_name_pl", "nutriscore_grade",
-                                                        "nutriments"])
+                                                        "nutriments", "categories_tags"])
 
         if not product_data:
             return JsonResponse({'error': 'Product not found.'}, status=404)
@@ -1275,13 +1294,17 @@ def fetch_barcode_data(request, barcode):
         name = product_data.get('product_name_pl') or product_data.get('product_name') or ""
         nutriments = product_data.get('nutriments', {})
 
+        # GET CATEGORY
+        category = _group_off_category(product_data.get('categories_tags', []))
+
         return JsonResponse({
             'barcode': barcode,
             'name': name.capitalize(),
             'kcal': int(nutriments.get('energy-kcal_100g', 0)),
             'proteins': round(float(nutriments.get('proteins_100g', 0.0)), 2),
             'fats': round(float(nutriments.get('fat_100g', 0.0)), 2),
-            'nutriscore': (product_data.get('nutriscore_grade') or 'X').upper()
+            'nutriscore': (product_data.get('nutriscore_grade') or 'X').upper(),
+            'category': category  # ADD TO RESPONSE
         })
     except Exception as e:
         return JsonResponse({'error': 'Connection error'}, status=503)
@@ -1302,6 +1325,7 @@ def api_add_product(request):
             messages.error(request, 'Product name and area are required.')
             return redirect(request.META.get('HTTP_REFERER') or 'home')
 
+        # Safely parse numeric fields
         try:
             quantity = int(float(request.POST.get('quantity', 1)))
             if quantity < 1: quantity = 1
@@ -1333,26 +1357,33 @@ def api_add_product(request):
         if nutriscore not in ['A', 'B', 'C', 'D', 'E']:
             nutriscore = 'X'
 
+        category = request.POST.get('category', 'other').strip()
+
         expiration_date_raw = request.POST.get('expiration_date')
         expiration_date = parse_date(expiration_date_raw) if expiration_date_raw else None
 
         unit_symbol = request.POST.get('unit_symbol', 'pcs').strip()
 
+        # Validate Area
         area = get_object_or_404(Area, id=area_id)
         if area.owner != request.user and not area.users.filter(id=request.user.id).exists():
             messages.error(request, 'Access denied for selected area.')
             return redirect(request.META.get('HTTP_REFERER') or 'home')
 
+        # Find or create unit
         unit = Unit.objects.filter(symbol__iexact=unit_symbol).first()
         if not unit:
             unit = Unit.objects.create(symbol=unit_symbol, is_global=False, user=request.user)
 
+        # Find or create dictionary product
         product_dict = None
         if barcode:
             product_dict = ProductDictionary.objects.filter(barcode=barcode).first()
         if not product_dict:
             product_dict = ProductDictionary.objects.filter(name__iexact=name).first()
+
         if not product_dict:
+            # Create NEW dictionary item
             product_dict = ProductDictionary.objects.create(
                 name=name,
                 barcode=barcode if barcode else None,
@@ -1360,22 +1391,42 @@ def api_add_product(request):
                 proteins=proteins,
                 fats=fats,
                 nutriscore=nutriscore,
+                category=category,
                 icon_number=1,
                 is_global=False,
                 user=request.user,
                 status=ItemStatus.UNOFFICIAL
             )
+        else:
+            # FIX 1: If it's an old item with no category, update it!
+            if (not product_dict.category or product_dict.category == 'other') and category not in ['other', '', None]:
+                product_dict.category = category
+                product_dict.save()
 
-        UserProduct.objects.create(
-            quantity=quantity,
-            price=price,
-            expiration_date=expiration_date,
+        # FIX 2: Check if this user already has this exact product in this area with the SAME expiration date
+        existing_user_product = UserProduct.objects.filter(
             area=area,
             product=product_dict,
-            unit=unit
-        )
+            unit=unit,
+            expiration_date=expiration_date
+        ).first()
 
-        messages.success(request, f'Added "{name}" to area: {area.name}!')
+        if existing_user_product:
+            # Merge quantities instead of duplicating
+            existing_user_product.quantity += quantity
+            existing_user_product.save()
+            messages.success(request, f'Updated quantity of "{name}" in {area.name}!')
+        else:
+            # Create new row
+            UserProduct.objects.create(
+                quantity=quantity,
+                price=price,
+                expiration_date=expiration_date,
+                area=area,
+                product=product_dict,
+                unit=unit
+            )
+            messages.success(request, f'Added "{name}" to area: {area.name}!')
 
     return redirect(request.META.get('HTTP_REFERER') or 'home')
 
@@ -1410,7 +1461,6 @@ def api_edit_product(request):
         raw_id = request.POST.get('user_product_id') or request.POST.get('product_id')
 
         try:
-            # Force integer conversion to catch 'undefined'
             user_product_id = int(raw_id)
             user_product = get_object_or_404(UserProduct, id=user_product_id)
         except (ValueError, TypeError):
@@ -1425,8 +1475,16 @@ def api_edit_product(request):
         name = request.POST.get('product_name', '').strip()
         area_id = request.POST.get('area_id')
 
+        # ---> THIS WAS MISSING: Grab category from the frontend
+        category = request.POST.get('category', 'other').strip()
+
         if name:
             user_product.product.name = name
+
+            # Save the category unconditionally so manual overrides always work
+            if category:
+                user_product.product.category = category
+
             user_product.product.save()
 
         if area_id:

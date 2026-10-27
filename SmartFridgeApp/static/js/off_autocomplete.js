@@ -1,21 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Pola formularza
-    const nameInput = document.getElementById('addProductName');
-    const codeInput = document.getElementById('addProductCode');
-    const enterBtn = document.getElementById('addProductCodeEnter');
-    const hiddenBarcode = document.getElementById('addHiddenBarcode');
+    // Helper to get fresh elements right when we need them
+    const getEl = (id) => document.getElementById(id);
 
+    // OpenFoodFacts Fetcher
+    const fetchBarcodeData = (barcodeToFetch, prefix) => {
+        const codeInput = getEl(`${prefix}ProductCode`);
+        const nameInput = getEl(`${prefix}ProductName`);
+        const enterBtn = getEl(`${prefix}ProductCodeEnter`);
+        const categoryInput = getEl(`${prefix}ProductCategory`);
 
-    const kcalInput = document.getElementById('addProductKcal') || document.querySelector('[name="kcal"]');
-    const proteinsInput = document.getElementById('addProductProteins') || document.querySelector('[name="proteins"]');
-    const fatsInput = document.getElementById('addProductFats') || document.querySelector('[name="fats"]');
-    const nutriscoreInput = document.getElementById('addProductNutriscore') || document.querySelector('[name="nutriscore"]');
+        const kcalInput = getEl(`${prefix}ProductKcal`);
+        const proteinsInput = getEl(`${prefix}ProductProteins`);
+        const fatsInput = getEl(`${prefix}ProductFats`);
+        const nutriscoreInput = getEl(`${prefix}ProductNutriscore`);
+        const hiddenBarcode = prefix === 'add' ? getEl('addHiddenBarcode') : null;
 
-
-    const fetchBarcodeData = (barcodeToFetch) => {
         const barcode = barcodeToFetch || (codeInput ? codeInput.value.trim() : '');
         if (!barcode) return;
-
 
         let originalIcon = '';
         if (enterBtn && !barcodeToFetch) {
@@ -24,22 +25,43 @@ document.addEventListener('DOMContentLoaded', () => {
             enterBtn.disabled = true;
         }
 
-        fetch(`/api/off-barcode/${barcode}/`)
-            .then(res => res.ok ? res.json() : Promise.reject(res))
+       fetch(`/api/off-barcode/${barcode}/`)
+            .then(res => {
+                if (!res.ok) {
+                    if (res.status === 404) throw new Error("Product not found");
+                    throw new Error("Server error");
+                }
+                return res.json();
+            })
             .then(data => {
-                if (data.error) return;
-
+                if (data.error) throw new Error(data.error);
 
                 if (hiddenBarcode) hiddenBarcode.value = data.barcode;
                 if (codeInput && !barcodeToFetch) codeInput.value = data.barcode;
                 if (nameInput && !nameInput.value) nameInput.value = data.name;
+
                 if (kcalInput) kcalInput.value = data.kcal;
                 if (proteinsInput) proteinsInput.value = data.proteins;
                 if (fatsInput) fatsInput.value = data.fats;
                 if (nutriscoreInput) nutriscoreInput.value = data.nutriscore;
 
+                // Save category and visually update custom dropdown
+                if (categoryInput && data.category) {
+                    categoryInput.value = data.category;
+                    const catMenu = getEl(`${prefix}CategoryMenu`);
+                    if (catMenu) {
+                        const option = catMenu.querySelector(`.category-option[data-category="${data.category}"]`);
+                        if (option) {
+                            const btnText = getEl(`${prefix}SelectedCategoryText`);
+                            if (btnText) btnText.innerHTML = option.innerHTML;
+                        }
+                    }
+                }
             })
-            .catch(err => console.warn("Barcode fetch error:", err))
+            .catch(err => {
+                console.warn("Barcode fetch error:", err);
+                alert("Product not found in the database. You can still fill in the details manually!");
+            })
             .finally(() => {
                 if (enterBtn && !barcodeToFetch) {
                     enterBtn.innerHTML = originalIcon;
@@ -48,37 +70,52 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     };
 
-
-    if (enterBtn && codeInput) {
-        enterBtn.addEventListener('click', () => fetchBarcodeData());
-        codeInput.addEventListener('keypress', (e) => {
+    // Attach listeners for Add Modal
+    const addEnterBtn = getEl('addProductCodeEnter');
+    const addCodeInput = getEl('addProductCode');
+    if (addEnterBtn && addCodeInput) {
+        addEnterBtn.addEventListener('click', () => fetchBarcodeData(null, 'add'));
+        addCodeInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                fetchBarcodeData();
+                fetchBarcodeData(null, 'add');
             }
         });
     }
 
+    // Attach listeners for Edit Modal
+    const editEnterBtn = getEl('editProductCodeEnter');
+    const editCodeInput = getEl('editProductCode');
+    if (editEnterBtn && editCodeInput) {
+        editEnterBtn.addEventListener('click', () => fetchBarcodeData(null, 'edit'));
+        editCodeInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                fetchBarcodeData(null, 'edit');
+            }
+        });
+    }
 
-    if (nameInput) {
+    // Live Search Autocomplete (Attached to Add Modal)
+    const addNameInput = getEl('addProductName');
+    if (addNameInput) {
         const suggestionsWrapper = document.createElement('div');
         suggestionsWrapper.className = 'dropdown-menu w-100 shadow-sm border-0';
         suggestionsWrapper.style.position = 'absolute';
         suggestionsWrapper.style.zIndex = '1050';
 
-        nameInput.parentNode.style.position = 'relative';
-        nameInput.parentNode.appendChild(suggestionsWrapper);
+        addNameInput.parentNode.style.position = 'relative';
+        addNameInput.parentNode.appendChild(suggestionsWrapper);
 
         let debounceTimer;
 
-        nameInput.addEventListener('input', function () {
+        addNameInput.addEventListener('input', function () {
             const query = this.value.trim();
 
             if (query.length < 3) {
                 suggestionsWrapper.classList.remove('show');
                 return;
             }
-
 
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
@@ -107,17 +144,18 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </div>
                                 `;
 
-
                                 item.addEventListener('click', (e) => {
                                     e.preventDefault();
-                                    nameInput.value = product.name;
+                                    addNameInput.value = product.name;
                                     suggestionsWrapper.classList.remove('show');
 
-
                                     if (product.barcode) {
-                                        if (hiddenBarcode) hiddenBarcode.value = product.barcode;
-                                        if (codeInput) codeInput.value = product.barcode;
-                                        fetchBarcodeData(product.barcode); // Wywołanie naszej funkcji po kodzie
+                                        const hiddenBc = getEl('addHiddenBarcode');
+                                        const codeInp = getEl('addProductCode');
+                                        if (hiddenBc) hiddenBc.value = product.barcode;
+                                        if (codeInp) codeInp.value = product.barcode;
+                                        // Trigger fetch and explicitly flag this as an "add" modal action
+                                        fetchBarcodeData(product.barcode, 'add');
                                     }
                                 });
 
@@ -133,42 +171,61 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.addEventListener('click', (e) => {
-            if (!nameInput.contains(e.target) && !suggestionsWrapper.contains(e.target)) {
+            if (!addNameInput.contains(e.target) && !suggestionsWrapper.contains(e.target)) {
                 suggestionsWrapper.classList.remove('show');
             }
         });
     }
 });
 
-// Czyszczenie modali po zamknięciu
-const addProductModal = document.getElementById('addProductModal');
-if (addProductModal) {
-    addProductModal.addEventListener('hidden.bs.modal', function () {
+// Modal Cleanup & Icon Reset
+const resetModal = (prefix) => {
+    const form = document.getElementById(`${prefix}ProductForm`);
+    if (form) form.reset();
 
+    const codeInput = document.getElementById(`${prefix}ProductCode`);
+    if (codeInput) codeInput.value = '';
 
-        const addForm = document.getElementById('addProductForm');
-        if (addForm) addForm.reset();
+    const catInput = document.getElementById(`${prefix}ProductCategory`);
+    const catText = document.getElementById(`${prefix}SelectedCategoryText`);
+    if (catInput) catInput.value = 'other';
+    if (catText) catText.innerHTML = '<i class="bi bi-basket2-fill fs-5"></i> Other';
 
-
-        const addCodeInput = document.getElementById('addProductCode');
-        if (addCodeInput) addCodeInput.value = '';
-
-
+    if (prefix === 'add') {
         const nameInput = document.getElementById('addProductName');
         if (nameInput && nameInput.parentNode) {
             const suggestions = nameInput.parentNode.querySelector('.dropdown-menu');
             if (suggestions) suggestions.classList.remove('show');
         }
-    });
+    }
+};
+
+const addProductModal = document.getElementById('addProductModal');
+if (addProductModal) {
+    addProductModal.addEventListener('hidden.bs.modal', () => resetModal('add'));
 }
 
 const editProductModal = document.getElementById('editProductModal');
 if (editProductModal) {
-    editProductModal.addEventListener('hidden.bs.modal', function () {
-        const editForm = document.getElementById('editProductForm');
-        if (editForm) editForm.reset();
-
-        const editCodeInput = document.getElementById('editProductCode');
-        if (editCodeInput) editCodeInput.value = '';
-    });
+    editProductModal.addEventListener('hidden.bs.modal', () => resetModal('edit'));
 }
+
+// // Force the edit modal's visual category dropdown to sync when opening an item
+// document.addEventListener('click', function(e) {
+//     const editBtn = e.target.closest('.item-edit');
+//     if (editBtn) {
+//         const row = editBtn.closest('.product-row');
+//         if (row) {
+//             const category = row.getAttribute('data-edit-category') || 'other';
+//             const editCategoryInput = document.getElementById('editProductCategory');
+//             const editMenu = document.getElementById('editCategoryMenu');
+//             const editBtnText = document.getElementById('editSelectedCategoryText');
+//
+//             if (editCategoryInput) editCategoryInput.value = category;
+//             if (editMenu && editBtnText) {
+//                 const option = editMenu.querySelector(`.category-option[data-category="${category}"]`);
+//                 if (option) editBtnText.innerHTML = option.innerHTML;
+//             }
+//         }
+//     }
+// });

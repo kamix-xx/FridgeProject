@@ -1977,6 +1977,35 @@ body {
     left: 50%;
 }
 
+/* Push the 1 year label slightly to the left */
 .scale-pos-1y {
-    right: 4px;
+    right: 45px !important; /* Adjust this value until it clears the gooey menu */
 }
+
+/* Or, alternative approach: Make the entire freshness bar slightly narrower so it doesn't collide with the menu */
+.freshness-bar {
+    width: calc(100% - 50px) !important;
+}
+
+/* Update the label's z-index to 0 (down from 2) */
+.freshness-scale-label {
+    position: absolute;
+    top: 50%;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 500;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+    z-index: 0;
+}
+
+/* Ensure the gooey menu container sits heavily above the bar */
+.product-row-actions {
+    flex-shrink: 0;
+    position: relative;
+    width: 34px;
+    height: 34px;
+    z-index: 50;
+}
+
+
+
