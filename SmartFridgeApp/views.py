@@ -709,6 +709,60 @@ def expense_details(request):
     return render(request, 'expense-tracker/expense-details.html')
 
 
+from django.db.models import Sum, F, Q, FloatField
+from django.db.models.functions import Coalesce
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import UserProduct, Area
+
+
+@login_required(login_url='login')
+def api_get_expense_details(request):
+    user_products = UserProduct.objects.filter(
+        Q(area__owner=request.user) | Q(area__users=request.user)
+    ).distinct()
+
+    macros = user_products.aggregate(
+        total_fats=Sum(Coalesce(F('product__fats'), 0.0) * F('quantity'), output_field=FloatField()),
+        total_proteins=Sum(Coalesce(F('product__proteins'), 0.0) * F('quantity'), output_field=FloatField()),
+        total_carbs=Sum(Coalesce(F('product__carbs'), 0.0) * F('quantity'), output_field=FloatField())
+        # Dodane węglowodany
+    )
+
+    fats = macros['total_fats'] or 0
+    proteins = macros['total_proteins'] or 0
+    carbs = macros['total_carbs'] or 0
+    total_macros = fats + proteins + carbs
+
+    if total_macros > 0:
+        fats_pct = round((fats / total_macros) * 100)
+        proteins_pct = round((proteins / total_macros) * 100)
+        carbs_pct = 100 - fats_pct - proteins_pct
+    else:
+        fats_pct, proteins_pct, carbs_pct = 34, 33, 33
+
+    areas = Area.objects.filter(Q(owner=request.user) | Q(users=request.user)).distinct()
+    area_names = [area.name for area in areas]
+
+    nutriscore_series = {
+        'A': [], 'B': [], 'C': [], 'D': [], 'E': []
+    }
+
+    for area in areas:
+        area_prods = user_products.filter(area=area)
+        for score in nutriscore_series.keys():
+            spent = area_prods.filter(product__nutriscore=score).aggregate(
+                total=Sum(F('price') * F('quantity'), output_field=FloatField())
+            )['total'] or 0
+            nutriscore_series[score].append(round(spent, 2))
+
+    return JsonResponse({
+        'macros': [fats_pct, proteins_pct, carbs_pct],
+        'areas': area_names,
+        'nutriscore': nutriscore_series
+    })
+
+
 # ---------------------- #
 # ------ Profile: ------ #
 # ---------------------- #
@@ -1303,6 +1357,7 @@ def fetch_barcode_data(request, barcode):
             'kcal': int(nutriments.get('energy-kcal_100g', 0)),
             'proteins': round(float(nutriments.get('proteins_100g', 0.0)), 2),
             'fats': round(float(nutriments.get('fat_100g', 0.0)), 2),
+            'carbs': round(float(nutriments.get('carbohydrates_100g', 0.0)), 2),
             'nutriscore': (product_data.get('nutriscore_grade') or 'X').upper(),
             'category': category  # ADD TO RESPONSE
         })
@@ -1353,6 +1408,11 @@ def api_add_product(request):
         except (ValueError, TypeError):
             fats = 0.0
 
+        try:
+            carbs = float(request.POST.get('carbs') or 0.0)
+        except ValueError:
+            carbs = 0.0
+
         nutriscore = request.POST.get('nutriscore', 'X').upper()
         if nutriscore not in ['A', 'B', 'C', 'D', 'E']:
             nutriscore = 'X'
@@ -1390,6 +1450,7 @@ def api_add_product(request):
                 kcal=kcal,
                 proteins=proteins,
                 fats=fats,
+                carbs=carbs,
                 nutriscore=nutriscore,
                 category=category,
                 icon_number=1,

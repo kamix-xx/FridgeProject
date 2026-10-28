@@ -86,6 +86,7 @@ class ProductDictionary(models.Model):
     kcal = models.IntegerField(null=True)
     proteins = models.FloatField(null=True)
     fats = models.FloatField(null=True)
+    carbs = models.FloatField(null=True)
     nutriscore = models.CharField(max_length=1, null=False)
     is_global = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)

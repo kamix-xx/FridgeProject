@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const kcalInput = getEl(`${prefix}ProductKcal`);
         const proteinsInput = getEl(`${prefix}ProductProteins`);
         const fatsInput = getEl(`${prefix}ProductFats`);
+        const carbsInput = getEl(`${prefix}ProductCarbs`)
         const nutriscoreInput = getEl(`${prefix}ProductNutriscore`);
         const hiddenBarcode = prefix === 'add' ? getEl('addHiddenBarcode') : null;
 
@@ -44,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (proteinsInput) proteinsInput.value = data.proteins;
                 if (fatsInput) fatsInput.value = data.fats;
                 if (nutriscoreInput) nutriscoreInput.value = data.nutriscore;
+                if (carbsInput) carbsInput.value = data.carbs;
 
                 // Save category and visually update custom dropdown
                 if (categoryInput && data.category) {
