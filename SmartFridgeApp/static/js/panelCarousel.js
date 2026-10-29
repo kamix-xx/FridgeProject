@@ -138,6 +138,24 @@ document.addEventListener('DOMContentLoaded', () => {
             nextBtn.addEventListener('click', (e) => { e.preventDefault(); stepArea(1); });
         }
 
+        // Handle Keyboard Arrow Keys
+        document.addEventListener('keydown', (e) => {
+            const active = document.activeElement;
+            const tag = active ? active.tagName.toLowerCase() : '';
+            const isEditable = active && (active.isContentEditable || ['input', 'textarea', 'select'].includes(tag));
+
+            // Prevent triggering slide changes while editing or typing in form controls
+            if (isEditable) return;
+
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                stepArea(-1);
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                stepArea(1);
+            }
+        });
+
         let startX = 0;
         let isSwiping = false;
 
