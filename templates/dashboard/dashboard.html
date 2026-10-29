@@ -18,6 +18,8 @@
     <link rel="stylesheet" href="{% static 'css/modals.css' %}?v=3">
     <link rel="stylesheet" href="{% static 'css/productModal.css' %}">
     <link rel="stylesheet" href="{% static 'css/editAreaModal.css' %}">
+    <link rel="stylesheet" href="{% static 'css/panelBezel.css' %}">
+    <script src="{% static 'js/panelBezel.js' %}" defer></script>
 {% endblock %}
 
 {% block title %}SmartFridge+ | Dashboard{% endblock %}
@@ -25,7 +27,7 @@
 {% block content %}
     {% include "partials/background_images.html" %}
 
-    <main class="dashboard-page">
+    <main class="dashboard-page dashboard-page--bezel">
         <!-- SVG Filter for the Gooey Effect -->
         <svg width="0" height="0" class="position-absolute" style="visibility: hidden;">
             <defs>
@@ -41,8 +43,9 @@
         <div class="dashboard-inner">
             <!-- rest of your dashboard code... -->
             <div class="dashboard-inner">
-                <!-- Search bar wrapped to align with Fridge panel width perfectly -->
-                <div class="dashboard-search-wrapper">
+                <!-- Search bar wrapped to align with Fridge panel width perfectly.
+                     Hidden by default; toggled from the panel bezel (panelBezel.js). -->
+                <div class="dashboard-search-wrapper is-collapsed" id="searchWrapper" inert>
                     <div class="dashboard-search-bar t-clear" id="searchWrap">
                         <i class="bi bi-search dashboard-search-icon" aria-hidden="true"></i>
                         <input
@@ -70,7 +73,7 @@
                 </div>
 
                 <!-- Fridge area carousel -->
-                <section class="fridge-panel">
+                <section class="fridge-panel has-bezel">
                     <button type="button" class="btn-scroll-down carousel-arrow" id="areaPrev"
                             aria-label="Previous area"
                             {% if areas|length < 2 %}disabled{% endif %}>
@@ -169,21 +172,52 @@
                         </div>
                     </div>
 
+                    <!-- Bezel glued to the panel's top edge (panelBezel.css / panelBezel.js).
+                         Collapsed it is a small handle; hover (mouse) or tap opens the tools. -->
+                    <div class="panel-bezel" id="panelBezel" role="group" aria-label="Dashboard tools">
+                        <span class="bezel-fillet bezel-fillet-left" aria-hidden="true"></span>
+                        <span class="bezel-fillet bezel-fillet-right" aria-hidden="true"></span>
+
+                        <div class="bezel-body">
+                            <button type="button" class="bezel-handle" id="bezelHandle"
+                                    aria-expanded="false" aria-controls="bezelActions"
+                                    aria-label="Open dashboard menu">
+                                <i class="bi bi-chevron-compact-down" aria-hidden="true"></i>
+                            </button>
+
+                            <div class="bezel-actions" id="bezelActions" inert>
+                                <a href="{% url 'areas' %}" class="bezel-btn" data-page-transition
+                                   aria-label="View all areas">
+                                    <i class="bi bi-grid" aria-hidden="true"></i>
+                                    <span class="bezel-label">
+                                        <span class="bz-long">View all areas</span><span class="bz-short">Areas</span>
+                                    </span>
+                                </a>
+
+                                <button type="button" class="bezel-btn"
+                                        data-bs-toggle="modal" data-bs-target="#addAreaModal"
+                                        data-area-mode="create" aria-label="Add new area">
+                                    <i class="bi bi-folder-plus" aria-hidden="true"></i>
+                                    <span class="bezel-label">
+                                        <span class="bz-long">Add new area</span><span class="bz-short">Add area</span>
+                                    </span>
+                                </button>
+
+                                <button type="button" class="bezel-btn" id="searchToggleBtn"
+                                        aria-pressed="false" aria-controls="searchWrapper"
+                                        aria-label="Toggle search bar">
+                                    <i class="bi bi-search" aria-hidden="true"></i>
+                                    <span class="bezel-label">Search</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <button type="button" class="btn-scroll-down carousel-arrow" id="areaNext" aria-label="Next area"
                             {% if areas|length < 2 %}disabled{% endif %}>
                         <i class="bi bi-chevron-right"></i>
                     </button>
                 </section>
-
-                <div class="dashboard-actions">
-                    <a href="{% url 'areas' %}" class="btn-fridge-outline" data-page-transition>View all areas</a>
-
-                    <button type="button" class="btn-fridge-outline"
-                            data-bs-toggle="modal" data-bs-target="#addAreaModal"
-                            data-area-mode="create">
-                        <i class="bi bi-plus"></i> Add new area
-                    </button>
-                </div>
             </div>
         </div>
 

@@ -118,3 +118,52 @@ html.page-transition-preparing .t-morph {
         opacity: 0;
     }
 }
+
+/* =========================================================
+   PANEL BEZEL ANIMATION
+   ========================================================= */
+
+/* Give the bezel its own transition identity */
+.panel-bezel {
+    view-transition-name: panel-bezel;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    /* Enter: Wait 300ms for the main panel to finish its layout morph,
+       then unroll smoothly from the top edge */
+    ::view-transition-new(panel-bezel):only-child {
+        animation: bezel-unroll 400ms cubic-bezier(0.22, 1, 0.36, 1) 300ms both;
+    }
+
+    /* Leave: Roll back up into the edge immediately on exit */
+    ::view-transition-old(panel-bezel):only-child {
+        animation: bezel-roll-up 250ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+}
+
+/* clip-path masks the element so it reveals top-to-bottom right at the border line */
+@keyframes bezel-unroll {
+    from {
+        clip-path: inset(0 0 100% 0);
+        transform: translateY(-8px);
+        opacity: 0;
+    }
+    to {
+        clip-path: inset(-20px -20px -20px -20px); /* Negative inset allows the drop shadow to be visible */
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes bezel-roll-up {
+    from {
+        clip-path: inset(-20px -20px -20px -20px);
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        clip-path: inset(0 0 100% 0);
+        transform: translateY(-8px);
+        opacity: 0;
+    }
+}

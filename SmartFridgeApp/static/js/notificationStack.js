@@ -1,101 +1,186 @@
 /**
  * notificationStack.js
- * Interactive iOS/Sonner-like stacked notifications that unstack on hover or tap.
+ * Interactive iOS/Sonner-like pill notification stack.
+ *
+ * Features:
+ * - Up top on the screen, pill-shaped.
+ * - Layered pill stack with cascading rounded bottom edges (no +n badge).
+ * - Multi-notification stack: hovering over the stack unrolls them into separate cards.
+ * - Single notification: clicking toggles enlarged view with smooth border-radius interpolation.
+ * - Dismiss button: visible on hover on desktop, always visible on mobile.
+ * - Uniform drop-in support for Django messages & dynamic window.showNotification().
  */
 (function () {
     'use strict';
 
+    if (window.__notificationStackLoaded) {
+        if (typeof window.__initNotificationStack === 'function') {
+            window.__initNotificationStack();
+        }
+        return;
+    }
+    window.__notificationStackLoaded = true;
+
+    let containerEl = null;
     let stackEl = null;
-    let badgeEl = null;
     let autoDismissTimer = null;
+    let isHoveringStack = false;
+
+    // Grace period before an unrolled stack folds back up after the pointer
+    // leaves it, so the mouse can briefly slip out (and back in) without the
+    // cards snapping shut under it.
+    const COLLAPSE_DELAY_MS = 300;
+    let collapseTimer = null;
+
+    function cancelScheduledCollapse() {
+        if (collapseTimer) {
+            clearTimeout(collapseTimer);
+            collapseTimer = null;
+        }
+    }
+
+    function scheduleCollapse() {
+        cancelScheduledCollapse();
+        collapseTimer = setTimeout(() => {
+            collapseTimer = null;
+            if (!isHoveringStack) collapseStack();
+        }, COLLAPSE_DELAY_MS);
+    }
+
+    function getCardCount() {
+        if (!stackEl) return 0;
+        return stackEl.querySelectorAll('.notification-card:not(.is-dismissing)').length;
+    }
 
     function initStack() {
+        containerEl = document.getElementById('notificationStackContainer');
         stackEl = document.getElementById('notificationStack');
         if (!stackEl) return;
 
-        badgeEl = document.getElementById('notificationBadge');
+        if (!stackEl.dataset.stackInitialized) {
+            stackEl.dataset.stackInitialized = 'true';
 
-        // Hover handling for desktop
-        stackEl.addEventListener('mouseenter', () => {
-            expandStack();
-            stopAutoDismiss();
-        });
+            // Hover handling for desktop: unstack when hovering multi-notification stack
+            stackEl.addEventListener('mouseenter', () => {
+                isHoveringStack = true;
+                cancelScheduledCollapse();
+                stopAutoDismiss();
+                if (getCardCount() > 1) {
+                    expandStack();
+                }
+            });
 
-        stackEl.addEventListener('mouseleave', () => {
-            collapseStack();
-            startAutoDismiss();
-        });
+            stackEl.addEventListener('mouseleave', () => {
+                isHoveringStack = false;
+                scheduleCollapse();
+                startAutoDismiss();
+            });
 
-        // Click / tap handling for mobile
-        stackEl.addEventListener('click', (e) => {
-            const closeBtn = e.target.closest('.notification-close');
-            if (closeBtn) {
-                e.stopPropagation();
-                const card = closeBtn.closest('.notification-card');
-                if (card) dismissCard(card);
-                return;
-            }
+            // Click / tap handling
+            stackEl.addEventListener('click', (e) => {
+                const closeBtn = e.target.closest('.notification-close');
+                if (closeBtn) {
+                    e.stopPropagation();
+                    const card = closeBtn.closest('.notification-card');
+                    if (card) dismissCard(card);
+                    return;
+                }
 
-            // If not expanded, expand it
-            if (!stackEl.classList.contains('is-expanded')) {
-                expandStack();
-            }
-        });
+                const card = e.target.closest('.notification-card');
+                if (!card) return;
 
-        // Tap outside to collapse on mobile
-        document.addEventListener('click', (e) => {
-            if (stackEl && !stackEl.contains(e.target)) {
-                collapseStack();
-            }
-        });
+                const total = getCardCount();
+
+                if (total === 1) {
+                    // Single notification: clicking toggles enlargement
+                    card.classList.toggle('is-enlarged');
+                } else {
+                    // Multiple notifications
+                    if (!stackEl.classList.contains('is-unstacked')) {
+                        // Mobile tap or click to unstack
+                        expandStack();
+                    } else {
+                        // Already unstacked: click to make this specific notification larger
+                        const wasEnlarged = card.classList.contains('is-enlarged');
+                        // Collapse any other enlarged cards
+                        stackEl.querySelectorAll('.notification-card.is-enlarged').forEach(c => {
+                            if (c !== card) c.classList.remove('is-enlarged');
+                        });
+                        if (wasEnlarged) {
+                            card.classList.remove('is-enlarged');
+                        } else {
+                            card.classList.add('is-enlarged');
+                        }
+                    }
+                }
+            });
+
+            // Tap/click outside to collapse on mobile or when focused away
+            document.addEventListener('click', (e) => {
+                if (stackEl && !stackEl.contains(e.target)) {
+                    collapseStack();
+                }
+            });
+        }
 
         updateStackPositions();
         startAutoDismiss();
     }
 
+    window.__initNotificationStack = initStack;
+
     function expandStack() {
         if (!stackEl) return;
-        const cards = stackEl.querySelectorAll('.notification-card');
-        if (cards.length > 1) {
-            stackEl.classList.add('is-expanded');
+        const total = getCardCount();
+        if (total > 1) {
+            stackEl.classList.add('is-unstacked');
         }
     }
 
     function collapseStack() {
         if (!stackEl) return;
-        stackEl.classList.remove('is-expanded');
+        cancelScheduledCollapse();
+        stackEl.classList.remove('is-unstacked');
+        // Clear enlarged state from cards when collapsing the stack
+        stackEl.querySelectorAll('.notification-card.is-enlarged').forEach(card => {
+            card.classList.remove('is-enlarged');
+        });
     }
 
     function updateStackPositions() {
         if (!stackEl) return;
-        const cards = Array.from(stackEl.querySelectorAll('.notification-card'));
+        const cards = Array.from(stackEl.querySelectorAll('.notification-card:not(.is-dismissing)'));
+        const total = cards.length;
+
+        stackEl.setAttribute('data-count', String(total));
 
         cards.forEach((card, index) => {
             card.setAttribute('data-stack-pos', String(index));
         });
 
-        // Update badge if there are more than 1
-        if (badgeEl) {
-            if (cards.length > 1) {
-                badgeEl.textContent = `+${cards.length - 1}`;
-                badgeEl.classList.remove('d-none');
-            } else {
-                badgeEl.classList.add('d-none');
-            }
+        // If only 1 card remains and user is not hovering, ensure unstacked is cleared
+        if (total <= 1 && !isHoveringStack) {
+            stackEl.classList.remove('is-unstacked');
         }
     }
 
     function dismissCard(card) {
-        card.style.transition = 'transform 0.25s ease, opacity 0.2s ease';
-        card.style.transform = 'translateY(-16px) scale(0.9)';
-        card.style.opacity = '0';
+        if (!card || card.classList.contains('is-dismissing')) return;
+        card.classList.add('is-dismissing');
+        card.classList.remove('is-enlarged');
 
         setTimeout(() => {
             card.remove();
             updateStackPositions();
-            const remaining = stackEl ? stackEl.querySelectorAll('.notification-card') : [];
-            if (remaining.length <= 1) {
-                collapseStack();
+            const remaining = getCardCount();
+            if (remaining <= 1) {
+                // If user is no longer hovering over the stack, collapse safely
+                if (!isHoveringStack || remaining === 0) {
+                    collapseStack();
+                }
+            }
+            if (remaining > 0 && !isHoveringStack) {
+                startAutoDismiss();
             }
         }, 220);
     }
@@ -103,12 +188,14 @@
     function startAutoDismiss() {
         stopAutoDismiss();
         autoDismissTimer = setTimeout(() => {
-            if (!stackEl || stackEl.classList.contains('is-expanded')) return;
-            const topCard = stackEl.querySelector('.notification-card[data-stack-pos="0"]');
+            if (!stackEl) return;
+            // Do not dismiss while hovering or unstacked or if any card is enlarged
+            if (isHoveringStack || stackEl.classList.contains('is-unstacked')) return;
+            if (stackEl.querySelector('.notification-card.is-enlarged')) return;
+
+            const topCard = stackEl.querySelector('.notification-card[data-stack-pos="0"]:not(.is-dismissing)');
             if (topCard) {
                 dismissCard(topCard);
-                // Keep dismissing slowly if there are more
-                startAutoDismiss();
             }
         }, 6000);
     }
@@ -120,34 +207,45 @@
         }
     }
 
+    function ensureContainer() {
+        if (!containerEl || !document.body.contains(containerEl)) {
+            containerEl = document.getElementById('notificationStackContainer');
+            if (!containerEl) {
+                containerEl = document.createElement('div');
+                containerEl.id = 'notificationStackContainer';
+                containerEl.className = 'notification-stack-container';
+                containerEl.setAttribute('aria-live', 'polite');
+                document.body.appendChild(containerEl);
+            }
+        }
+
+        if (!stackEl || !document.body.contains(stackEl)) {
+            stackEl = document.getElementById('notificationStack');
+            if (!stackEl) {
+                stackEl = document.createElement('div');
+                stackEl.id = 'notificationStack';
+                stackEl.className = 'notification-stack';
+                containerEl.appendChild(stackEl);
+            }
+        }
+
+        initStack();
+    }
+
+    /**
+     * Programmatic API to show notifications anywhere in the app.
+     * @param {string} message - Main notification text.
+     * @param {string} type - 'success' | 'error' | 'danger' | 'warning' | 'info'
+     * @param {string|null} title - Optional custom title.
+     */
     window.showNotification = function (message, type = 'info', title = null) {
-        let container = document.getElementById('notificationStackContainer');
-        if (!container) {
-            container = document.createElement('div');
-            container.id = 'notificationStackContainer';
-            container.className = 'notification-stack-container';
-            container.setAttribute('aria-live', 'polite');
-            document.body.appendChild(container);
-        }
+        ensureContainer();
 
-        if (!stackEl) {
-            stackEl = document.createElement('div');
-            stackEl.id = 'notificationStack';
-            stackEl.className = 'notification-stack';
-            container.appendChild(stackEl);
-
-            badgeEl = document.createElement('div');
-            badgeEl.id = 'notificationBadge';
-            badgeEl.className = 'notification-badge-count d-none';
-            stackEl.appendChild(badgeEl);
-
-            initStack();
-        }
+        const normType = type === 'danger' ? 'error' : type;
 
         const iconMap = {
             success: 'bi-check-circle-fill',
             error: 'bi-x-circle-fill',
-            danger: 'bi-x-circle-fill',
             warning: 'bi-exclamation-triangle-fill',
             info: 'bi-info-circle-fill'
         };
@@ -155,34 +253,37 @@
         const titleMap = {
             success: 'Success',
             error: 'Error',
-            danger: 'Error',
             warning: 'Warning',
             info: 'Notice'
         };
 
         const card = document.createElement('div');
-        card.className = `notification-card notification-${type}`;
+        card.className = `notification-card notification-${normType}`;
+        card.setAttribute('role', 'alert');
 
-        const iconClass = iconMap[type] || 'bi-info-circle-fill';
-        const displayTitle = title || titleMap[type] || 'Notice';
+        const iconClass = iconMap[normType] || 'bi-info-circle-fill';
+        const displayTitle = title || titleMap[normType] || 'Notice';
 
         card.innerHTML = `
             <div class="notification-icon">
                 <i class="bi ${iconClass}"></i>
             </div>
             <div class="notification-body">
-                <div class="notification-title">${displayTitle}</div>
-                <div class="notification-text">${message}</div>
+                <span class="notification-title">${displayTitle}</span>
+                <span class="notification-text">${message}</span>
             </div>
             <button type="button" class="notification-close" aria-label="Close notification">
                 <i class="bi bi-x"></i>
             </button>
         `;
 
-        // Add to front of stack
+        // Prepend to front of the stack
         stackEl.insertBefore(card, stackEl.firstChild);
         updateStackPositions();
-        startAutoDismiss();
+
+        if (!isHoveringStack) {
+            startAutoDismiss();
+        }
     };
 
     if (document.readyState === 'loading') {
@@ -190,4 +291,8 @@
     } else {
         initStack();
     }
+
+    window.addEventListener('pageshow', () => {
+        initStack();
+    });
 })();

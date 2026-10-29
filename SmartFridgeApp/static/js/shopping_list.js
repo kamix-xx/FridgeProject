@@ -121,10 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const checkedBoxes = activePanel.querySelectorAll('.shopping-checkbox:checked');
                 if (allBoxes.length > 0 && allBoxes.length === checkedBoxes.length) {
                     Confetti.launch(150);
-                    const toastEl = document.getElementById('completionToast');
-                    if (toastEl && window.bootstrap) {
-                        const toast = new bootstrap.Toast(toastEl, {delay: 4000});
-                        toast.show();
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification('All items in this list are completed! 🎉', 'success');
                     }
                 }
             }

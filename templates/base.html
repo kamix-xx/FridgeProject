@@ -43,8 +43,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}?v=11">
     <link rel="stylesheet" href="{% static 'css/pageTransitions.css' %}?v=3">
+    <link rel="stylesheet" href="{% static 'css/notificationStack.css' %}?v=3">
     <script src="{% static 'js/main.js' %}?v=2" defer></script>
     <script src="{% static 'js/pageTransitions.js' %}?v=1" defer></script>
+    <script src="{% static 'js/notificationStack.js' %}?v=3" defer></script>
     {% block head %}{% endblock %}
 </head>
 <body>
@@ -159,12 +161,8 @@
     </div>
 {% endif %}
 
-{% if user.is_authenticated %}
-
-<!-- Notifications -->
-    {% include "partials/notifications.html" %}
-
-{% endif %}
+<!-- GLOBAL NOTIFICATIONS / TOASTS -->
+{% include "partials/notifications.html" %}
 
 {% block content %}
 {% endblock %}
@@ -183,7 +181,7 @@
         const minSwipeDistance = 60;
         let touchStart = null;
 
-        document.addEventListener('pointerdown', function (event) {
+        document.addEventListener('pointerdown', function eventHandler(event) {
             if (event.pointerType !== 'touch' || sideMenu.classList.contains('show')) {
                 touchStart = null;
                 return;

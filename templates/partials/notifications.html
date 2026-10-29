@@ -1,39 +1,44 @@
-{% if messages %}
-    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-4"
-         style="z-index: 1070; margin-top: 60px;">
-        {% for message in messages %}
+{% load static %}
 
-            <!-- Toast alert -->
-            <div class="toast align-items-center text-bg-{% if 'error' in message.tags %}danger{% else %}success{% endif %} border-0 show shadow-lg"
-                 role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body fs-6 fw-medium">
-                        {{ message }}
+<!-- Global Notification Stack Container (Top Centered Pill Stack) -->
+<div id="notificationStackContainer" class="notification-stack-container" aria-live="polite">
+    <div id="notificationStack" class="notification-stack">
+        {% if messages %}
+            {% for message in messages %}
+                {% with msg_tags=message.tags|default:"info" %}
+                <div class="notification-card notification-{% if 'error' in msg_tags or 'danger' in msg_tags %}error{% elif 'warning' in msg_tags %}warning{% elif 'success' in msg_tags %}success{% else %}info{% endif %}"
+                     role="alert">
+                    <div class="notification-icon">
+                        <i class="bi {% if 'error' in msg_tags or 'danger' in msg_tags %}bi-x-circle-fill{% elif 'warning' in msg_tags %}bi-exclamation-triangle-fill{% elif 'success' in msg_tags %}bi-check-circle-fill{% else %}bi-info-circle-fill{% endif %}"></i>
                     </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                            aria-label="Close"></button>
+                    <div class="notification-body">
+                        <span class="notification-title">
+                            {% if 'error' in msg_tags or 'danger' in msg_tags %}Error
+                            {% elif 'warning' in msg_tags %}Warning
+                            {% elif 'success' in msg_tags %}Success
+                            {% else %}Notice{% endif %}
+                        </span>
+                        <span class="notification-text">{{ message }}</span>
+                    </div>
+                    <button type="button" class="notification-close" aria-label="Close notification">
+                        <i class="bi bi-x"></i>
+                    </button>
                 </div>
-            </div>
+                {% endwith %}
 
-            <!-- Jeśli błąd dotyczy zmiany hasła w profilu, otwórz modal -->
-            {% if 'password_error' in message.tags %}
-                <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const changePassModal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
-                        if (changePassModal) {
-                            changePassModal.show();
-                        }
-                    });
-                </script>
-            {% endif %}
-
-        {% endfor %}
+                <!-- Automatically open change password modal on password error -->
+                {% if 'password_error' in message.tags %}
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const changePassModalEl = document.getElementById('changePasswordModal');
+                            if (changePassModalEl && window.bootstrap && window.bootstrap.Modal) {
+                                const changePassModal = bootstrap.Modal.getOrCreateInstance(changePassModalEl);
+                                if (changePassModal) changePassModal.show();
+                            }
+                        });
+                    </script>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
     </div>
-
-    <script>
-        // Automatyczne ukrywanie tostów po 5 sekundach
-        setTimeout(() => {
-            document.querySelectorAll('.toast').forEach(t => t.classList.remove('show'));
-        }, 5000);
-    </script>
-{% endif %}
+</div>

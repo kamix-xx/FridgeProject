@@ -56,12 +56,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 navigator.clipboard.writeText(shareCodeInput.value).then(function () {
                     btnCopy.innerHTML = '<i class="bi bi-check-lg text-success"></i>';
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification('Area code copied to clipboard!', 'info');
+                    }
 
                     setTimeout(function () {
                         btnCopy.innerHTML = '<i class="bi bi-copy"></i>';
                     }, 2000);
                 }).catch(function (err) {
                     console.error('Failed to copy text: ', err);
+                    if (typeof window.showNotification === 'function') {
+                        window.showNotification('Could not copy area code to clipboard.', 'error');
+                    }
                 });
             });
         }

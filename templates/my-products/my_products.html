@@ -87,17 +87,23 @@
                                         <ul class="product-list">
                                             {% for p in area.products %}
                                                 <li class="product-row" role="button" tabindex="0"
+                                                    data-user-product-id="{{ p.id }}"
                                                     data-product-id="{{ p.id }}"
+                                                    data-product-name="{{ p.product.name|lower }}"
+                                                    data-edit-id="{{ p.id }}"
                                                     data-edit-code="{{ p.product.barcode|default_if_none:'' }}"
                                                     data-edit-name="{{ p.product.name|default_if_none:'' }}"
                                                     data-edit-price="{{ p.price|default_if_none:'' }}"
                                                     data-edit-quantity="{{ p.quantity|default_if_none:'' }}"
                                                     data-edit-unit="{{ p.unit.symbol|default_if_none:'' }}"
                                                     data-edit-expiration="{{ p.expiration_date|date:'Y-m-d' }}"
-                                                    data-edit-area="{{ area.id }}">
+                                                    data-edit-area="{{ area.id }}"
+                                                    data-edit-category="{{ p.product.category|default_if_none:'other' }}"
+                                                    aria-label="Edit {{ p.product.name }}">
 
-                                                    <span class="product-icon" aria-hidden="true">
-                                                        <i class="bi bi-basket2-fill"></i>
+                                                    <span class="product-icon" aria-hidden="true"
+                                                          title="{{ p.product.category|default:'other'|title }}">
+                                                        {% include "partials/category_icon.html" with category=p.product.category %}
                                                     </span>
 
                                                     <div class="product-info">
@@ -117,19 +123,42 @@
                                                         </span>
                                                     </div>
 
-                                                    <div class="freshness-bar freshness-{{ p.freshness_level|default:'fresh' }}"
-                                                         role="progressbar"
-                                                         aria-valuenow="{{ p.freshness_percent|default:100 }}"
-                                                         aria-valuemin="0"
-                                                         aria-valuemax="100">
-                                                        <div class="freshness-bar-fill"
-                                                             style="width: {{ p.freshness_percent|default:100 }}%"></div>
-                                                    </div>
+                                                    {% if p.freshness_percent is not None %}
+                                                        <div class="freshness-bar freshness-{{ p.freshness_level }} position-relative"
+                                                             role="progressbar"
+                                                             aria-label="Freshness"
+                                                             aria-valuenow="{{ p.freshness_percent }}"
+                                                             aria-valuemin="0"
+                                                             aria-valuemax="100"
+                                                             title="Skala przydatności: 1m (miesiąc), 6m (pół roku), 1r (rok)">
 
-                                                    <div class="d-none d-md-block fw-medium ms-3 me-2 label"
-                                                         style="font-size: 1.05rem;">
-                                                        {{ area.name }}
-                                                    </div>
+                                                            <div class="freshness-bar-fill"
+                                                                 style="width: {{ p.freshness_percent }}%"></div>
+
+                                                            <div class="freshness-scale-overlay">
+                                                                <div class="freshness-scale-line scale-pos-7d"></div>
+                                                                <div class="freshness-scale-line scale-pos-1m"></div>
+                                                                <div class="freshness-scale-line scale-pos-6m"></div>
+
+                                                                <span class="freshness-scale-label scale-pos-1m translate-middle">1m</span>
+                                                                <span class="freshness-scale-label scale-pos-6m translate-middle">6m</span>
+                                                                <span class="freshness-scale-label scale-pos-1y translate-middle-y">1r</span>
+                                                            </div>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="freshness-bar position-relative" aria-hidden="true"
+                                                             title="Brak daty ważności">
+                                                            <div class="freshness-scale-overlay">
+                                                                <div class="freshness-scale-line freshness-scale-line-muted scale-pos-1m"></div>
+                                                                <div class="freshness-scale-line freshness-scale-line-muted scale-pos-6m"></div>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+
+{#                                                    <div class="d-none d-md-block fw-medium ms-3 me-2 label"#}
+{#                                                         style="font-size: 1.05rem;">#}
+{#                                                        {{ area.name }}#}
+{#                                                    </div>#}
 
                                                     <div class="product-row-actions gooey-menu">
                                                         <input type="checkbox"
@@ -315,6 +344,29 @@
                                 </p>
                                 <button type="submit" class="popup-circular-btn mx-auto" aria-label="Add Area"
                                         id="submitAddAreaBtn"><i class="bi bi-plus"></i></button>
+                            </form>
+                        </div>
+
+                        <div class="add-area-panel add-area-panel-code modal-body text-center p-4 p-md-5"
+                             data-panel="code" aria-hidden="true">
+                            <h3 class="popup-title mb-4">Join Area</h3>
+                            <form method="post" action="{% url 'api_join_area' %}" id="joinAreaForm">
+                                {% csrf_token %}
+                                <div class="text-start mb-2">
+                                    <label for="joinAreaCode" class="form-label popup-label">Area Code</label>
+                                    <input type="text" name="area_code" maxlength="12"
+                                           class="form-control popup-input shadow-none" id="joinAreaCode" required
+                                           autocomplete="off" tabindex="-1">
+                                </div>
+                                <p class="custom-subtext mb-5">
+                                    Create your own area
+                                    <button type="button" class="custom-link custom-link-button add-area-switch-btn"
+                                            data-switch-to="create" tabindex="-1">HERE
+                                    </button>
+                                </p>
+                                <button type="submit" class="popup-circular-btn mx-auto" aria-label="Join Area"
+                                        id="submitJoinAreaBtn" tabindex="-1"><i class="bi bi-box-arrow-in-right"></i>
+                                </button>
                             </form>
                         </div>
                     </div>

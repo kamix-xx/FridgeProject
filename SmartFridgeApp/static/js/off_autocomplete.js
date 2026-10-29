@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const kcalInput = getEl(`${prefix}ProductKcal`);
         const proteinsInput = getEl(`${prefix}ProductProteins`);
         const fatsInput = getEl(`${prefix}ProductFats`);
-        const carbsInput = getEl(`${prefix}ProductCarbs`)
         const nutriscoreInput = getEl(`${prefix}ProductNutriscore`);
         const hiddenBarcode = prefix === 'add' ? getEl('addHiddenBarcode') : null;
 
@@ -45,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (proteinsInput) proteinsInput.value = data.proteins;
                 if (fatsInput) fatsInput.value = data.fats;
                 if (nutriscoreInput) nutriscoreInput.value = data.nutriscore;
-                if (carbsInput) carbsInput.value = data.carbs;
 
                 // Save category and visually update custom dropdown
                 if (categoryInput && data.category) {
@@ -62,7 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(err => {
                 console.warn("Barcode fetch error:", err);
-                alert("Product not found in the database. You can still fill in the details manually!");
+                if (window.showNotification) {
+                    window.showNotification("Product not found in the database. You can still fill in the details manually!", "warning");
+                } else {
+                    alert("Product not found in the database. You can still fill in the details manually!");
+                }
             })
             .finally(() => {
                 if (enterBtn && !barcodeToFetch) {
@@ -211,23 +213,3 @@ const editProductModal = document.getElementById('editProductModal');
 if (editProductModal) {
     editProductModal.addEventListener('hidden.bs.modal', () => resetModal('edit'));
 }
-
-// // Force the edit modal's visual category dropdown to sync when opening an item
-// document.addEventListener('click', function(e) {
-//     const editBtn = e.target.closest('.item-edit');
-//     if (editBtn) {
-//         const row = editBtn.closest('.product-row');
-//         if (row) {
-//             const category = row.getAttribute('data-edit-category') || 'other';
-//             const editCategoryInput = document.getElementById('editProductCategory');
-//             const editMenu = document.getElementById('editCategoryMenu');
-//             const editBtnText = document.getElementById('editSelectedCategoryText');
-//
-//             if (editCategoryInput) editCategoryInput.value = category;
-//             if (editMenu && editBtnText) {
-//                 const option = editMenu.querySelector(`.category-option[data-category="${category}"]`);
-//                 if (option) editBtnText.innerHTML = option.innerHTML;
-//             }
-//         }
-//     }
-// });

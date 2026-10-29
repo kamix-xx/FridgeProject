@@ -1,0 +1,400 @@
+/* =========================================
+   Dashboard panel bezel
+   -----------------------------------------
+   A tab glued to the top edge of the fridge panel. It is drawn so that
+   it reads as part of the panel's own outline:
+     - convex rounded top corners on the tab itself
+     - "reverse rounded" (concave) fillets where the tab meets the panel
+     - the panel's top border line is cut away underneath the tab, so
+       there is no seam between the two glass surfaces
+
+   Collapsed: a small handle. Open: the full tool bar.
+   Desktop (mouse): opens on hover.  Touch / keyboard: tap or Enter.
+
+   Load AFTER dashboard.css.
+   ========================================= */
+
+/* ---------- Tokens + state ---------- */
+
+.fridge-panel.has-bezel {
+    --bz-r: 10px;
+    --bz-closed-w: 76px;
+    --bz-closed-h: 20px;
+
+    /* Increased to fit a 3-item vertical list */
+    --bz-open-h: 138px;
+    --bz-open-w: 480px;
+
+    --bz-bg: rgb(255 222 191 / 0.7);
+    --bz-border: #8b481c;
+    --bz-dur: 0.4s;
+    --bz-ease: cubic-bezier(0.34, 1.25, 0.64, 1);
+
+    --bz-w: var(--bz-closed-w);
+    --bz-h: var(--bz-closed-h);
+    position: relative;
+}
+
+[data-bs-theme="dark"] .fridge-panel.has-bezel {
+    --bz-bg: rgb(20 16 12 / 0.8);
+    --bz-border: rgba(255, 255, 255, 0.18);
+}
+
+.fridge-panel.has-bezel.is-bezel-open {
+    --bz-w: var(--bz-open-w, 480px);
+    --bz-h: var(--bz-open-h);
+}
+
+
+/* ---------- Panel outline with a gap under the tab ---------- */
+
+/* The panel's real border goes transparent; the outline is redrawn by a
+   pseudo-element so a notch can be masked out of its top edge. */
+/*.fridge-panel.has-bezel .fridge-panel-body {*/
+/*    border-color: transparent;*/
+/*    background-clip: padding-box; !* nothing painted under the 1px border row *!*/
+/*}*/
+
+/*.fridge-panel.has-bezel .fridge-panel-body::before {*/
+/*    --notch: calc(var(--bz-w) + 2 * var(--bz-r));*/
+/*    content: "";*/
+/*    position: absolute;*/
+/*    inset: -1px;*/
+/*    z-index: 2;*/
+/*    box-sizing: border-box;*/
+/*    border: 1px solid var(--bz-border);*/
+/*    border-radius: 12px;*/
+/*    pointer-events: none;*/
+
+/*    !* Gap at the top-center *!*/
+/*    -webkit-mask-image: linear-gradient(#000, #000), linear-gradient(#000, #000);*/
+/*    mask-image: linear-gradient(#000, #000), linear-gradient(#000, #000);*/
+/*    -webkit-mask-size: 100% 100%, var(--notch) 3px;*/
+/*    mask-size: 100% 100%, var(--notch) 3px;*/
+/*    -webkit-mask-position: 0 0, 50% 0;*/
+/*    mask-position: 0 0, 50% 0;*/
+/*    -webkit-mask-repeat: no-repeat;*/
+/*    mask-repeat: no-repeat;*/
+/*    -webkit-mask-composite: xor;*/
+/*    mask-composite: exclude;*/
+
+/*    transition: -webkit-mask-size var(--bz-dur) var(--bz-ease),*/
+/*    mask-size var(--bz-dur) var(--bz-ease),*/
+/*    border-color 0.3s ease;*/
+/*}*/
+
+/* ---------- The bezel ---------- */
+
+.panel-bezel {
+    position: absolute;
+    left: 50%;
+
+    /* Shift down by 1px so it starts immediately below the panel's top border */
+    top: 1px;
+    bottom: auto;
+    z-index: 15;
+
+    width: var(--bz-w);
+    height: var(--bz-h);
+    transform: translateX(-50%);
+
+    transition: width var(--bz-dur) var(--bz-ease),
+    height var(--bz-dur) var(--bz-ease);
+}
+
+.bezel-body {
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    background: var(--bz-bg);
+    -webkit-backdrop-filter: blur(32px);
+    backdrop-filter: blur(32px);
+
+    /* Open at the top, rounded at the bottom */
+    border: 1px solid var(--bz-border);
+    border-top: 0;
+    border-radius: 0 0 var(--bz-r) var(--bz-r);
+
+    /* Beautiful glass drop shadow for when it floats over the panel */
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+[data-bs-theme="dark"] .bezel-body {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+/*!* Fillets attach to the top edge *!*/
+/*.bezel-fillet {*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    width: calc(var(--bz-r) + 1px);*/
+/*    height: calc(var(--bz-r) + 1px);*/
+/*    pointer-events: none;*/
+/*}*/
+
+/*!* Left fillet: curves into the top border *!*/
+/*.bezel-fillet-left {*/
+/*    left: calc(-1 * var(--bz-r));*/
+/*    background: radial-gradient(circle at 0 100%,*/
+/*    transparent var(--bz-r),*/
+/*    var(--bz-border) var(--bz-r),*/
+/*    var(--bz-border) calc(var(--bz-r) + 1px),*/
+/*    var(--bz-bg) calc(var(--bz-r) + 1px));*/
+/*}*/
+
+/*!* Right fillet: curves into the top border *!*/
+/*.bezel-fillet-right {*/
+/*    right: calc(-1 * var(--bz-r));*/
+/*    background: radial-gradient(circle at 100% 100%,*/
+/*    transparent var(--bz-r),*/
+/*    var(--bz-border) var(--bz-r),*/
+/*    var(--bz-border) calc(var(--bz-r) + 1px),*/
+/*    var(--bz-bg) calc(var(--bz-r) + 1px));*/
+/*}*/
+
+
+/* ---------- Handle (collapsed state) ---------- */
+
+.bezel-handle {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--title-color);
+    font-size: 0.95rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease 0.1s;
+}
+
+.bezel-handle:focus-visible {
+    outline: 2px solid #e25327;
+    outline-offset: -3px;
+    border-radius: 0 0 var(--bz-r) var(--bz-r);
+}
+
+/* Add an icon flip animation */
+.bezel-handle i {
+    display: inline-block;
+    transition: transform 0.3s var(--bz-ease);
+}
+
+/* Flip the chevron completely upside down when the bezel drops open */
+.fridge-panel.is-bezel-open .bezel-handle i {
+    transform: rotate(180deg);
+}
+
+.fridge-panel.is-bezel-open .bezel-handle {
+    opacity: 0;
+    pointer-events: none;
+    transition-delay: 0s;
+}
+
+/* ---------- Actions (open state) ---------- */
+
+.bezel-actions {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column; /* Stack vertically */
+    align-items: stretch;
+    padding: 0.5rem 0; /* Breathing room at top and bottom */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.fridge-panel.is-bezel-open .bezel-actions {
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.25s ease 0.14s;
+}
+
+.bezel-btn {
+    flex: 0 0 auto;
+    min-width: 200px; /* Forces a nice, wide dropdown menu */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem; /* Wider horizontal padding */
+
+    border: 0;
+    background: transparent;
+    color: var(--title-color);
+    font-family: inherit;
+    font-size: 0.74rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.bezel-btn:hover {
+    background: rgba(0, 0, 0, 0.07);
+    color: var(--title-color);
+}
+
+[data-bs-theme="dark"] .bezel-btn {
+    color: var(--sidemenu-text, var(--title-color));
+}
+
+[data-bs-theme="dark"] .bezel-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.bezel-btn:focus-visible {
+    outline: 2px solid #e25327;
+    outline-offset: -3px;
+}
+
+.bezel-btn + .bezel-btn {
+    border-left: 0;
+    border-top: 1px solid rgba(139, 72, 28, 0.15);
+}
+
+[data-bs-theme="dark"] .bezel-btn + .bezel-btn {
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.bezel-btn > i {
+    flex-shrink: 0;
+    font-size: 0.95rem;
+}
+
+.bezel-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bz-short {
+    display: none;
+}
+
+/* Search toggle in its "on" state */
+.bezel-btn[aria-pressed="true"] {
+    color: #e25327;
+}
+
+.bezel-btn[aria-pressed="true"]:hover {
+    color: #e25327;
+}
+
+/* panelBezel.js measures the natural width of the actions with this */
+.panel-bezel.is-measuring .bezel-actions {
+    inset: auto;
+    top: 0;
+    left: 0;
+    width: max-content;
+    height: max-content; /* Allow height to stretch while measuring */
+    opacity: 0;
+    visibility: hidden;
+    transition: none;
+}
+
+.panel-bezel.is-measuring .bezel-btn {
+    flex: 0 0 auto;
+}
+
+
+/* ---------- Search bar: now a toggle ---------- */
+
+.dashboard-page--bezel {
+    padding-top: calc(70px + 0.5rem);
+}
+
+.dashboard-page--bezel .dashboard-search-wrapper {
+    overflow: hidden;
+    max-height: 90px;
+    opacity: 1;
+    visibility: visible;
+    transition: max-height 0.38s var(--bz-ease, ease),
+    margin-bottom 0.38s var(--bz-ease, ease),
+    opacity 0.25s ease 0.08s,
+    visibility 0s;
+}
+
+.dashboard-page--bezel .dashboard-search-wrapper.is-collapsed {
+    max-height: 0;
+    margin-bottom: 0;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: max-height 0.38s var(--bz-ease, ease),
+    margin-bottom 0.38s var(--bz-ease, ease),
+    opacity 0.2s ease,
+    visibility 0s linear 0.38s;
+}
+
+
+/* ---------- Mobile / narrow ---------- */
+
+@media (max-width: 900px) {
+    .dashboard-page--bezel {
+        padding-top: calc(70px + 0.4rem);
+        /* The two buttons that used to sit under the panel are gone, so the
+           floating prev/next arrows (which hang 18px below the panel) need
+           this room themselves or they'd be clipped. */
+        padding-bottom: calc(22px + 0.5rem);
+    }
+
+    .fridge-panel.has-bezel {
+        --bz-open-h: 126px; /* Slightly shorter for mobile vertical stack */
+        --bz-closed-w: 68px;
+        --bz-closed-h: 18px;
+    }
+
+    .bezel-btn {
+        min-width: 160px; /* Slightly narrower on mobile, but still wide enough */
+        padding: 0.6rem 1.25rem;
+        gap: 0.6rem;
+    }
+
+    .bz-long {
+        display: none;
+    }
+
+    .bz-short {
+        display: inline;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-page--bezel {
+        padding-bottom: calc(20px + 0.5rem);
+    }
+}
+
+/* Tiny screens: icons only */
+@media (max-width: 380px) {
+    .bezel-label {
+        display: none;
+    }
+
+    .bezel-btn {
+        padding: 0 0.9rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .panel-bezel,
+    .fridge-panel.has-bezel .fridge-panel-body::before,
+    .dashboard-page--bezel .dashboard-search-wrapper,
+    .bezel-actions,
+    .bezel-handle {
+        transition: none !important;
+    }
+}
