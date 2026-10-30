@@ -123,7 +123,7 @@
         <a href="{% url 'profile' %}" class="side-menu-user">
             <div class="side-menu-avatar">
                 {% if user.avatar %}
-                    <img src="{{ user.avatar.url }}" alt="{{ user.username }}">
+                    <img src="{{ user.avatar }}" alt="{{ user.username }}">
                 {% else %}
                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"
                          aria-hidden="true">

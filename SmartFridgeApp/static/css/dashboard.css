@@ -1812,30 +1812,13 @@ body {
 }
 
 /* =========================================
-   REMOVE EXCESS EXTERNAL PADDING ON MOBILE
+   RESTORED EXTERNAL PADDING ON MOBILE
    ========================================= */
 @media (max-width: 900px) {
-    /* Clear out the inner container side padding so the card fills the width */
+    /* Increased side padding so the panel isn't hugging the screen edges */
     .dashboard-inner {
-        padding-left: 0.5rem !important;
-        padding-right: 0.5rem !important;
-    }
-
-    /* Zero out outer spacing on the search bar wrapper */
-    .dashboard-search-wrapper {
-        padding-left: 0.5rem !important;
-        padding-right: 0.5rem !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-    }
-
-    /* Force the panel container to use 100% of the screen width */
-    .fridge-panel {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        width: 100% !important;
+        padding-left: 1.25rem !important;
+        padding-right: 1.25rem !important;
     }
 
     .dashboard-search-wrapper {
@@ -1851,6 +1834,14 @@ body {
         width: 100% !important;
         margin-left: 0 !important;
         margin-right: 0 !important;
+    }
+
+    .fridge-panel {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
     }
 }
 
@@ -2025,4 +2016,116 @@ body {
 }
 
 
+/* =========================================
+   Product View Switcharoo (Cards Mode)
+   ========================================= */
 
+.product-list.view-cards {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+    gap: 1rem !important;
+}
+
+/* Apply card layout ONLY if the search hasn't hidden the row */
+.product-list.view-cards .product-row:not(.d-none) {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 1.25rem 1rem !important;
+    position: relative !important;
+    height: 100% !important;
+    justify-content: space-between !important;
+    gap: 0.75rem !important;
+}
+
+/* Guarantee that searched-out items stay completely hidden in card mode */
+.product-list.view-cards .product-row.d-none {
+    display: none !important;
+}
+
+.product-list.view-cards .product-icon {
+    grid-area: auto !important;
+    margin: 0 auto !important;
+}
+
+.product-list.view-cards .product-info {
+    width: 100% !important;
+    align-items: center !important;
+    text-align: center !important;
+    grid-area: auto !important;
+}
+
+.product-list.view-cards .product-name {
+    white-space: normal !important;
+    text-align: center !important;
+    word-break: break-word !important;
+}
+
+.product-list.view-cards .product-exp {
+    text-align: center !important;
+}
+
+/* Fix for the giant vertical bars:
+   force flex: none so it doesn't stretch vertically */
+.product-list.view-cards .freshness-bar {
+    flex: none !important;
+    width: 100% !important;
+    height: 12px !important;
+    min-height: 12px !important;
+    max-height: 12px !important;
+    margin-top: auto !important; /* Pushes it to the very bottom */
+    grid-area: auto !important;
+    display: block !important;
+}
+
+.product-list.view-cards .product-row-actions {
+    position: absolute !important;
+    top: 0.5rem !important;
+    right: 0.5rem !important;
+    grid-area: auto !important;
+    margin: 0 !important;
+}
+
+/* =========================================
+   View Toggle Button (Header)
+   ========================================= */
+.view-toggle-btn {
+    position: absolute;
+    top: 50%;
+    right: 64px;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    color: var(--title-color);
+    background: rgba(255, 255, 255, 0.35);
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    text-decoration: none;
+    z-index: 10;
+    border: none;
+    cursor: pointer;
+}
+
+.view-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.6);
+    transform: translateY(-50%) scale(1.05);
+    color: var(--title-color);
+}
+
+[data-bs-theme="dark"] .view-toggle-btn {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .view-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 900px) {
+    .view-toggle-btn {
+        right: 54px; /* Keeps it clear of the morph menu on mobile */
+    }
+}

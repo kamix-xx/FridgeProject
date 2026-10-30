@@ -41,61 +41,148 @@
         </svg>
 
         <div class="dashboard-inner">
-            <!-- rest of your dashboard code... -->
-            <div class="dashboard-inner">
-                <!-- Search bar wrapped to align with Fridge panel width perfectly.
-                     Hidden by default; toggled from the panel bezel (panelBezel.js). -->
-                <div class="dashboard-search-wrapper is-collapsed" id="searchWrapper" inert>
-                    <div class="dashboard-search-bar t-clear" id="searchWrap">
-                        <i class="bi bi-search dashboard-search-icon" aria-hidden="true"></i>
-                        <input
-                                type="search"
-                                id="productSearch"
-                                class="dashboard-search-input"
-                                placeholder="Search products…"
-                                aria-label="Search products"
-                                autocomplete="off"
-                        >
-                        <div class="t-clear-mirror" aria-hidden="true"></div>
-                        <div class="t-clear-placeholder" aria-hidden="true">
-                            Search products…
-                        </div>
-                        <div class="t-clear-glow" aria-hidden="true"></div>
-                        <button
-                                type="button"
-                                class="t-clear-btn"
-                                id="searchClearBtn"
-                                aria-label="Clear Search"
-                        >
-                            <i class="bi bi-x" aria-hidden="true"></i>
+            <!-- Search bar wrapper (toggled via searchToggleBtn in bezel) -->
+            <div class="dashboard-search-wrapper is-collapsed" id="searchWrapper" inert>
+                <div class="dashboard-search-bar t-clear" id="searchWrap">
+                    <i class="bi bi-search dashboard-search-icon" aria-hidden="true"></i>
+                    <input
+                            type="search"
+                            id="productSearch"
+                            class="dashboard-search-input"
+                            placeholder="Search products…"
+                            aria-label="Search products"
+                            autocomplete="off"
+                    >
+                    <div class="t-clear-mirror" aria-hidden="true"></div>
+                    <div class="t-clear-placeholder" aria-hidden="true">
+                        Search products…
+                    </div>
+                    <div class="t-clear-glow" aria-hidden="true"></div>
+                    <button
+                            type="button"
+                            class="t-clear-btn"
+                            id="searchClearBtn"
+                            aria-label="Clear Search"
+                    >
+                        <i class="bi bi-x" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fridge area carousel -->
+            <section class="fridge-panel has-bezel">
+                <button type="button" class="btn-scroll-down carousel-arrow" id="areaPrev"
+                        aria-label="Previous area"
+                        {% if areas|length < 2 %}disabled{% endif %}>
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+
+                <div class="fridge-panel-body" id="page-transition-panel">
+                    <header class="fridge-panel-header">
+                        <h2 class="fridge-panel-title" id="areaTitle">
+    <span class="area-title-text" id="areaTitleText">{% if areas %}{{ areas.0.name }}{% else %}
+        No areas{% endif %}{% if areas and areas.0.is_shared %}
+        <span class="area-shared-icon area-title-word"
+              title="Shared area"
+              aria-label="Shared area">
+            <i class="bi bi-people-fill" aria-hidden="true"></i>
+        </span>
+    {% endif %}</span>
+                        </h2>
+
+                        <!-- View Toggle Button (Replaces old edit area button) -->
+                        <button type="button"
+                                class="view-toggle-btn"
+                                id="viewToggleBtn"
+                                title="Switch product view"
+                                aria-label="Toggle view mode">
+                            <i class="bi bi-grid-3x3-gap" id="viewToggleIcon" aria-hidden="true"></i>
                         </button>
+
+                        <div class="t-morph" data-open="false">
+                            <button type="button" class="t-morph-plus" aria-expanded="false"
+                                    aria-label="Quick actions">
+                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                                    <path d="M9 1v16M1 9h16" stroke="currentColor" stroke-width="2"
+                                          stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                            <nav class="t-morph-menu">
+                                <button type="button" class="t-morph-menu-item"
+                                        data-bs-toggle="modal" data-bs-target="#addProductModal"
+                                        data-initial-mode="scan">
+                                    <i class="bi bi-upc-scan"></i> Scan product
+                                </button>
+                                <button type="button" class="t-morph-menu-item"
+                                        data-bs-toggle="modal" data-bs-target="#addProductModal"
+                                        data-initial-mode="manual">
+                                    <i class="bi bi-plus-circle"></i> Add product by hand
+                                </button>
+                                <button type="button" class="t-morph-menu-item"
+                                        data-bs-toggle="modal" data-bs-target="#addAreaModal"
+                                        data-area-mode="create">
+                                    <i class="bi bi-folder-plus"></i> Add area
+                                </button>
+                            </nav>
+                        </div>
+                    </header>
+
+                    <div class="area-carousel-viewport">
+                        <div class="area-carousel" id="areaCarousel">
+                            {% for area in areas %}
+                                <div class="area-panel"
+                                     data-area-id="{{ area.id }}"
+                                     data-area-name="{{ area.name }}"
+                                     data-is-shared="{{ area.is_shared|yesno:'true,false' }}"
+                                     data-area-owner="{{ area.is_owner|yesno:'true,false' }}">
+
+                                    {% if area.shared_users_script %}{{ area.shared_users_script }}{% endif %}
+
+                                    {% if area.products %}
+                                        <ul class="product-list">
+                                            {% for user_product in area.products %}
+                                                {% include "partials/product_row.html" with up=user_product area_name=area.name %}
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <p class="dashboard-empty-state">No products in this area yet.</p>
+                                    {% endif %}
+                                </div>
+                            {% empty %}
+                                <div class="area-panel">
+                                    <p class="dashboard-empty-state">
+                                        You don't have any areas yet — add one to get started.
+                                    </p>
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
 
-                <!-- Fridge area carousel -->
-                <section class="fridge-panel has-bezel">
-                    <button type="button" class="btn-scroll-down carousel-arrow" id="areaPrev"
-                            aria-label="Previous area"
-                            {% if areas|length < 2 %}disabled{% endif %}>
-                        <i class="bi bi-chevron-left"></i>
-                    </button>
+                <!-- Panel Bezel containing tools & controls -->
+                <div class="panel-bezel" id="panelBezel" role="group" aria-label="Dashboard tools">
+                    <span class="bezel-fillet bezel-fillet-left" aria-hidden="true"></span>
+                    <span class="bezel-fillet bezel-fillet-right" aria-hidden="true"></span>
 
-                    <div class="fridge-panel-body" id="page-transition-panel">
-                        <header class="fridge-panel-header">
-                            <h2 class="fridge-panel-title" id="areaTitle">
-                            <span class="area-title-text" id="areaTitleText">{% if areas %}{{ areas.0.name }}{% else %}
-                                No areas{% endif %}{% if areas and areas.0.is_shared %}
-                                <span class="area-shared-icon area-title-word"
-                                      title="Shared area"
-                                      aria-label="Shared area">
-                                    <i class="bi bi-people-fill" aria-hidden="true"></i>
-                                </span>
-                            {% endif %}</span>
-                            </h2>
+                    <div class="bezel-body">
+                        <button type="button" class="bezel-handle" id="bezelHandle"
+                                aria-expanded="false" aria-controls="bezelActions"
+                                aria-label="Open dashboard menu">
+                            <i class="bi bi-chevron-compact-down" aria-hidden="true"></i>
+                        </button>
 
-                            <!-- Edit area button -->
+                        <div class="bezel-actions" id="bezelActions" inert>
+                            <a href="{% url 'areas' %}" class="bezel-btn" data-page-transition
+                               aria-label="View all areas">
+                                <i class="bi bi-grid" aria-hidden="true"></i>
+                                <span class="bezel-label">
+            <span class="bz-long">View all areas</span><span class="bz-short">Areas</span>
+        </span>
+                            </a>
+
+                            <!-- Edit Area moved to Bezel -->
                             <button type="button"
-                                    class="area-edit-btn"
+                                    class="bezel-btn"
                                     id="areaEditBtn"
                                     title="Edit area"
                                     aria-label="Edit area"
@@ -109,128 +196,49 @@
                                     {% else %}
                                     disabled
                                     {% endif %}>
-                                <i class="bi bi-pencil"></i>
+                                <i class="bi bi-pencil" aria-hidden="true"></i>
+                                <span class="bezel-label">
+            <span class="bz-long">Edit area</span><span class="bz-short">Edit</span>
+        </span>
                             </button>
 
-                            <div class="t-morph" data-open="false">
-                                <button type="button" class="t-morph-plus" aria-expanded="false"
-                                        aria-label="Quick actions">
-                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                                        <path d="M9 1v16M1 9h16" stroke="currentColor" stroke-width="2"
-                                              stroke-linecap="round"/>
-                                    </svg>
-                                </button>
-                                <nav class="t-morph-menu">
-                                    <button type="button" class="t-morph-menu-item"
-                                            data-bs-toggle="modal" data-bs-target="#addProductModal"
-                                            data-initial-mode="scan">
-                                        <i class="bi bi-upc-scan"></i> Scan product
-                                    </button>
-                                    <button type="button" class="t-morph-menu-item"
-                                            data-bs-toggle="modal" data-bs-target="#addProductModal"
-                                            data-initial-mode="manual">
-                                        <i class="bi bi-plus-circle"></i> Add product by hand
-                                    </button>
-                                    <button type="button" class="t-morph-menu-item"
-                                            data-bs-toggle="modal" data-bs-target="#addAreaModal"
-                                            data-area-mode="create">
-                                        <i class="bi bi-folder-plus"></i> Add area
-                                    </button>
-                                </nav>
-                            </div>
-                        </header>
-
-                        <div class="area-carousel-viewport">
-                            <div class="area-carousel" id="areaCarousel">
-                                {% for area in areas %}
-                                    <div class="area-panel"
-                                         data-area-id="{{ area.id }}"
-                                         data-area-name="{{ area.name }}"
-                                         data-is-shared="{{ area.is_shared|yesno:'true,false' }}"
-                                         data-area-owner="{{ area.is_owner|yesno:'true,false' }}">
-
-                                        {% if area.shared_users_script %}{{ area.shared_users_script }}{% endif %}
-
-                                        {% if area.products %}
-                                            <ul class="product-list">
-                                                {% for user_product in area.products %}
-                                                    {% include "partials/product_row.html" with up=user_product area_name=area.name %}
-                                                {% endfor %}
-                                            </ul>
-                                        {% else %}
-                                            <p class="dashboard-empty-state">No products in this area yet.</p>
-                                        {% endif %}
-                                    </div>
-                                {% empty %}
-                                    <div class="area-panel">
-                                        <p class="dashboard-empty-state">
-                                            You don't have any areas yet — add one to get started.
-                                        </p>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bezel glued to the panel's top edge (panelBezel.css / panelBezel.js).
-                         Collapsed it is a small handle; hover (mouse) or tap opens the tools. -->
-                    <div class="panel-bezel" id="panelBezel" role="group" aria-label="Dashboard tools">
-                        <span class="bezel-fillet bezel-fillet-left" aria-hidden="true"></span>
-                        <span class="bezel-fillet bezel-fillet-right" aria-hidden="true"></span>
-
-                        <div class="bezel-body">
-                            <button type="button" class="bezel-handle" id="bezelHandle"
-                                    aria-expanded="false" aria-controls="bezelActions"
-                                    aria-label="Open dashboard menu">
-                                <i class="bi bi-chevron-compact-down" aria-hidden="true"></i>
+                            <button type="button" class="bezel-btn"
+                                    data-bs-toggle="modal" data-bs-target="#addAreaModal"
+                                    data-area-mode="create" aria-label="Add new area">
+                                <i class="bi bi-folder-plus" aria-hidden="true"></i>
+                                <span class="bezel-label">
+            <span class="bz-long">Add new area</span><span class="bz-short">Add area</span>
+        </span>
                             </button>
 
-                            <div class="bezel-actions" id="bezelActions" inert>
-                                <a href="{% url 'areas' %}" class="bezel-btn" data-page-transition
-                                   aria-label="View all areas">
-                                    <i class="bi bi-grid" aria-hidden="true"></i>
-                                    <span class="bezel-label">
-                                        <span class="bz-long">View all areas</span><span class="bz-short">Areas</span>
-                                    </span>
-                                </a>
-
-                                <button type="button" class="bezel-btn"
-                                        data-bs-toggle="modal" data-bs-target="#addAreaModal"
-                                        data-area-mode="create" aria-label="Add new area">
-                                    <i class="bi bi-folder-plus" aria-hidden="true"></i>
-                                    <span class="bezel-label">
-                                        <span class="bz-long">Add new area</span><span class="bz-short">Add area</span>
-                                    </span>
-                                </button>
-
-                                <button type="button" class="bezel-btn" id="searchToggleBtn"
-                                        aria-pressed="false" aria-controls="searchWrapper"
-                                        aria-label="Toggle search bar">
-                                    <i class="bi bi-search" aria-hidden="true"></i>
-                                    <span class="bezel-label">Search</span>
-                                </button>
-                            </div>
+                            <!-- Search Toggle Button -->
+                            <button type="button" class="bezel-btn" id="searchToggleBtn"
+                                    aria-pressed="false" aria-controls="searchWrapper"
+                                    aria-label="Toggle search bar">
+                                <i class="bi bi-search" aria-hidden="true"></i>
+                                <span class="bezel-label">Search</span>
+                            </button>
                         </div>
                     </div>
+                </div>
 
-                    <button type="button" class="btn-scroll-down carousel-arrow" id="areaNext" aria-label="Next area"
-                            {% if areas|length < 2 %}disabled{% endif %}>
-                        <i class="bi bi-chevron-right"></i>
-                    </button>
-                </section>
-            </div>
+                <button type="button" class="btn-scroll-down carousel-arrow" id="areaNext" aria-label="Next area"
+                        {% if areas|length < 2 %}disabled{% endif %}>
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </section>
         </div>
-
     </main>
 
-    <!-- DASHBOARD SPECIFIC MODALS -->
+    <!-- DASHBOARD MODALS -->
 
-{#    TODO make the picker have a physical feel like the rest of them #}
-    <!-- Add Product Modal (RESTORED) -->
+    <!-- Add Product Modal -->
     <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content custom-popup t-modal product-modal" id="addProductModalContent">
-                <button type="button" class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button"
+                        class="btn-close popup-close-btn position-absolute top-0 end-0 m-3 shadow-none z-3"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="modal-body p-4 p-md-5">
                     <h3 class="popup-title text-center mb-4">Add Product</h3>
                     <div class="product-scan-preview">
@@ -239,19 +247,28 @@
                             <span class="product-scan-corner product-scan-corner-tr"></span>
                             <span class="product-scan-corner product-scan-corner-bl"></span>
                             <span class="product-scan-corner product-scan-corner-br"></span>
-                            <video class="product-scan-video" id="addProductScanVideo" autoplay playsinline muted></video>
-                            <div class="product-scan-fallback" id="addProductScanFallback"><i class="bi bi-camera-video-off" aria-hidden="true"></i></div>
-                            <button type="button" class="product-scan-badge" id="addProductScanBadge" title="Open camera" aria-label="Open camera"><i class="bi bi-camera-fill" aria-hidden="true"></i></button>
+                            <video class="product-scan-video" id="addProductScanVideo" autoplay playsinline
+                                   muted></video>
+                            <div class="product-scan-fallback" id="addProductScanFallback"><i
+                                    class="bi bi-camera-video-off" aria-hidden="true"></i></div>
+                            <button type="button" class="product-scan-badge" id="addProductScanBadge"
+                                    title="Open camera" aria-label="Open camera"><i class="bi bi-camera-fill"
+                                                                                    aria-hidden="true"></i></button>
                         </div>
                     </div>
                     <div class="mb-2">
                         <label for="addProductCode" class="form-label popup-label">Product code</label>
                         <div class="product-code-row">
-                            <input type="text" class="form-control popup-input shadow-none" id="addProductCode" placeholder="Scan or type a barcode" autocomplete="off">
-                            <button type="button" class="product-code-enter" id="addProductCodeEnter" title="Enter" aria-label="Enter"><i class="bi bi-arrow-return-left" aria-hidden="true"></i></button>
+                            <input type="text" class="form-control popup-input shadow-none" id="addProductCode"
+                                   placeholder="Scan or type a barcode" autocomplete="off">
+                            <button type="button" class="product-code-enter" id="addProductCodeEnter" title="Enter"
+                                    aria-label="Enter"><i class="bi bi-arrow-return-left" aria-hidden="true"></i>
+                            </button>
                         </div>
                     </div>
-                    <p class="custom-subtext product-scan-manual-link" id="addProductManualLink">Don't have a code? <button type="button" class="custom-link custom-link-button">CLICK HERE</button></p>
+                    <p class="custom-subtext product-scan-manual-link" id="addProductManualLink">Don't have a code?
+                        <button type="button" class="custom-link custom-link-button">CLICK HERE</button>
+                    </p>
                     <div class="product-extra-fields" id="addProductExtraFields">
                         <div class="product-extra-fields-inner" id="addProductExtraFieldsInner">
                             <form method="post" action="{% url 'api_add_product' %}" id="addProductForm">
@@ -266,7 +283,7 @@
         </div>
     </div>
 
-    <!-- Remove Product Confirmation Modal -->
+    <!-- Delete Product Confirmation Modal -->
     <div class="modal fade" id="deleteProductModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content custom-popup t-modal">
@@ -292,7 +309,7 @@
         </div>
     </div>
 
-    <!-- Add Area / Add Shared Area -->
+    <!-- Add Area Modal -->
     <div class="modal fade" id="addAreaModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content custom-popup t-modal">
@@ -357,7 +374,7 @@
         </div>
     </div>
 
-    <!-- Edit Area Modal -->
+    <!-- Edit Area Modal (Multi-Panel Structure matching Areas Modal) -->
     <div class="modal fade" id="editAreaModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content custom-popup t-modal">
@@ -366,25 +383,89 @@
                         data-bs-dismiss="modal" aria-label="Close"></button>
                 <div class="modal-body p-4 p-md-5">
                     <div class="edit-area-morph-wrap" id="editAreaMorphWrap">
+                        <!-- Panel: main -->
                         <div class="edit-area-panel text-center" data-panel="main">
                             <h3 class="popup-title mb-5">Edit Area</h3>
+
                             <form method="post" action="{% url 'edit_area' %}" id="editAreaForm">
                                 {% csrf_token %}
                                 <input type="hidden" name="area_id" id="editAreaId">
+
                                 <div class="text-start mb-5">
                                     <label for="editAreaName" class="form-label popup-label">Area Name</label>
-                                    <input type="text" name="area_name" maxlength="30"
-                                           class="form-control popup-input shadow-none" id="editAreaName" required>
+                                    <input type="text" name="area_name" class="form-control popup-input shadow-none"
+                                           id="editAreaName" required maxlength="30">
                                 </div>
-                                <button type="submit" class="popup-circular-btn mx-auto" aria-label="Save Area" id="saveAreaBtn" onclick="HTMLFormElement.prototype.submit.call(this.form);">
+
+                                <button type="submit"
+                                        class="popup-circular-btn mx-auto"
+                                        aria-label="Save Area"
+                                        id="saveAreaBtn">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                          xmlns="http://www.w3.org/2000/svg">
                                         <path d="M17 21V13H7V21M7 3V8H15M19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16L21 8V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21Z"
                                               stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
-                                              stroke-linejoin="round"/>
+                                              stroke-linejoin="round"></path>
                                     </svg>
                                 </button>
                             </form>
+
+                            <!-- Owner + shared users section -->
+                            <div class="edit-area-people d-none" id="editAreaPeopleSection">
+                                <hr class="popup-divider mx-auto mt-5 mb-4">
+                                <p class="popup-label mb-3">Shared with</p>
+                                <div class="avatar-group" id="editAreaAvatarGroup"></div>
+                                <button type="button"
+                                        class="btn btn-link text-decoration-none popup-btn-danger mt-4"
+                                        id="stopSharingAreaBtn">
+                                    Stop sharing this area
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Panel: full scrollable list -->
+                        <div class="edit-area-panel d-none" data-panel="list">
+                            <button type="button" class="edit-area-back-btn" id="editAreaListBack" aria-label="Back">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2.5"
+                                          stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                            </button>
+                            <h3 class="popup-title mb-4 text-center">Shared with</h3>
+                            <div class="edit-area-people-list" id="editAreaPeopleList"></div>
+                        </div>
+
+                        <!-- Panel: remove-person confirmation -->
+                        <div class="edit-area-panel d-none text-center" data-panel="confirm">
+                            <h3 class="popup-title mb-5">
+                                Are you sure you want to remove <span id="editAreaConfirmName"></span> from the area?
+                            </h3>
+                            <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                                    id="editAreaConfirmCancel">
+                                Nah, just kidding
+                            </button>
+                            <hr class="popup-divider mx-auto mb-4">
+                            <button type="button" class="btn btn-link text-decoration-none popup-btn-danger"
+                                    id="editAreaConfirmRemove">
+                                Yes, remove them!
+                            </button>
+                        </div>
+
+                        <!-- Panel: stop-sharing confirmation -->
+                        <div class="edit-area-panel d-none text-center" data-panel="confirm-stop">
+                            <h3 class="popup-title mb-5">
+                                Are you sure you want to stop sharing this area?
+                            </h3>
+                            <button type="button" class="btn btn-link text-decoration-none popup-btn-text mb-4"
+                                    id="editAreaStopCancel">
+                                Nah, just kidding
+                            </button>
+                            <hr class="popup-divider mx-auto mb-4">
+                            <button type="button" class="btn btn-link text-decoration-none popup-btn-danger"
+                                    id="editAreaStopConfirm">
+                                Yes, stop sharing!
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -421,9 +502,7 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- POP-UP: Create Custom Unit -->
-    <!-- ========================================== -->
+    <!-- Create Custom Unit Modal -->
     <div class="modal fade" id="createUnitModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content custom-popup position-relative border-0">
@@ -458,5 +537,4 @@
             </div>
         </div>
     </div>
-    </main>
 {% endblock %}

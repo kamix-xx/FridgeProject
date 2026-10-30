@@ -21,8 +21,8 @@
     --bz-closed-w: 76px;
     --bz-closed-h: 20px;
 
-    /* Increased to fit a 3-item vertical list */
-    --bz-open-h: 138px;
+    /* Increased default fallback to fit a 5-item vertical list */
+    --bz-open-h: 240px;
     --bz-open-w: 480px;
 
     --bz-bg: rgb(255 222 191 / 0.95);
@@ -44,44 +44,6 @@
     --bz-w: var(--bz-open-w, 480px);
     --bz-h: var(--bz-open-h);
 }
-
-
-/* ---------- Panel outline with a gap under the tab ---------- */
-
-/* The panel's real border goes transparent; the outline is redrawn by a
-   pseudo-element so a notch can be masked out of its top edge. */
-/*.fridge-panel.has-bezel .fridge-panel-body {*/
-/*    border-color: transparent;*/
-/*    background-clip: padding-box; !* nothing painted under the 1px border row *!*/
-/*}*/
-
-/*.fridge-panel.has-bezel .fridge-panel-body::before {*/
-/*    --notch: calc(var(--bz-w) + 2 * var(--bz-r));*/
-/*    content: "";*/
-/*    position: absolute;*/
-/*    inset: -1px;*/
-/*    z-index: 2;*/
-/*    box-sizing: border-box;*/
-/*    border: 1px solid var(--bz-border);*/
-/*    border-radius: 12px;*/
-/*    pointer-events: none;*/
-
-/*    !* Gap at the top-center *!*/
-/*    -webkit-mask-image: linear-gradient(#000, #000), linear-gradient(#000, #000);*/
-/*    mask-image: linear-gradient(#000, #000), linear-gradient(#000, #000);*/
-/*    -webkit-mask-size: 100% 100%, var(--notch) 3px;*/
-/*    mask-size: 100% 100%, var(--notch) 3px;*/
-/*    -webkit-mask-position: 0 0, 50% 0;*/
-/*    mask-position: 0 0, 50% 0;*/
-/*    -webkit-mask-repeat: no-repeat;*/
-/*    mask-repeat: no-repeat;*/
-/*    -webkit-mask-composite: xor;*/
-/*    mask-composite: exclude;*/
-
-/*    transition: -webkit-mask-size var(--bz-dur) var(--bz-ease),*/
-/*    mask-size var(--bz-dur) var(--bz-ease),*/
-/*    border-color 0.3s ease;*/
-/*}*/
 
 /* ---------- The bezel ---------- */
 
@@ -126,36 +88,6 @@
 [data-bs-theme="dark"] .bezel-body {
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
-
-/*!* Fillets attach to the top edge *!*/
-/*.bezel-fillet {*/
-/*    position: absolute;*/
-/*    top: 0;*/
-/*    width: calc(var(--bz-r) + 1px);*/
-/*    height: calc(var(--bz-r) + 1px);*/
-/*    pointer-events: none;*/
-/*}*/
-
-/*!* Left fillet: curves into the top border *!*/
-/*.bezel-fillet-left {*/
-/*    left: calc(-1 * var(--bz-r));*/
-/*    background: radial-gradient(circle at 0 100%,*/
-/*    transparent var(--bz-r),*/
-/*    var(--bz-border) var(--bz-r),*/
-/*    var(--bz-border) calc(var(--bz-r) + 1px),*/
-/*    var(--bz-bg) calc(var(--bz-r) + 1px));*/
-/*}*/
-
-/*!* Right fillet: curves into the top border *!*/
-/*.bezel-fillet-right {*/
-/*    right: calc(-1 * var(--bz-r));*/
-/*    background: radial-gradient(circle at 100% 100%,*/
-/*    transparent var(--bz-r),*/
-/*    var(--bz-border) var(--bz-r),*/
-/*    var(--bz-border) calc(var(--bz-r) + 1px),*/
-/*    var(--bz-bg) calc(var(--bz-r) + 1px));*/
-/*}*/
-
 
 /* ---------- Handle (collapsed state) ---------- */
 
@@ -293,7 +225,7 @@
     color: #e25327;
 }
 
-/* panelBezel.js measures the natural width of the actions with this */
+/* panelBezel.js measures the natural width and height of the actions with this */
 .panel-bezel.is-measuring .bezel-actions {
     inset: auto;
     top: 0;
@@ -345,14 +277,11 @@
 @media (max-width: 900px) {
     .dashboard-page--bezel {
         padding-top: calc(70px + 0.4rem);
-        /* The two buttons that used to sit under the panel are gone, so the
-           floating prev/next arrows (which hang 18px below the panel) need
-           this room themselves or they'd be clipped. */
         padding-bottom: calc(22px + 0.5rem);
     }
 
     .fridge-panel.has-bezel {
-        --bz-open-h: 126px; /* Slightly shorter for mobile vertical stack */
+        --bz-open-h: 230px; /* Slightly shorter default fallback for mobile vertical stack */
         --bz-closed-w: 68px;
         --bz-closed-h: 18px;
     }

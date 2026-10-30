@@ -499,6 +499,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // =========================================
+// View Switcharoo (List <-> Cards Toggle)
+// =========================================
+    (function () {
+        const viewToggleBtn = document.getElementById('viewToggleBtn');
+        if (!viewToggleBtn) return;
+
+        const viewToggleIcon = document.getElementById('viewToggleIcon');
+        let currentViewMode = localStorage.getItem('dashboardProductView') || 'list';
+
+        function applyProductViewMode(mode) {
+            currentViewMode = mode;
+            const productLists = document.querySelectorAll('.product-list');
+
+            productLists.forEach((list) => {
+                if (mode === 'cards') {
+                    list.classList.add('view-cards');
+                } else {
+                    list.classList.remove('view-cards');
+                }
+            });
+
+            if (viewToggleIcon) {
+                // Show the OPPOSITE icon of what is currently active
+                if (mode === 'cards') {
+                    viewToggleIcon.className = 'bi bi-list-task';
+                } else {
+                    viewToggleIcon.className = 'bi bi-grid-3x3-gap';
+                }
+            }
+        }
+
+        // Apply preference immediately on load
+        applyProductViewMode(currentViewMode);
+
+        viewToggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const newMode = currentViewMode === 'cards' ? 'list' : 'cards';
+            applyProductViewMode(newMode);
+            localStorage.setItem('dashboardProductView', newMode);
+        });
+    })();
+
 }); // End of DOMContentLoaded
 
 // =========================================
