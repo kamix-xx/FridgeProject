@@ -1346,6 +1346,8 @@ def fetch_barcode_data(request, barcode):
             return JsonResponse({'error': 'Product not found.'}, status=404)
 
         name = product_data.get('product_name_pl') or product_data.get('product_name') or ""
+        # Add this line to prevent sending oversized names to the frontend
+        name = name[:45]
         nutriments = product_data.get('nutriments', {})
 
         # GET CATEGORY
@@ -1373,7 +1375,8 @@ from django.utils.dateparse import parse_date
 def api_add_product(request):
     if request.method == 'POST':
         barcode = request.POST.get('barcode', '').strip()
-        name = request.POST.get('product_name', '').strip()
+        # Add [:45] to truncate
+        name = request.POST.get('product_name', '').strip()[:45]
         area_id = request.POST.get('area_id')
 
         if not name or not area_id:
@@ -1533,7 +1536,8 @@ def api_edit_product(request):
             messages.error(request, 'Permission denied.')
             return redirect(request.META.get('HTTP_REFERER') or 'home')
 
-        name = request.POST.get('product_name', '').strip()
+        # Add [:45] to truncate
+        name = request.POST.get('product_name', '').strip()[:45]
         area_id = request.POST.get('area_id')
 
         # ---> THIS WAS MISSING: Grab category from the frontend
@@ -1581,3 +1585,64 @@ def api_edit_product(request):
         messages.success(request, 'Product updated successfully.')
 
     return redirect(request.META.get('HTTP_REFERER') or 'home')
+
+
+# Add this near your existing openfoodfacts_search function
+@login_required(login_url='login')
+def local_product_search(request):
+    query = request.GET.get('q', '').strip()
+    if len(query) < 2:
+        return JsonResponse({'results': []})
+
+    # Find products already known to the user's DB
+    local_prods = ProductDictionary.objects.filter(
+        Q(name__icontains=query) & (Q(is_global=True) | Q(user=request.user))
+    ).distinct()[:8]
+
+    results = []
+    for p in local_prods:
+        results.append({
+            'name': p.name.capitalize(),
+            'barcode': p.barcode or '',
+            'category': p.category or 'other',
+            'brand': '',  # We omit brand for local DB since it isn't tracked
+            'image_url': ''
+        })
+
+    return JsonResponse({'results': results})
+
+
+@login_required(login_url='login')
+def stop_sharing_area(request, area_id):
+    if request.method == 'POST':
+        area = get_object_or_404(Area, id=area_id, owner=request.user)
+        # Remove all users except the owner
+        area.users.set([request.user])
+
+        # GENERATE A NEW UNIQUE KEY SO OLD CODES BECOME INVALID
+        area.key = uuid.uuid4().hex[:12].upper()
+        area.save()
+
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=400)
+
+
+@login_required(login_url='login')
+def remove_area_member(request, area_id):
+    if request.method == 'POST':
+        area = get_object_or_404(Area, id=area_id, owner=request.user)
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            user_to_remove = User.objects.get(username=username)
+            if user_to_remove != request.user:
+                area.users.remove(user_to_remove)
+
+                # REGENERATE THE UNIQUE KEY SO OLD CODES BECOME INVALID
+                area.key = uuid.uuid4().hex[:12].upper()
+                area.save()
+
+                return JsonResponse({'status': 'success'})
+        except Exception:
+            pass
+    return JsonResponse({'status': 'error'}, status=400)

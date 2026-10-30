@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.addEventListener('click', () => {
                     selectEl.value = option.value;
                     selectEl.dispatchEvent(new Event('change', {bubbles: true}));
-                    closePanel(); // Immediate close with zero delay
+                    closePanel();
                 });
 
                 panel.appendChild(item);
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             selectEl.appendChild(existing);
                         }
                         selectEl.value = existing.value;
-                        selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+                        selectEl.dispatchEvent(new Event('change', {bubbles: true}));
                         syncLabel();
                         closePanel();
                     }

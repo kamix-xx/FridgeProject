@@ -1,8 +1,9 @@
-from django.urls import path, include
-from . import views
-from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
+from django.urls import path, include
+
+from . import views
 
 urlpatterns = [
     # Password reset & Auth...
@@ -79,6 +80,11 @@ urlpatterns = [
     path('admin-panel/unit/edit/', views.admin_edit_unit, name='admin_edit_unit'),
     path('admin-panel/unit/delete/', views.admin_delete_unit, name='admin_delete_unit'),
     path('my-products/', views.my_products_view, name='my-products'),
+
+    path('api/local-search/', views.local_product_search, name='local_product_search'),
+
+    path('areas/<int:area_id>/stop-sharing/', views.stop_sharing_area, name='stop_sharing_area'),
+    path('areas/<int:area_id>/remove-member/', views.remove_area_member, name='remove_area_member'),
 ]
 
 if settings.DEBUG:

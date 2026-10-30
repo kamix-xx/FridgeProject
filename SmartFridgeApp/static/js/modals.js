@@ -70,25 +70,31 @@ document.addEventListener('show.bs.modal', function (e) {
 });
 
 // 2. Handle Backdrop Click-Away Cancellation (Clicking off to instantly close/cancel)
-// 2. Handle Backdrop Click-Away Cancellation (Clicking off to instantly close/cancel)
+// Variable to track where the mouse was initially pressed
+let isBackdropMouseDown = false;
+
+document.addEventListener('mousedown', function (e) {
+    const openModal = document.querySelector('.modal.show');
+    // Only set to true if the user clicks directly on the dark backdrop, not inside the dialog
+    isBackdropMouseDown = (openModal && e.target === openModal);
+});
+
+// 2. Handle Backdrop Click-Away Cancellation
 document.addEventListener('click', function (e) {
     const openModal = document.querySelector('.modal.show');
     if (!openModal) return;
 
-    // Check if the click was directly on the modal container backdrop (outside the dialog)
-    if (e.target === openModal) {
-
+    // Check if the click was directly on the modal container AND started there
+    if (e.target === openModal && isBackdropMouseDown) {
 
         const isStatic = openModal.getAttribute('data-bs-backdrop') === 'static';
         if (isStatic) {
-
             openModal.classList.add('modal-static');
             setTimeout(() => {
                 openModal.classList.remove('modal-static');
             }, 300);
-            return; // Przerwij działanie skryptu - NIE zamykaj modala!
+            return;
         }
-        // ------------------------------------------------
 
         // Instantly cancel transitions to avoid lingering animation lockup
         openModal.style.transition = 'none';
@@ -100,7 +106,6 @@ document.addEventListener('click', function (e) {
             if (bsInstance) {
                 bsInstance.hide();
             } else {
-                // Fallback manual hide if instance is missing
                 openModal.classList.remove('show');
                 openModal.style.display = 'none';
                 document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());

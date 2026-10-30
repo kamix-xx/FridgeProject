@@ -591,3 +591,103 @@
         transform: translateY(calc(var(--morph-slide) / 2)) scale(0.97);
     }
 }
+
+
+/* =========================================
+   AUTOCOMPLETE POPUP
+   ========================================= */
+
+.autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+    display: block;
+}
+
+.autocomplete-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    background-color: #FFFBF5;
+    border: 1px solid #8b481c;
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 1055;
+    display: none;
+    flex-direction: column;
+    padding: 0.4rem;
+}
+
+.autocomplete-dropdown.show {
+    display: flex;
+}
+
+[data-bs-theme="dark"] .autocomplete-dropdown {
+    background-color: #1e1e1e;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.autocomplete-item {
+    padding: 0.6rem 0.8rem;
+    cursor: pointer;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--title-color);
+    transition: background-color 0.15s ease;
+}
+
+.autocomplete-item:hover {
+    background-color: rgba(255, 121, 76, 0.1);
+}
+
+[data-bs-theme="dark"] .autocomplete-item:hover {
+    background-color: rgba(255, 145, 102, 0.15);
+}
+
+.autocomplete-status {
+    padding: 0.75rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: rgba(81, 67, 54, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+[data-bs-theme="dark"] .autocomplete-status {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.autocomplete-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 50px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badge-local {
+    background: rgba(139, 72, 28, 0.12);
+    color: #8b481c;
+}
+
+[data-bs-theme="dark"] .badge-local {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+.badge-off {
+    background: rgba(255, 121, 76, 0.2);
+    color: #d94b18;
+}
+
+[data-bs-theme="dark"] .badge-off {
+    background: rgba(255, 145, 102, 0.2);
+    color: #ff9166;
+}

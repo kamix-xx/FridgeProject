@@ -6,7 +6,7 @@
     {#    <link rel="stylesheet" href="{% static 'css/profile.css' %}">#}
     <link rel="stylesheet" href="{% static 'css/areas.css' %}?v=7">
     <link rel="stylesheet" href="{% static 'css/morphMenu.css' %}?v=2">
-    <link rel="stylesheet" href="{% static 'css/modals.css' %}?v=3">
+    <link rel="stylesheet" href="{% static 'css/modals.css' %}?v=6">
     <link rel="stylesheet" href="{% static 'css/editAreaModal.css' %}">
     <script src="{% static 'js/gooeyMenu.js' %}?v=2" defer></script>
     <script src="{% static 'js/menuMorph.js' %}?v=2" defer></script>
@@ -209,7 +209,7 @@
                                 <div class="text-start mb-2">
                                     <label for="newAreaName" class="form-label popup-label">Area Name</label>
                                     <input type="text" name="area_name" class="form-control popup-input shadow-none"
-                                           id="newAreaName" required maxlength="10">
+                                           id="newAreaName" required maxlength="30">
                                 </div>
 
                                 <p class="custom-subtext mb-5">
@@ -268,12 +268,11 @@
                     <h3 class="popup-title mb-5 d-flex align-items-center justify-content-center gap-2">
                         <i class="bi bi-share fs-4"></i>Share the Fridge
                     </h3>
-                    <div class="d-flex flex-column flex-sm-row align-items-center justify-content-center gap-3 mb-5">
+                    <div class="d-flex flex-column align-items-center justify-content-center gap-2 mb-5">
                         <span class="popup-label mb-0 fs-6">Your sharing code:</span>
-                        <div class="input-group popup-share-group">
-                            <span class="input-group-text"><i class="bi bi-key"></i></span>
+                        <div class="popup-share-group">
                             <input type="text" class="form-control shadow-none" value="" id="shareCodeInput" readonly>
-                            <button class="btn btn-copy" type="button" aria-label="Copy code">
+                            <button class="btn btn-copy" type="button" id="copyShareCodeBtn" aria-label="Copy code">
                                 <i class="bi bi-copy"></i>
                             </button>
                         </div>

@@ -225,6 +225,7 @@
 
     <!-- DASHBOARD SPECIFIC MODALS -->
 
+{#    TODO make the picker have a physical feel like the rest of them #}
     <!-- Add Product Modal (RESTORED) -->
     <div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -307,7 +308,7 @@
                                 {% csrf_token %}
                                 <div class="text-start mb-2">
                                     <label for="newAreaName" class="form-label popup-label">Area Name</label>
-                                    <input type="text" name="area_name" maxlength="10"
+                                    <input type="text" name="area_name" maxlength="30"
                                            class="form-control popup-input shadow-none"
                                            id="newAreaName" required autocomplete="off">
                                 </div>
@@ -372,7 +373,7 @@
                                 <input type="hidden" name="area_id" id="editAreaId">
                                 <div class="text-start mb-5">
                                     <label for="editAreaName" class="form-label popup-label">Area Name</label>
-                                    <input type="text" name="area_name" maxlength="10"
+                                    <input type="text" name="area_name" maxlength="30"
                                            class="form-control popup-input shadow-none" id="editAreaName" required>
                                 </div>
                                 <button type="submit" class="popup-circular-btn mx-auto" aria-label="Save Area" id="saveAreaBtn" onclick="HTMLFormElement.prototype.submit.call(this.form);">

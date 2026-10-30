@@ -1,10 +1,9 @@
-<div class="row g-3 mx-0 mb-2">
-    <div class="col-12 px-1">
-        <label for="{{ id_prefix }}ProductName" class="form-label popup-label">Product Name</label>
-        <input type="text" name="product_name" class="form-control popup-input shadow-none"
-               id="{{ id_prefix }}ProductName" list="{{ id_prefix }}ProductOptions" placeholder="Type or select..."
-               autocomplete="off" required>
-    </div>
+<!-- In product_form_fields.html -->
+<div class="col-12 px-1">
+    <label for="{{ id_prefix }}ProductName" class="form-label popup-label">Product Name</label>
+    <input type="text" name="product_name" class="form-control popup-input shadow-none"
+           id="{{ id_prefix }}ProductName" list="{{ id_prefix }}ProductOptions" placeholder="Type or select..."
+           autocomplete="off" maxlength="45" required> <!-- ADDED maxlength="45" -->
 </div>
 
 <div class="row g-3 mx-0 mb-3">

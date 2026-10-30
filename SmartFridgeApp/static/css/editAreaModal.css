@@ -304,3 +304,83 @@
 .edit-area-person-row:hover .edit-area-person-remove-icon {
     opacity: 1;
 }
+
+/* =========================================
+   Edit Area Modal Mobile & Morph Styling Fixes
+   ========================================= */
+
+.edit-area-morph-wrap {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.edit-area-panel {
+    width: 100%;
+    transition: opacity 250ms ease, transform 250ms ease;
+}
+
+.edit-area-panel.d-none {
+    display: none !important;
+}
+
+/* Fix avatar group flex wrap on mobile */
+.edit-area-people .avatar-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px dashed rgba(139, 72, 28, 0.3);
+    transition: background-color 0.2s ease;
+}
+
+.edit-area-people .avatar-group:hover {
+    background: rgba(255, 145, 102, 0.08);
+}
+
+[data-bs-theme="dark"] .edit-area-people .avatar-group {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Scrollable container for full member list on mobile */
+.edit-area-people-list {
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* Mobile Viewport Safety Padding */
+@media (max-width: 575.98px) {
+    #editAreaModal .modal-dialog {
+        margin: 0.5rem;
+        max-width: calc(100% - 1rem);
+    }
+
+    #editAreaModal .modal-body {
+        padding: 1.25rem !important;
+    }
+
+    .edit-area-people-list {
+        max-height: 180px;
+    }
+}
+
+/* Prevent layout shifting / scrollbar flashing on hover of list elements */
+.edit-area-people-list {
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 220px;
+    padding-bottom: 2px; /* Leaves a tiny buffer so hover states don't hit the border */
+    box-sizing: border-box;
+}
+
+.edit-area-person-row {
+    transform: translateZ(0); /* Promotes to its own GPU layer to prevent reflow flickering */
+    backface-visibility: hidden;
+}

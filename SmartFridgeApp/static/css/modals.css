@@ -187,43 +187,58 @@
 }
 
 /* Share Code Group */
+/* Share Code Group (Ticket Style) */
 .popup-share-group {
-    border: 1px solid rgba(81, 67, 54, 0.5);
-    border-radius: 10px;
-    overflow: hidden;
+    background: rgba(255, 145, 102, 0.12); /* Tinted background based on product-accent */
+    border: 2px #ff9166;
+    border-radius: 12px;
+    padding: 0.35rem 0.35rem 0.35rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     max-width: 320px;
-}
-
-.popup-share-group .input-group-text {
-    background-color: transparent;
-    border: none;
-    color: var(--title-color);
-    font-size: 1.3rem;
-    padding-right: 0.5rem;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .popup-share-group .form-control {
-    background-color: transparent;
+    background-color: transparent !important;
     border: none;
-    color: var(--title-color);
-    font-size: 0.95rem;
-    padding-left: 0.2rem;
+    color: #d94b18 !important; /* Bold accent color */
+    font-family: monospace;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-align: center;
+    padding: 0;
+}
+
+[data-bs-theme="dark"] .popup-share-group .form-control {
+    color: #ff9166 !important;
 }
 
 .popup-share-group .btn-copy {
-    background-color: transparent;
-    border: none;
-    color: var(--title-color);
-    font-size: 1.3rem;
-    transition: opacity 0.2s ease, transform 0.1s ease;
+    /*background-color: #ff9166;*/
+    color: #ff9166;
+    /*border-radius: 8px;*/
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: transform 0.15s ease, background-color 0.2s ease;
 }
 
 .popup-share-group .btn-copy:hover {
-    opacity: 0.6;
+    background-color: #ffa17c;
+    color: #2c1e16;
+    transform: scale(1.05);
+    opacity: 1;
 }
 
 .popup-share-group .btn-copy:active {
-    transform: scale(0.9);
+    transform: scale(0.95);
 }
 
 [data-bs-theme="dark"] .popup-share-group {
@@ -479,4 +494,153 @@
         top: auto !important;
         bottom: calc(100% + 8px) !important;
     }
+}
+
+
+/* Loading Overlay for Modal Actions */
+.app-loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 14, 10, 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.app-loading-overlay.is-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.app-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(255, 145, 102, 0.3);
+    border-top-color: #ff9166;
+    border-radius: 50%;
+    animation: app-spin 0.8s linear infinite;
+}
+
+@keyframes app-spin {
+    to { transform: rotate(360deg); }
+}
+
+
+/* Shared-members list header and hover containment. */
+.edit-area-panel[data-panel="list"] {
+    position: relative;
+    padding-top: 0.5rem !important;
+
+    /* Hover transforms on the final member can otherwise enlarge the
+       panel's scrollable overflow and create a scrollbar intermittently.
+       Keep that visual overflow inside the list panel. Any actual list
+       scroller nested inside this panel remains independently scrollable. */
+    overflow: clip;
+}
+
+.edit-area-panel[data-panel="list"] .popup-title {
+    text-align: center;
+    line-height: 1.4;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* The title's line box starts 0.5rem below the panel top and is
+   1.6rem × 1.4 high. Center the 36px button on that line box, rather
+   than aligning the button's top edge with the title's top edge. */
+.edit-area-panel[data-panel="list"] .edit-area-back-btn {
+    position: absolute;
+    top: calc(0.5rem + 1.12rem) !important;
+    left: 1rem;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--title-color);
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 5;
+}
+
+.edit-area-panel[data-panel="list"] .edit-area-back-btn:hover {
+    opacity: 0.7;
+    transform: translateY(-50%) translateX(-2px);
+}
+
+/* Non-owners receive a disabled/read-only name field from the modal logic.
+   Override the global white input treatment so that state is apparent in
+   both the Areas page and the Dashboard, which share this modal. */
+#editAreaName:disabled,
+#editAreaName[readonly],
+#editAreaName[aria-readonly="true"] {
+    background-color: #e7e7e7 !important;
+    color: #777777 !important;
+    -webkit-text-fill-color: #777777 !important;
+    border-color: #b8b8b8 !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    cursor: not-allowed;
+}
+
+[data-bs-theme="dark"] #editAreaName:disabled,
+[data-bs-theme="dark"] #editAreaName[readonly],
+[data-bs-theme="dark"] #editAreaName[aria-readonly="true"] {
+    background-color: #343434 !important;
+    color: #aaaaaa !important;
+    -webkit-text-fill-color: #aaaaaa !important;
+    border-color: #666666 !important;
+}
+
+/* Ensure unit picker panels support sliding hover physics */
+.product-unit-select-wrap .picker-panel.has-sliding-hover {
+    position: relative;
+    overflow: hidden;
+}
+
+.product-unit-select-wrap .picker-panel .sliding-hover-pill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(255, 145, 102, 0.2);
+    border-radius: 8px;
+    pointer-events: none;
+    opacity: 0;
+    transition: transform 0.1s ease-out, opacity 0.15s ease;
+    will-change: transform, opacity;
+}
+
+[data-bs-theme="dark"] .product-unit-select-wrap .picker-panel .sliding-hover-pill {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.popup-circular-btn:disabled,
+.popup-circular-btn[disabled] {
+    background-color: #dcdad6 !important;
+    color: #999999 !important;
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none !important;
+}
+
+[data-bs-theme="dark"] .popup-circular-btn:disabled,
+[data-bs-theme="dark"] .popup-circular-btn[disabled] {
+    background-color: #383838 !important;
+    color: #777777 !important;
 }

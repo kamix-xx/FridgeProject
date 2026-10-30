@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
         editAreaPanels[panel.dataset.panel] = panel;
     });
 
-    var editAreaState = { current: 'main', previous: 'main' };
+    var editAreaState = {current: 'main', previous: 'main', pendingUser: null};
 
     function switchEditAreaPanel(name, instant) {
         if (name === editAreaState.current) return;
@@ -89,14 +89,60 @@ document.addEventListener('DOMContentLoaded', function () {
     var confirmCancelBtn = document.getElementById('editAreaConfirmCancel');
     if (confirmCancelBtn) {
         confirmCancelBtn.addEventListener('click', function () {
-            switchEditAreaPanel(editAreaState.previous || 'main');
+            switchEditAreaPanel(editAreaState.previous || 'list');
         });
     }
 
+    // Helper to get CSRF token
+    function getCsrfToken() {
+        var tokenInput = document.querySelector('#editAreaModal [name=csrfmiddlewaretoken]') ||
+            document.querySelector('input[name=csrfmiddlewaretoken]');
+        return tokenInput ? tokenInput.value : '';
+    }
+
+    // Helper to show/hide loading spinner
+    function setGlobalLoading(isLoading) {
+        let overlay = document.getElementById('appGlobalLoader');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'appGlobalLoader';
+            overlay.className = 'app-loading-overlay';
+            overlay.innerHTML = '<div class="app-spinner"></div>';
+            document.body.appendChild(overlay);
+        }
+        overlay.classList.toggle('is-active', isLoading);
+    }
+
+    // ---- API Actions (Remove Member & Stop Sharing) -------------------
     var confirmRemoveBtn = document.getElementById('editAreaConfirmRemove');
     if (confirmRemoveBtn) {
         confirmRemoveBtn.addEventListener('click', function () {
-            // TODO: API endpoint call to remove editAreaState.pendingUser
+            var areaId = editAreaModalEl.dataset.areaId;
+            var user = editAreaState.pendingUser;
+            if (!areaId || !user) return;
+
+            setGlobalLoading(true); // Show loader immediately
+
+            fetch('/areas/' + areaId + '/remove-member/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({username: user.username})
+            })
+                .then(function (res) {
+                    if (res.ok) {
+                        window.location.reload();
+                    } else {
+                        setGlobalLoading(false);
+                        alert('Failed to remove member.');
+                    }
+                })
+                .catch(function () {
+                    setGlobalLoading(false);
+                    alert('Connection error occurred.');
+                });
         });
     }
 
@@ -117,7 +163,30 @@ document.addEventListener('DOMContentLoaded', function () {
     var stopConfirmBtn = document.getElementById('editAreaStopConfirm');
     if (stopConfirmBtn) {
         stopConfirmBtn.addEventListener('click', function () {
-            // TODO: API endpoint call to stop sharing area
+            var areaId = editAreaModalEl.dataset.areaId;
+            if (!areaId) return;
+
+            setGlobalLoading(true); // Show loader immediately
+
+            fetch('/areas/' + areaId + '/stop-sharing/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                }
+            })
+                .then(function (res) {
+                    if (res.ok) {
+                        window.location.reload();
+                    } else {
+                        setGlobalLoading(false);
+                        alert('Failed to stop sharing area.');
+                    }
+                })
+                .catch(function () {
+                    setGlobalLoading(false);
+                    alert('Connection error occurred.');
+                });
         });
     }
 
@@ -173,6 +242,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (avatarGroupEl) {
         avatarGroupEl.addEventListener('mouseleave', clearAvatarHover);
+
+        // Clicking anywhere on the container background/wrapper (not strictly an avatar button) opens full list
+        avatarGroupEl.addEventListener('click', function (e) {
+            if (e.target === avatarGroupEl) {
+                switchEditAreaPanel('list');
+            }
+        });
     }
 
     function renderAvatarGroup(users) {
@@ -186,28 +262,37 @@ document.addEventListener('DOMContentLoaded', function () {
             var btn = buildAvatarEl('button', user, 'avatar-group-item');
             btn.type = 'button';
             btn.title = user.username;
-            btn.setAttribute('aria-label', 'Remove ' + user.username + ' from this area');
+            btn.setAttribute('aria-label', 'View details or remove ' + user.username);
+
             btn.addEventListener('mouseenter', function () {
                 applyAvatarHover(i);
             });
-            btn.addEventListener('click', function () {
-                openConfirmPanel(user);
+
+            // Clicking an individual avatar now opens the full list panel instead of instant prompt removal
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                switchEditAreaPanel('list');
             });
+
             avatarGroupEl.appendChild(btn);
         });
 
-        if (overflowCount > 0) {
+        if (overflowCount > 0 || users.length > 0) {
             var moreBtn = document.createElement('button');
             moreBtn.type = 'button';
             moreBtn.className = 'avatar-group-item avatar-group-more';
-            moreBtn.textContent = '+' + overflowCount;
+            moreBtn.textContent = overflowCount > 0 ? ('+' + overflowCount) : '...';
             moreBtn.setAttribute('aria-label', 'Show all ' + users.length + ' people this area is shared with');
+
             moreBtn.addEventListener('mouseenter', function () {
                 applyAvatarHover(visible.length);
             });
-            moreBtn.addEventListener('click', function () {
+
+            moreBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
                 switchEditAreaPanel('list');
             });
+
             avatarGroupEl.appendChild(moreBtn);
         }
     }
@@ -254,12 +339,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         editAreaModalEl.dataset.areaId = trigger.dataset.areaId || '';
 
-        var nameInput = document.getElementById('editAreaName');
-        if (nameInput) nameInput.value = trigger.dataset.areaName || '';
-
-        var isShared = trigger.dataset.areaShared === 'true';
+        // Read ownership and sharing status
+        var isShared = String(trigger.dataset.areaShared).toLowerCase() === 'true';
         var isOwner = trigger.dataset.areaOwner === 'true';
         var users = [];
+
 
         if (isShared && isOwner) {
             var dataEl = document.getElementById('area-users-' + trigger.dataset.areaId);
@@ -270,6 +354,24 @@ document.addEventListener('DOMContentLoaded', function () {
                     users = [];
                 }
             }
+        }
+
+        var nameInput = editAreaModalEl.querySelector('#editAreaName');
+        var saveAreaBtn = editAreaModalEl.querySelector('#saveAreaBtn');
+
+// Lock editing for shared areas when the current user is not the owner
+
+        var isLocked = !isOwner;
+
+        if (nameInput) {
+            nameInput.value = trigger.dataset.areaName || '';
+            nameInput.disabled = isLocked;
+        }
+
+        if (saveAreaBtn) {
+            saveAreaBtn.disabled = isLocked;
+            saveAreaBtn.style.opacity = isLocked ? '0.5' : '';
+            saveAreaBtn.style.pointerEvents = isLocked ? 'none' : '';
         }
 
         if (peopleSectionEl) {

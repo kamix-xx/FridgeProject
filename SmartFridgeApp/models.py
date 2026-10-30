@@ -28,9 +28,10 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+
 class Area(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=10)
+    name = models.CharField(max_length=30)
     creation_date = models.DateTimeField(auto_now_add=True)
     key = models.CharField(max_length=255, unique=True)
 
@@ -48,16 +49,18 @@ class Area(models.Model):
 
     @property
     def is_shared(self):
-        return self.users.count() > 1
+        return self.users.exclude(id=self.owner_id).exists()
 
     def is_owned_by(self, user):
-        return self.owner_id == user.id
+        return user.is_authenticated and self.owner_id == user.id
+
 
 class Unit(models.Model):
     id = models.AutoField(primary_key=True)
     symbol = models.CharField(max_length=45, unique=True, null=False)
     is_global = models.BooleanField(default=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+
 
 class ItemStatus(models.TextChoices):
     # ENUM_KEY = "DataBase", "display"
@@ -77,6 +80,7 @@ class ItemStatus(models.TextChoices):
     # Option 2:
     # 1. Rename is_global to is_official (official recipes made by admin and staff)
     # 2. Item status: PRIVATE, PENDING, PUBLIC
+
 
 # models.py
 class ProductDictionary(models.Model):
@@ -99,6 +103,7 @@ class ProductDictionary(models.Model):
     # ADD THIS:
     category = models.CharField(max_length=50, default='other')
 
+
 class UserProduct(models.Model):
     id = models.AutoField(primary_key=True)
     quantity = models.IntegerField(null=False, validators=[MinValueValidator(1)])
@@ -109,18 +114,21 @@ class UserProduct(models.Model):
     product = models.ForeignKey(ProductDictionary, on_delete=models.CASCADE, null=True)
     unit = models.ForeignKey(Unit, on_delete=models.RESTRICT, null=False)
 
+
 class ShoppingList(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=45, null=False)
     user = models.ForeignKey(User, on_delete=models.RESTRICT, null=False)
 
+
 class ShoppingListItem(models.Model):
     id = models.AutoField(primary_key=True)
     quantity = models.FloatField(null=False)
     is_done = models.BooleanField(null=False, default=False)
-    shoppingList= models.ForeignKey(ShoppingList, on_delete=models.CASCADE, null=False)
+    shoppingList = models.ForeignKey(ShoppingList, on_delete=models.CASCADE, null=False)
     product = models.ForeignKey(ProductDictionary, on_delete=models.CASCADE, null=True)
     unit = models.ForeignKey(Unit, on_delete=models.RESTRICT, null=False)
+
 
 class Recipe(models.Model):
     id = models.AutoField(primary_key=True)
@@ -137,6 +145,7 @@ class Recipe(models.Model):
         default=ItemStatus.UNOFFICIAL
     )
 
+
 class Step(models.Model):
     id = models.AutoField(primary_key=True)
     description = models.TextField(null=False)
@@ -144,6 +153,7 @@ class Step(models.Model):
     name = models.CharField(max_length=45, null=False)
     picture = models.ImageField(upload_to='recipes/pictures', null=True)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, null=False)
+
 
 class RecipeProduct(models.Model):
     id = models.AutoField(primary_key=True)
