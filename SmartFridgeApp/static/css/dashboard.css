@@ -2013,5 +2013,16 @@ body {
     z-index: 50;
 }
 
+/* Search clear button */
+#searchWrapper:not(.is-collapsed) #searchClearBtn {
+    display: inline-flex;
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+}
+
 
 
