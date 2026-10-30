@@ -17,8 +17,6 @@
 {% block content %}
     {% include "partials/background_images.html" %}
 
-    
-
     <main class="dashboard-page">
         <div class="dashboard-inner">
             <section class="fridge-panel">
@@ -92,6 +90,7 @@
                         </defs>
                     </svg>
 
+{#                FIXME there is a bug with the green border creating a horizontal scrollbar, needs an overflow protection #}
                     <div class="area-carousel-viewport">
                         <div class="area-carousel" id="listCarousel">
                             {% for list in shopping_lists %}
