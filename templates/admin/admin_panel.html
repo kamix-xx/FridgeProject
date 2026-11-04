@@ -58,6 +58,10 @@
 
 
 
+
+
+
+
                                                             {% if user_item.avatar %}{{ user_item.avatar.url }}{% endif %}">
                                                 <i class="bi bi-zoom-in"></i>
                                             </button>
@@ -89,44 +93,47 @@
 
                 <div class="col-lg-6 d-flex flex-column gap-4">
 
+                    <!-- PENDING RECIPES -->
                     <div class="glass-card p-4 p-md-5" style="max-width: 100%;">
                         <h2 class="admin-section-title text-center mb-4">Pending recipes</h2>
-
                         <div class="admin-scroll-container" style="max-height: 35vh;">
                             <ul class="admin-list">
                                 {% for recipe in pending_recipes %}
                                     <li class="admin-list-item admin-item-orange shadow-sm">
-
-                                        <span class="admin-item-name">{{ recipe.name }}</span>
-
+                                        <a href="{% url 'recipe_detail' recipe.id %}"
+                                           class="admin-item-name text-dark text-decoration-none"
+                                           style="cursor: pointer;" title="Preview recipe">
+                                            {{ recipe.name }}
+                                        </a>
                                         <div class="admin-item-actions">
+                                            <!-- ACCEPT BUTTON -->
                                             <button class="admin-icon-btn"
                                                     title="Accept"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#universalConfirmModal"
-                                                    data-title="Send for verification?"
-                                                    data-desc="Once verified, this recipe will become global and visible to all SmartFridge+ users."
-                                                    data-btn-text="Yes, send it!"
+                                                    data-title="Accept this recipe?"
+                                                    data-desc="This recipe will become global and visible to all users."
+                                                    data-btn-text="Yes, accept it"
                                                     data-btn-class="popup-btn-confirm"
                                                     data-item-id="{{ recipe.id }}"
-                                                    data-action="accept_recipe">
+                                                    data-action="{% url 'admin_accept_recipe' %}">
                                                 <i class="bi bi-check-lg"></i>
                                             </button>
 
+                                            <!-- REJECT BUTTON -->
                                             <button class="admin-icon-btn"
-                                                    title="Remove"
+                                                    title="Reject"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#universalConfirmModal"
-                                                    data-title="Are you sure you want to delete this recipe?"
-                                                    data-desc=""
-                                                    data-btn-text="Yes, delete it"
+                                                    data-title="Reject this recipe?"
+                                                    data-desc="It will be reverted to the user's private collection."
+                                                    data-btn-text="Yes, reject it"
                                                     data-btn-class="popup-btn-danger"
                                                     data-item-id="{{ recipe.id }}"
-                                                    data-action="delete_recipe">
+                                                    data-action="{% url 'admin_reject_recipe' %}">
                                                 <i class="bi bi-x-lg"></i>
                                             </button>
                                         </div>
-
                                     </li>
                                 {% empty %}
                                     <li class="text-center text-muted py-4">
@@ -137,6 +144,7 @@
                         </div>
                     </div>
 
+                    <!-- PUBLIC RECIPES -->
                     <div class="glass-card p-4 p-md-5 flex-grow-1" style="max-width: 100%;">
                         <h2 class="admin-section-title text-center mb-4">Public recipes</h2>
 
@@ -144,23 +152,28 @@
                             <ul class="admin-list">
                                 {% for recipe in public_recipes %}
                                     <li class="admin-list-item admin-item-yellow shadow-sm">
-                                        <span class="admin-item-name text-dark">{{ recipe.name }}</span>
+                                        <a href="{% url 'recipe_detail' recipe.id %}"
+                                           class="admin-item-name text-dark text-decoration-none"
+                                           style="cursor: pointer;" title="Preview recipe">
+                                            {{ recipe.name }}
+                                        </a>
                                         <div class="admin-item-actions text-dark">
-                                            <button class="admin-icon-btn text-dark" aria-label="Edit recipe"
-                                                    title="Edit">
+                                            <a href="{% url 'recipe_detail' recipe.id %}"
+                                               class="admin-icon-btn text-dark text-decoration-none"
+                                               aria-label="Edit recipe" title="Edit">
                                                 <i class="bi bi-pencil-square"></i>
-                                            </button>
+                                            </a>
 
                                             <button class="admin-icon-btn text-dark" aria-label="Remove recipe"
                                                     title="Remove"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#universalConfirmModal"
-                                                    data-title="Are you sure you want to delete this recipe?"
-                                                    data-desc="This recipe will be permanently removed from the public database."
-                                                    data-btn-text="Yes, delete it"
+                                                    data-title="Remove from global recipes?"
+                                                    data-desc="This recipe will no longer be visible to all users. It will revert to private."
+                                                    data-btn-text="Yes, remove it"
                                                     data-btn-class="popup-btn-danger"
                                                     data-item-id="{{ recipe.id }}"
-                                                    data-action="delete_public_recipe">
+                                                    data-action="{% url 'admin_remove_public_recipe' %}">
                                                 <i class="bi bi-x-lg"></i>
                                             </button>
                                         </div>
@@ -171,12 +184,6 @@
                                     </li>
                                 {% endfor %}
                             </ul>
-                        </div>
-
-                        <div class="d-flex justify-content-center mt-auto">
-                            <button class="admin-add-btn shadow-sm" aria-label="Add new public recipe">
-                                <i class="bi bi-plus-lg"></i>
-                            </button>
                         </div>
                     </div>
 

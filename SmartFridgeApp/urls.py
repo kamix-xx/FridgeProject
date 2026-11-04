@@ -79,6 +79,9 @@ urlpatterns = [
     path('admin-panel/unit/add/', views.admin_add_unit, name='admin_add_unit'),
     path('admin-panel/unit/edit/', views.admin_edit_unit, name='admin_edit_unit'),
     path('admin-panel/unit/delete/', views.admin_delete_unit, name='admin_delete_unit'),
+    path('admin-panel/recipe/accept/', views.admin_accept_recipe, name='admin_accept_recipe'),
+    path('admin-panel/recipe/reject/', views.admin_reject_recipe, name='admin_reject_recipe'),
+    path('admin-panel/recipe/remove-public/', views.admin_remove_public_recipe, name='admin_remove_public_recipe'),
     path('my-products/', views.my_products_view, name='my-products'),
 
     path('api/local-search/', views.local_product_search, name='local_product_search'),

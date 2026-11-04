@@ -869,26 +869,21 @@ def change_password_view(request):
 
 @login_required(login_url='login')
 def get_recipe_status(obj):
-    # Check the status:
-    status = "not suppose to happen :)"
-    if obj.item_status == "OFFICIAL":
-        status = "Official recipe"
+    if obj.is_global and obj.item_status == "OFFICIAL":
+        return "Global Recipe"
+    elif obj.item_status == "PENDING":
+        return "Pending Verification"
     else:
-        if obj.item_status == "PENDING":
-            status = "Pending"
-        else:
-            status = "Private"
-    return status
+        return "Private Recipe"
 
 
 @login_required(login_url='login')
 def recipes(request):
-    # recipes = Recipe.objects.all()
-    # Pobieramy przepisy użytkownika (najnowsze na górze)
-    user_recipes = Recipe.objects.filter(user=request.user).order_by('-id')
+    user_recipes = Recipe.objects.filter(
+        Q(user=request.user) | Q(is_global=True)
+    ).distinct().order_by('-id')
 
     for user_recipe in user_recipes:
-        # noinspection unresolved-references
         user_recipe.status_display = get_recipe_status(user_recipe)
 
     context = {
@@ -960,9 +955,10 @@ def create_recipe(request):
         thumbnail = request.FILES.get('thumbnail')
         ingredients_json = request.POST.get('ingredients_data')
 
-        status = ItemStatus.OFFICIAL if request.user.is_staff else ItemStatus.UNOFFICIAL
+        is_admin = (request.user.role == 'ADMIN')
+        status = ItemStatus.OFFICIAL if is_admin else ItemStatus.UNOFFICIAL
+        is_global = True if is_admin else False
 
-        # 1. Zapis Przepisu
         recipe = Recipe.objects.create(
             name=name,
             description=description,
@@ -970,47 +966,38 @@ def create_recipe(request):
             thumbnail=thumbnail,
             user=request.user,
             item_status=status,
-            calories=1,  # Validator wymusza wartość >= 1
-            is_global=False,  # Przepis dodany przez użytkownika jest prywatny
+            calories=1,
+            is_global=is_global,
         )
 
-        # 2. Przetworzenie składników i zapis do tabeli pośredniej (RecipeProduct)
         if ingredients_json:
-            print(f"--- DANE SKŁADNIKÓW Z FORMULARZA: {ingredients_json} ---")  # LOG DO KONSOLI
             ingredients = json.loads(ingredients_json)
-
             for item in ingredients:
                 ing_name = item.get('name')
                 ing_qty = item.get('quantity')
                 ing_unit_symbol = item.get('unit')
 
-                # Znajdź lub stwórz jednostkę
                 unit_obj, _ = Unit.objects.get_or_create(
                     symbol=ing_unit_symbol,
                     defaults={'user': request.user, 'is_global': False}
                 )
 
-                # Znajdź lub stwórz produkt w słowniku
                 product_obj, _ = ProductDictionary.objects.get_or_create(
                     name=ing_name,
                     defaults={
                         'user': request.user,
                         'is_global': False,
-                        'icon_number': 1,  # Wymagane przez model (null=False)
-                        'nutriscore': 'X'  # Wymagane przez model (max_length=1)
+                        'icon_number': 1,
+                        'nutriscore': 'X'
                     }
                 )
 
-                # Utworzenie relacji z użyciem prawidłowej nazwy modelu (RecipeProduct)
                 RecipeProduct.objects.create(
                     quantity=ing_qty,
                     unit=unit_obj,
                     recipe=recipe,
                     product=product_obj
                 )
-        else:
-            print("--- UWAGA: Otrzymano pustą listę składników (None lub '') ---")
-
         messages.success(request, 'Recipe created successfully.')
 
     return redirect('recipes')
@@ -1086,9 +1073,24 @@ def edit_recipe(request, recipe_id):
                 )
 
         messages.success(request, 'Recipe updated successfully.')
-        # Przekierowujemy z powrotem do detali zedytowanego przepisu
         return redirect('recipe_detail', recipe_id=recipe.id)
 
+    return redirect('recipes')
+
+
+@login_required(login_url='login')
+def send_recipe_for_verification(request, recipe_id):
+    if request.method == 'POST':
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+
+        if recipe.user == request.user:
+            recipe.item_status = ItemStatus.PENDING
+            recipe.save()
+            messages.success(request, 'Recipe submitted for verification. It is now pending.')
+        else:
+            messages.error(request, 'You cannot send this recipe for verification.')
+
+        return redirect('recipe_detail', recipe_id=recipe.id)
     return redirect('recipes')
 
 
@@ -1222,7 +1224,7 @@ def admin_panel_view(request):
     all_users = User.objects.exclude(role='ADMIN')
 
     pending_recipes = Recipe.objects.filter(item_status=ItemStatus.PENDING)
-    public_recipes = Recipe.objects.filter(item_status=ItemStatus.OFFICIAL)
+    public_recipes = Recipe.objects.filter(is_global=True, item_status=ItemStatus.OFFICIAL)
     global_units = Unit.objects.filter(is_global=True).order_by('symbol')
 
     context = {
@@ -1233,6 +1235,47 @@ def admin_panel_view(request):
     }
 
     return render(request, 'admin/admin_panel.html', context)
+
+
+@login_required(login_url='login')
+def admin_accept_recipe(request):
+    if request.user.role == 'ADMIN' and request.method == 'POST':
+        recipe_id = request.POST.get('item_id')
+        if recipe_id:
+            recipe = get_object_or_404(Recipe, id=recipe_id)
+            recipe.is_global = True
+            recipe.item_status = ItemStatus.OFFICIAL
+            recipe.save()
+            messages.success(request, f'Recipe "{recipe.name}" has been approved and is now global.')
+    return redirect('admin_panel')
+
+
+@login_required(login_url='login')
+def admin_reject_recipe(request):
+    if request.user.role == 'ADMIN' and request.method == 'POST':
+        recipe_id = request.POST.get('item_id')
+        if recipe_id:
+            recipe = get_object_or_404(Recipe, id=recipe_id)
+            recipe.item_status = ItemStatus.UNOFFICIAL
+            recipe.is_global = False
+            recipe.save()
+            messages.success(request, f'Recipe "{recipe.name}" has been rejected. It remains private.')
+    return redirect('admin_panel')
+
+
+@login_required(login_url='login')
+def admin_remove_public_recipe(request):
+    if request.user.role == 'ADMIN' and request.method == 'POST':
+        recipe_id = request.POST.get('item_id')
+        if recipe_id:
+            recipe = get_object_or_404(Recipe, id=recipe_id)
+
+            recipe.is_global = False
+            recipe.item_status = ItemStatus.UNOFFICIAL
+            recipe.save()
+
+            messages.success(request, f'Recipe "{recipe.name}" has been removed from global list. It is now private.')
+    return redirect('admin_panel')
 
 
 @login_required(login_url='login')
