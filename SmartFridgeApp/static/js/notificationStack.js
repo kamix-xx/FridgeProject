@@ -193,9 +193,14 @@
             if (isHoveringStack || stackEl.classList.contains('is-unstacked')) return;
             if (stackEl.querySelector('.notification-card.is-enlarged')) return;
 
-            const topCard = stackEl.querySelector('.notification-card[data-stack-pos="0"]:not(.is-dismissing)');
-            if (topCard) {
-                dismissCard(topCard);
+            // Persistent cards (for example, the expired-products notice) must
+            // remain until the user closes them manually.
+            const dismissibleCard = Array.from(
+                stackEl.querySelectorAll('.notification-card:not(.is-dismissing)')
+            ).find(card => card.dataset.persistent !== 'true');
+
+            if (dismissibleCard) {
+                dismissCard(dismissibleCard);
             }
         }, 6000);
     }
@@ -238,7 +243,7 @@
      * @param {string} type - 'success' | 'error' | 'danger' | 'warning' | 'info'
      * @param {string|null} title - Optional custom title.
      */
-    window.showNotification = function (message, type = 'info', title = null) {
+    window.showNotification = function (message, type = 'info', title = null, options = {}) {
         ensureContainer();
 
         const normType = type === 'danger' ? 'error' : type;
@@ -261,10 +266,15 @@
         card.className = `notification-card notification-${normType}`;
         card.setAttribute('role', 'alert');
 
+        // Persistent notifications are excluded from the auto-dismiss timer.
+        if (options && options.persistent === true) {
+            card.dataset.persistent = 'true';
+        }
+
         const iconClass = iconMap[normType] || 'bi-info-circle-fill';
         const displayTitle = title || titleMap[normType] || 'Notice';
 
-        card.innerHTML = `
+       card.innerHTML = `
             <div class="notification-icon">
                 <i class="bi ${iconClass}"></i>
             </div>
@@ -277,13 +287,28 @@
             </button>
         `;
 
-        // Prepend to front of the stack
-        stackEl.insertBefore(card, stackEl.firstChild);
+        // --- REPLACE THE INSERTION LOGIC WITH THIS ---
+        if (options && options.alwaysOnTop) {
+            card.classList.add('is-always-on-top');
+            stackEl.insertBefore(card, stackEl.firstChild);
+        } else {
+            // Find the first card that ISN'T pinned to the top, and insert before it
+            const firstNormal = stackEl.querySelector('.notification-card:not(.is-always-on-top)');
+            if (firstNormal) {
+                stackEl.insertBefore(card, firstNormal);
+            } else {
+                stackEl.appendChild(card);
+            }
+        }
+
         updateStackPositions();
 
         if (!isHoveringStack) {
             startAutoDismiss();
         }
+        // ---------------------------------------------
+
+        return card;
     };
 
     if (document.readyState === 'loading') {

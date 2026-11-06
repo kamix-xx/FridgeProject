@@ -131,4 +131,18 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // 5. EXPIRY NOTIFICATION FREQUENCY SETTING
+    const notifFreq = document.getElementById('notifFreq');
+    if (notifFreq) {
+        // Load the saved setting (defaulting to 'always')
+        notifFreq.value = localStorage.getItem('expiry_notif_frequency') || 'always';
+
+        // Save automatically whenever the user changes the dropdown
+        notifFreq.addEventListener('change', function() {
+            localStorage.setItem('expiry_notif_frequency', this.value);
+            // Clear the dismissal timestamp so the user can test the change immediately
+            localStorage.removeItem('expiry_notif_dismissed_at');
+        });
+    }
 });

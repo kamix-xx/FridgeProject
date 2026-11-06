@@ -67,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'SmartFridgeApp.context_processors.global_modal_context',
             ],
         },
     },
@@ -144,26 +145,17 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
-
 if os.getenv('ENVIRONMENT') == 'PRODUCTION':
-    MAILERS = {
-        'default': {
-            'BACKEND': 'django.core.mail.backends.smtp.EmailBackend',
-            'HOST': 'smtp.gmail.com',
-            'PORT': 587,
-            'USE_TLS': True,
-            'USER': os.getenv('EMAIL_HOST_USER'),
-            'PASSWORD': os.getenv('EMAIL_HOST_PASSWORD'),  # DANE KONTA GMAIL
-        }
-    }
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+    DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER', 'SmartFridge+ <noreply@smartfridge.app>')
 else:
-    MAILERS = {
-        'default': {
-            'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-        }
-    }
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = 'SmartFridge+ <noreply@smartfridge.app>'
+
+# Base URL used in emails (override in production via env var)
+SITE_URL = os.getenv('SITE_URL', 'http://127.0.0.1:8000')

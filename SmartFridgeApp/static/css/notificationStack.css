@@ -353,3 +353,97 @@
         min-width: calc(100vw - 20px);
     }
 }
+
+/* =========================================
+   Expiry Notification — expandable detail
+   ========================================= */
+
+/* Detail block hidden until card is enlarged */
+.notification-expiry .expiry-notif-detail {
+    display: none;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.notification-card.is-enlarged.notification-expiry .expiry-notif-detail {
+    display: block;
+}
+
+.expiry-notif-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 10px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.expiry-notif-list li {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(81, 67, 54, 0.08);
+    font-size: 0.82rem;
+}
+
+[data-bs-theme="dark"] .expiry-notif-list li {
+    border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+.expiry-notif-list li:last-child {
+    border-bottom: none;
+}
+
+.expiry-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #f59e0b;
+    flex-shrink: 0;
+}
+
+.expiry-name {
+    font-weight: 600;
+    color: #2c1e16;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+[data-bs-theme="dark"] .expiry-name {
+    color: #f5ede4;
+}
+
+.expiry-area {
+    color: #887869;
+    font-size: 0.78rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+[data-bs-theme="dark"] .expiry-area {
+    color: #a09080;
+}
+
+.expiry-notif-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #e25b38;
+    text-decoration: none;
+    transition: opacity 0.15s ease;
+}
+
+.expiry-notif-link:hover {
+    opacity: 0.8;
+    color: #e25b38;
+}
+
+/* Wider card in expanded state to fit the list comfortably */
+.notification-card.is-enlarged.notification-expiry {
+    max-width: min(520px, calc(100vw - 32px));
+    min-width: min(320px, calc(100vw - 32px));
+}

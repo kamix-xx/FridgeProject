@@ -42,3 +42,122 @@
         {% endif %}
     </div>
 </div>
+
+{% if user.is_authenticated and expired_products_summary %}
+<!-- Expired-products notification details; cloned into the expandable pill by JavaScript. -->
+<template id="expiredProductsNotificationDetails">
+    <div class="expiry-notif-detail">
+        <ul class="expiry-notif-list">
+            {% for item in expired_products_summary %}
+            <li>
+                <span class="expiry-dot"></span>
+                <span class="expiry-name">{{ item.product.name }}</span>
+                <span class="expiry-area">{{ item.area.name }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <a href="{% url 'home' %}#area-{{ first_expired_area_id }}"
+           class="expiry-notif-link">
+            Go to dashboard <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+</template>
+
+<script>
+(function () {
+    'use strict';
+
+    function shouldShowNotification() {
+        var freq = localStorage.getItem('expiry_notif_frequency') || 'always';
+        if (freq === 'always') return true;
+
+        var dismissedAt = localStorage.getItem('expiry_notif_dismissed_at');
+        if (!dismissedAt) return true; // Never dismissed yet
+
+        var now = new Date().getTime();
+        var diffMs = now - parseInt(dismissedAt, 10);
+
+        if (freq === 'never') return false;
+        if (freq === 'daily') return diffMs > (24 * 60 * 60 * 1000);
+        if (freq === 'weekly') return diffMs > (7 * 24 * 60 * 60 * 1000);
+
+        return true;
+    }
+
+    function showExpiredProductsNotification() {
+        // 1. Check frequency rules
+        if (!shouldShowNotification()) {
+            console.log("Expiry Notification: Hidden (Suppressed by Profile frequency settings)");
+            return;
+        }
+
+        var count = {{ expired_products_summary|length|default:"0" }};
+        if (!count || count === 0) {
+            return;
+        }
+
+        var detailsTemplate = document.getElementById('expiredProductsNotificationDetails');
+        if (!detailsTemplate) return;
+
+        // 2. Wait for JS file to load
+        if (typeof window.showNotification !== 'function') {
+            setTimeout(showExpiredProductsNotification, 100);
+            return;
+        }
+
+        // 3. EMERGENCY VISIBILITY FIX: Force the container through any CSS conflicts
+        var container = document.getElementById('notificationStackContainer');
+        if (container) {
+            container.style.display = 'flex';
+            container.style.opacity = '1';
+            container.style.visibility = 'visible';
+            container.style.zIndex = '999999';
+        }
+
+        try {
+            var message = count + ' expired product' + (count === 1 ? '' : 's') + ' — click to view the list';
+
+            var card = window.showNotification(
+                message,
+                'warning',
+                'Expired products',
+                { persistent: true, alwaysOnTop: true }
+            );
+
+            if (!card) return;
+
+            card.classList.add('notification-expiry');
+
+            var body = card.querySelector('.notification-body');
+            if (body) {
+                body.appendChild(detailsTemplate.content.cloneNode(true));
+            }
+
+            var dashboardLink = card.querySelector('.expiry-notif-link');
+            if (dashboardLink) {
+                dashboardLink.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                });
+            }
+
+            // 4. Record the exact time when 'X' is clicked
+            var closeBtn = card.querySelector('.notification-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function () {
+                    localStorage.setItem('expiry_notif_dismissed_at', new Date().getTime().toString());
+                });
+            }
+        } catch (err) {
+            console.error("Expiry Notification: Crashed while building the card:", err);
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', showExpiredProductsNotification, { once: true });
+    } else {
+        showExpiredProductsNotification();
+    }
+})();
+</script>
+{% endif %}

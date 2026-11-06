@@ -1,5 +1,8 @@
-from .models import Area, Unit
+from datetime import date
+
 from django.db.models import Q
+
+from .models import Area, Unit, UserProduct
 
 
 def global_modal_context(request):
@@ -7,6 +10,8 @@ def global_modal_context(request):
         return {
             'all_user_areas': [],
             'all_units': [],
+            'expired_products_summary': [],
+            'first_expired_area_id': None,
         }
 
     user_areas = list(
@@ -32,7 +37,24 @@ def global_modal_context(request):
         .order_by('symbol')
     )
 
+    # Expired products for the notification banner
+    expired_qs = (
+        UserProduct.objects
+        .filter(
+            Q(area__owner=request.user) | Q(area__users=request.user),
+            expiration_date__lt=date.today(),
+        )
+        .select_related('product', 'area')
+        .distinct()
+        .order_by('expiration_date')
+    )
+    expired_list = list(expired_qs)
+    first_expired_area_id = expired_list[0].area_id if expired_list else None
+
     return {
         'all_user_areas': user_areas,
         'all_units': units,
+        'expired_products_summary': expired_list,
+        'first_expired_area_id': first_expired_area_id,
     }
+
