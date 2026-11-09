@@ -9,7 +9,8 @@ from types import SimpleNamespace
 from django.utils.html import json_script
 from .models import ProductDictionary, Recipe, RecipeProduct, Unit, Step, Area, ShoppingList, ShoppingListItem, \
     ItemStatus, UserProduct
-from django.db.models import Q, RestrictedError, Sum, F
+from django.db.models import Q, RestrictedError, Sum, F, Count
+import random
 from django.db.models.functions import TruncDate
 from .forms import CustomUserCreationForm
 import json
@@ -886,8 +887,56 @@ def recipes(request):
     for user_recipe in user_recipes:
         user_recipe.status_display = get_recipe_status(user_recipe)
 
+    # --- Suggestions ---
+
+    # Look for names of products and split them
+    user_product_names = UserProduct.objects.filter(
+        Q(area__owner=request.user) | Q(area__users=request.user)
+    ).values_list('product__name', flat=True).distinct()
+
+    keywords = set()
+    for name in user_product_names:
+        for word in name.split():
+            if len(word) > 3:
+                keywords.add(word.lower())
+
+    # Look for global recipes
+    global_recipes = Recipe.objects.filter(
+        is_global=True,
+        item_status=ItemStatus.OFFICIAL
+    ).prefetch_related('recipeproduct_set__product')
+
+    ranked_recipes = []
+
+    # Now we match recipes for products keyword names
+    for recipe in global_recipes:
+        match_score = 0
+        for recipe_ingredient in recipe.recipeproduct_set.all():
+            ing_name_lower = recipe_ingredient.product.name.lower()
+            if any(keyword in ing_name_lower for keyword in keywords):
+                match_score += 1
+
+        ranked_recipes.append((match_score, recipe))
+
+    ranked_recipes.sort(key=lambda x: (x[0], random.random()), reverse=True)
+
+    suggested = [r[1] for r in ranked_recipes[:2]]
+
+    if len(suggested) < 2:
+        needed = 2 - len(suggested)
+        exclude_ids = [r.id for r in suggested]
+        fallback = Recipe.objects.filter(
+            is_global=True,
+            item_status=ItemStatus.OFFICIAL
+        ).exclude(id__in=exclude_ids).order_by('?')[:needed]
+        suggested.extend(list(fallback))
+
+    for sr in suggested:
+        sr.status_display = get_recipe_status(sr)
+
     context = {
-        'user_recipes': user_recipes
+        'user_recipes': user_recipes,
+        'suggested_recipes': suggested
     }
     return render(request, 'recipes/recipes.html', context)
 
