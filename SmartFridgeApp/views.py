@@ -1054,8 +1054,11 @@ def create_recipe(request):
 
 @login_required(login_url='login')
 def edit_recipe(request, recipe_id):
-    # Pobieramy przepis i upewniamy się, że należy do aktualnego usera
-    recipe = get_object_or_404(Recipe, id=recipe_id, user=request.user)
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+
+    if recipe.user != request.user and request.user.role != 'ADMIN':
+        messages.error(request, 'You do not have permission to edit this recipe.')
+        return redirect('recipes')
 
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -1077,14 +1080,12 @@ def edit_recipe(request, recipe_id):
         if thumbnail:
             recipe.thumbnail = thumbnail
         elif remove_thumb_flag == 'true':
-            # Jeśli nie wgrano nowego zdjęcia, a flaga wynosi 'true', usuń obrazek z bazy
             if recipe.thumbnail:
-                recipe.thumbnail.delete(save=False)  # Usuwa plik z dysku (opcjonalnie)
-            recipe.thumbnail = None  # Resetuje pole w bazie danych
+                recipe.thumbnail.delete(save=False)
+            recipe.thumbnail = None
 
         recipe.save()
 
-        # 2. Aktualizacja składników (nadpisujemy stare powiązania)
         if ingredients_json:
             ingredients = json.loads(ingredients_json)
 
@@ -1113,7 +1114,6 @@ def edit_recipe(request, recipe_id):
                     }
                 )
 
-                # Tworzymy nowe relacje na podstawie zaktualizowanej listy
                 RecipeProduct.objects.create(
                     quantity=ing_qty,
                     unit=unit_obj,
