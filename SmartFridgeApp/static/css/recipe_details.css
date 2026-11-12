@@ -301,6 +301,29 @@ div.popup-input:focus-within {
     color: #ff9166;
 }
 
+.recipe-inner-panel {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    transition: background 0.3s ease, border 0.3s ease;
+}
+
+[data-bs-theme="dark"] .recipe-inner-panel {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+[data-bs-theme="dark"] .recipe-inner-panel .recipe-section-title,
+[data-bs-theme="dark"] .recipe-inner-panel .ingredient-name,
+[data-bs-theme="dark"] .recipe-inner-panel .ingredient-qty,
+[data-bs-theme="dark"] .recipe-inner-panel .ingredient-bullet,
+[data-bs-theme="dark"] .recipe-inner-panel .recipe-description-text,
+[data-bs-theme="dark"] .recipe-inner-panel .recipe-description-text p {
+    color: #ffffff !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
 /* =========================================
    RESPONSIVE (Mobile Overrides)
    ========================================= */

@@ -81,8 +81,7 @@
 
                     <div class="row g-4 mt-2">
                         <div class="col-md-5">
-                            <div class="p-4 rounded-4"
-                                 style="background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5);">
+                            <div class="p-4 rounded-4 recipe-inner-panel">
                                 <h3 class="recipe-section-title mb-4">Ingredients:</h3>
                                 <ul class="recipe-ingredients-list list-unstyled m-0 p-0">
                                     {% for ingredient in recipe.ingredients %}
@@ -99,8 +98,7 @@
                         </div>
 
                         <div class="col-md-7">
-                            <div class="p-4 rounded-4 h-100"
-                                 style="background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5);">
+                            <div class="p-4 rounded-4 h-100 recipe-inner-panel">
                                 <h3 class="recipe-section-title text-center text-md-start mb-4">Description:</h3>
                                 <div class="recipe-description-text" style="font-size: 1.05rem; line-height: 1.6;">
                                     {% if recipe.description_short %}
