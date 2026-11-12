@@ -128,6 +128,20 @@ background-color: #ff9166;
     background-color: #ff9166;
 }
 
+textarea.popup-input {
+    min-height: 180px;
+    resize: vertical;
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+textarea.popup-input:focus {
+    border-color: #fd7e14 !important;
+    box-shadow: 0 0 0 0.25rem rgba(253, 126, 20, 0.25) !important;
+    outline: none !important;
+}
+
 
 @media (max-width: 575px) {
     .recipe-img-upload {

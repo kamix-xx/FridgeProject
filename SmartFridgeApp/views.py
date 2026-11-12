@@ -989,7 +989,8 @@ def recipe_detail(request, recipe_id):
 
     context = {
         'recipe': recipe,
-        'recipe_steps': recipe_steps
+        'recipe_steps': recipe_steps,
+        'recipe_obj': recipe_obj
     }
 
     return render(request, 'recipes/recipe_detail.html', context)
@@ -1145,21 +1146,21 @@ def send_recipe_for_verification(request, recipe_id):
 
 @login_required(login_url='login')
 def add_step(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+
+    if recipe.user != request.user and request.user.role != 'ADMIN':
+        messages.error(request, "You do not have permission to add a step to this recipe.")
+        return redirect('recipe_detail', recipe_id=recipe_id)
+
     if request.method == 'POST':
-        # 1. Pobieramy przepis, do którego chcemy dodać krok
-        recipe = get_object_or_404(Recipe, id=recipe_id)
-
-        # Zabezpieczenie (opcjonalne): sprawdź czy to faktycznie przepis tego użytkownika
-        if recipe.user != request.user:
-            messages.error(request, "You can only edit your own recipes.")
-            return redirect('recipe_detail', recipe_id=recipe_id)
-
-        # 2. Pobieramy dane z inputów modala
-        name = request.POST.get('name')
-        description = request.POST.get('description')
+        name = request.POST.get('name', '').strip()
+        description = request.POST.get('description', '').strip()
         picture = request.FILES.get('picture')
 
-        # 3. Automatyczne obliczanie numeru kroku (order) - wrzucamy na sam koniec listy
+        if not name or not description:
+            messages.error(request, "Step title and description are required.")
+            return redirect('recipe_detail', recipe_id=recipe_id)
+
         current_steps_count = Step.objects.filter(recipe=recipe).count()
         next_order = current_steps_count + 1
 
@@ -1178,33 +1179,46 @@ def add_step(request, recipe_id):
 
 
 @login_required(login_url='login')
+def delete_recipe(request, recipe_id):
+    if request.method == 'POST':
+        recipe = get_object_or_404(Recipe, id=recipe_id)
+
+        # Poprawka: Właściciel LUB Admin
+        if recipe.user == request.user or request.user.role == 'ADMIN':
+            recipe.delete()
+            messages.success(request, 'Recipe deleted successfully.')
+        else:
+            messages.error(request, 'You do not have permission to delete this recipe.')
+
+    return redirect('recipes')
+
+@login_required(login_url='login')
 def edit_step(request, step_id):
     step = get_object_or_404(Step, id=step_id)
     recipe_id = step.recipe.id
 
-    if step.recipe.user != request.user:
-        messages.error(request, 'You cannot edit this step.')
+    if step.recipe.user != request.user and request.user.role != 'ADMIN':
+        messages.error(request, 'You do not have permission to edit this step.')
         return redirect('recipe_detail', recipe_id=recipe_id)
 
     if request.method == 'POST':
-        name = request.POST.get('name')  # w formularzu HTML pole tytułu kroku ma name = "name"
+        name = request.POST.get('name')
         description = request.POST.get('description')
         picture = request.FILES.get('picture')
-
-        # Pobieramy flagę usunięcia miniatury z formularza (domyślnie 'false')
         remove_pict_flag = request.POST.get('remove_picture', 'false')
 
         if name:
-            step.name = name
-        if description:
-            step.description = description
+            step.name = name.strip()
+
+        if description is not None:
+            step.description = description.strip()
+
         if picture:
-            step.picture = picture  # Zależnie od nazwy pola w modelu Step (np. image lub picture)
+            step.picture = picture
         elif remove_pict_flag == 'true':
-            # Jeśli nie wgrano nowego zdjęcia, a flaga wynosi 'true', usuń obrazek z bazy
             if step.picture:
-                step.picture.delete(save=False)  # Usuwa plik z dysku (opcjonalnie)
-            step.picture = None  # Resetuje pole w bazie danych
+                step.picture.delete(save=False)
+            step.picture = None
 
         step.save()
         messages.success(request, 'Step updated successfully.')
@@ -1231,11 +1245,11 @@ def delete_step(request, step_id):
         step = get_object_or_404(Step, id=step_id)
         recipe_id = step.recipe.id
 
-        if step.recipe.user == request.user:
+        if step.recipe.user == request.user or request.user.role == 'ADMIN':
             step.delete()
             messages.success(request, 'Step deleted successfully.')
         else:
-            messages.error(request, 'You cannot delete this step.')
+            messages.error(request, 'You do not have permission to delete this step.')
 
         return redirect('recipe_detail', recipe_id=recipe_id)
 
