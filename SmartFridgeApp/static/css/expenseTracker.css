@@ -1,0 +1,25 @@
+/* Prevent horizontal overflow on narrow screens */
+.expense-page {
+    min-height: 100dvh;
+    overflow-x: clip;
+}
+
+.expense-page > .container,
+.expense-page .glass-card,
+.expense-page .chart-container {
+    min-width: 0;
+}
+
+.expense-page .chart-container {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.expense-page #expenseChart,
+.expense-page .apexcharts-canvas {
+    max-width: 100%;
+}
+
+.expense-page .summary-total {
+    overflow-wrap: anywhere;
+}
