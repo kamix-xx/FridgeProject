@@ -773,12 +773,46 @@ def profile(request):
     return render(request, 'user/profile.html')
 
 
+
+
 @login_required(login_url='login')
 def delete_account(request):
     if request.method == 'POST':
         user = request.user
+
+        with transaction.atomic():
+
+            Recipe.objects.filter(user=user).delete()
+            ShoppingList.objects.filter(user=user).delete()
+
+
+            Area.objects.filter(owner=user).delete()
+            user.areas.clear()
+
+
+            for product in ProductDictionary.objects.filter(user=user):
+                try:
+                    product.delete()
+                except RestrictedError:
+                    product.user = None
+                    product.save()
+
+            for unit in Unit.objects.filter(user=user):
+                try:
+                    unit.delete()
+                except RestrictedError:
+                    unit.user = None
+                    unit.save()
+
+            if user.avatar:
+                user.avatar.delete(save=False)
+                user.avatar = None
+
+            user.status = User.Status.DELETED
+            user.is_active = False
+            user.save()
+
         logout(request)
-        user.delete()
         messages.success(request, 'Your account has been deleted.')
         return redirect('login')
 
@@ -1744,7 +1778,6 @@ def remove_area_member(request, area_id):
             if user_to_remove != request.user:
                 area.users.remove(user_to_remove)
 
-                # REGENERATE THE UNIQUE KEY SO OLD CODES BECOME INVALID
                 area.key = uuid.uuid4().hex[:12].upper()
                 area.save()
 

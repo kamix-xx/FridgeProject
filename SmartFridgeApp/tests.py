@@ -118,11 +118,11 @@ class SmartFridgeTests(TestCase):
                 UserProduct.objects.all().delete()
 
                 client.post('/api/add-product/', {
-                    'product_name': 'Testowy Produkt', 'area_id': self.area.id,
+                    'product_name': 'Test Product', 'area_id': self.area.id,
                     'price': price_in, 'quantity': qty_in, 'unit_symbol': 'pcs'})
 
                 saved_product = UserProduct.objects.first()
 
-                self.assertIsNotNone(saved_product, "Produkt nie został w ogóle zapisany!")
+                self.assertIsNotNone(saved_product, "Product has not been saved!")
                 self.assertEqual(saved_product.price, expected_price)
                 self.assertEqual(saved_product.quantity, expected_qty)
