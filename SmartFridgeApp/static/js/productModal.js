@@ -421,14 +421,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const constraintOptions = [
                 {
                     video: {
-                        facingMode: 'environment',
+                        facingMode: { ideal: 'environment' },
                         width: { ideal: 1920 },
                         height: { ideal: 1080 },
                     },
                     audio: false,
                 },
                 {
-                    video: { facingMode: 'environment' },
+                    video: { facingMode: { ideal: 'environment' } },
                     audio: false,
                 },
                 {
