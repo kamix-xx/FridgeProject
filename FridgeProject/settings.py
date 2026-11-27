@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-j4@p==4$^b_@kjwapzy*8)lo%&82xjyxiw4dlb1(g==en$7f&7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["fridgeproject-0tjd.onrender.com", "fridgeproject-1.onrender.com", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["fridgeproject-0tjd.onrender.com", "localhost", "127.0.0.1"]
 
 # Application definition
 
